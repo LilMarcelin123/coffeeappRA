@@ -71,6 +71,35 @@ $(document).ready(function() {
 		});
 
 	});
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	document.addEventListener("DOMContentLoaded", function () {
+	        const params = new URLSearchParams(window.location.search);
+	        const idOrden = params.get("idOrden");
+
+	        if (idOrden) {
+	            const div = document.getElementById("resultadoProceso");
+	            div.innerHTML = `
+	                <div class="alert alert-success p-2 mb-0">
+	                    🧾 Orden iniciada correctamente: <strong>#${idOrden}</strong>
+	                </div>
+	            `;
+	        }
+	    });
+	
+	
+	
+	
+	
+	
 
 });
 function cargarOpcionesExtras(idSubcategoria) {
