@@ -8,6 +8,9 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.icaro.coffeeapp.service.ProcedimientosAlmacenados;
 import com.icaro.coffeeapp.utils.ConexionJDBC;
@@ -44,4 +47,33 @@ public class ProcedimientosAlmacenadosController {
 	        out.flush();
 	    }
 	}
+	
+	
+	
+	@PostMapping("/admin/orden/agregarItem")
+	@ResponseBody
+	public Map<String, Object> agregarItem(
+	        @RequestParam("idOrden") Integer idOrden,
+	        @RequestParam("idProducto") Integer idProducto,
+	        @RequestParam("cantidadProducto") Integer cantidadProducto,
+	        @RequestParam("listaExtrasJson") String listaExtrasJson) {
+
+	//    log.info(">>> agregarItem() idOrden={}, idProducto={}, cantidadProducto={}, listaExtrasJson={}",
+	  //          idOrden, idProducto, cantidadProducto, listaExtrasJson);
+
+	    Integer idItem = procedimientosAlmacenados.spAgregarItemConExtras(
+	            idOrden,
+	            idProducto,
+	            cantidadProducto,
+	            listaExtrasJson
+	    );
+
+	    return Map.of(
+	            "idItem", idItem,
+	            "mensaje", "Item agregado correctamente"
+	    );
+	}
+
+
+	
 }	

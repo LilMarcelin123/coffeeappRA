@@ -102,6 +102,8 @@ $(document).ready(function() {
 	
 
 });
+
+
 function cargarOpcionesExtras(idSubcategoria) {
 
 	$.ajax({
@@ -174,8 +176,6 @@ $(document).on("change", ".extra-checkbox", function() {
 
 
 
-
-
 $('#contenedorProductos').on("change",function() {
 	$("#cantidadProducto").val("");
 	console.log("HERE");
@@ -189,5 +189,65 @@ $('#contenedorProductos').on("change",function() {
 
 
 
+$("#btnAñadeItem").on("click", function () {
 
+	    const idOrden = $("#idOrden").val();          
+	    const idProducto = $("#selectProducto").val(); 
+	    const cantidadProducto = $("#cantidadProducto").val(); // input number
+
+	    console.log("HERE");
+	    console.log("idOrden:", idOrden);
+	    console.log("idProducto:", idProducto);
+	    console.log("cantidadProducto:", cantidadProducto);
+
+	    const extras = [];
+
+		    $(".extra-checkbox:checked").each(function () {
+		        const idExtra = $(this).val(); // viene de value="${o.id}"
+		        const cantidadExtra = $("#cantidadExtra_" + idExtra).val() || 1;
+
+		        extras.push({
+		            id_extra: parseInt(idExtra),
+		            cantidad: parseInt(cantidadExtra)
+		        });
+		    });
+
+		    console.log("extras construidos:", extras);
+		    console.log("JSON que se mandará:", JSON.stringify(extras));
+
+		    $.ajax({
+		        url: "/admin/orden/agregarItem",
+		        type: "POST",
+		        data: {
+		            idOrden: idOrden,
+		            idProducto: idProducto,
+		            cantidadProducto: cantidadProducto,
+		            listaExtrasJson: JSON.stringify(extras)
+		        },
+		        success: function (data) {
+		            console.log("Item agregado:", data);
+		            $("#mensajeItem").html(`
+		                <div class="alert alert-success p-2 mb-0">
+		                    Producto agregado. ID item: <strong>${data.idItem}</strong>
+		                </div>
+		            `);
+					
+					$("#selectCategoria").val('');
+					$("#selectProducto").val('');
+					$("#cantidadProducto").val('1');
+					$("#contenedorOpcionesExtras").html('');
+
+					
+					
+		        },
+		        error: function (xhr, status, error) {
+		            console.error("Error al agregar item:", error);
+		            console.log("Respuesta completa:", xhr.responseText);
+		            alert("No se pudo agregar el producto a la orden.");
+		        }
+		    });
+
+		});
+		
+		
 

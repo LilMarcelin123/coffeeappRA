@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.sql.ResultSetMetaData;
 
-
 import lombok.extern.slf4j.Slf4j;
 import com.icaro.coffeeapp.utils.ConexionJDBC;
 
@@ -21,33 +20,72 @@ import com.icaro.coffeeapp.utils.ConexionJDBC;
 public class ProcedimientosAlmacenados {
 	@Autowired
 	private ConexionJDBC conexionJDBC;
-	
+
 	public Integer spIniciaOrdenInt(Integer tipoProceso) {
-	    Integer idOrden = null;
+		Integer idOrden = null;
 
-	    try {
-	        conexionJDBC.getConexion();
+		try {
+			conexionJDBC.getConexion();
 
-	        CallableStatement cs = ConexionJDBC.conn.prepareCall("{call sp_inicia_orden(?)}");
-	        cs.setInt(1, tipoProceso);
+			CallableStatement cs = ConexionJDBC.conn.prepareCall("{call sp_inicia_orden(?)}");
+			cs.setInt(1, tipoProceso);
 
-	        boolean result = cs.execute();
+			boolean result = cs.execute();
 
-	        if (result) {
-	            ResultSet rs = cs.getResultSet();
-	            if (rs.next()) {
-	                idOrden = rs.getInt(1);
-	            }
-	            rs.close();
-	        }
+			if (result) {
+				ResultSet rs = cs.getResultSet();
+				if (rs.next()) {
+					idOrden = rs.getInt(1);
+				}
+				rs.close();
+			}
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    } finally {
-	        try { conexionJDBC.cerrarConexion(); } catch (Exception ignored) {}
-	    }
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conexionJDBC.cerrarConexion();
+			} catch (Exception ignored) {
+			}
+		}
 
-	    return idOrden;
+		return idOrden;
+	}
+
+	public Integer spAgregarItemConExtras(Integer idOrden, Integer idProducto, Integer cantidadProducto,
+			String listaExtrasJson) {
+
+		Integer idItem = null;
+
+		try {
+			conexionJDBC.getConexion();
+			CallableStatement cs = ConexionJDBC.conn.prepareCall("{call sp_agregar_item_con_extras(?, ?, ?, ?)}");
+
+			cs.setInt(1, idOrden);
+			cs.setInt(2, idProducto);
+			cs.setInt(3, cantidadProducto);
+			cs.setString(4, listaExtrasJson);
+
+			boolean result = cs.execute();
+
+			if (result) {
+				try (ResultSet rs = cs.getResultSet()) {
+					if (rs.next()) {
+						idItem = rs.getInt("id_item");
+					}
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conexionJDBC.cerrarConexion();
+			} catch (Exception ignored) {
+			}
+		}
+
+		return idItem;
 	}
 
 }
