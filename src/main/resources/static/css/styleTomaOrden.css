@@ -6,52 +6,6 @@
     margin-top: 20px;
 }
 
-/* Estilo base del botón */
-.boton-accion {
-    background: rgb(143, 108, 80);
-    color: white;
-    border: none;
-    padding: 15px;
-    font-size: 1.2rem;
-    border-radius: 10px;
-    width: 100%;
-    cursor: pointer;
-    font-weight: bold;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-
-    transition: transform 0.2s ease, box-shadow 0.3s ease;
-    
-    /* Animación suave pulsante */
-    animation: pulse 2s infinite;
-}
-
-/* Hover */
-.boton-accion:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-}
-
-/* Activo (clic) */
-.boton-accion:active {
-    transform: scale(0.97);
-}
-
-/* Ícono dentro del botón */
-.boton-accion i {
-    font-size: 1.4rem;
-}
-
-/* Keyframes de animación */
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.03); }
-    100% { transform: scale(1); }
-}
-
 
 
 
@@ -193,5 +147,284 @@
   background: #007aff;
   color: #fff;
   transform: scale(1.05);
+}
+
+
+
+
+
+
+
+/* Contenedor con efecto glass/liquid */
+.orden-liquid {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(25px) saturate(180%);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+  color: #111; /* texto negro por defecto */
+  animation: liquidFade 0.6s ease-out;
+  max-width: 420px;
+  margin: auto;
+  overflow: hidden;
+}
+
+/* Animación fluida */
+@keyframes liquidFade {
+  0% {
+    transform: scale(0.9) translateY(30px);
+    opacity: 0;
+    border-radius: 50%;
+  }
+  60% {
+    transform: scale(1.05) translateY(-10px);
+    opacity: 1;
+    border-radius: 1.8rem;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    border-radius: 1.5rem;
+  }
+}
+
+/* Encabezado elegante */
+.orden-liquid .orden-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #000; /* letras negras */
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Ícono con animación sutil */
+.orden-liquid .icon {
+  font-size: 1.4rem;
+  color: #333; /* gris oscuro para contraste */
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { color: #333; }
+  50% { color: #000; }
+  100% { color: #333; }
+}
+
+/* Cuerpo con ID destacado */
+.orden-liquid .orden-body {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.orden-liquid .orden-id {
+  font-size: 1.6rem;
+  font-weight: bold;
+  background: linear-gradient(90deg, #000000, #444444); /* gradiente negro/gris */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 2px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Botón base */
+.boton-accion {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.6rem;
+  border: none;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111; /* texto negro elegante */
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px) saturate(180%);
+  cursor: pointer;
+  transition: all 0.4s ease;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+/* Animación de entrada */
+.boton-accion {
+  animation: liquidFadeBtn 0.6s ease-out;
+}
+
+@keyframes liquidFadeBtn {
+  from { transform: scale(0.9); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+/* Hover con efecto líquido */
+.boton-accion::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.25) 0%, transparent 70%);
+  transform: scale(0);
+  transition: transform 0.6s ease;
+  border-radius: 50%;
+}
+
+.boton-accion:hover::before {
+  transform: scale(1);
+}
+
+.boton-accion:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+}
+
+/* Íconos con animación sutil */
+.boton-accion i {
+  font-size: 1.2rem;
+  transition: transform 0.3s ease, color 0.3s ease;
+  color: #333;
+}
+
+.boton-accion:hover i {
+  transform: rotate(10deg) scale(1.2);
+  color: #000;
+}
+	
+
+
+
+/*SELECT*/
+/* Contenedor con efecto glass */
+.select-liquid {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Select base */
+.select-liquid select {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: none; /* sin borde azul */
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #111; /* texto negro elegante */
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+  appearance: none; /* oculta flecha nativa */
+  cursor: pointer;
+  transition: all 0.4s ease;
+}
+
+/* Animación flotante */
+.select-liquid select:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(0,0,0,0.3);
+}
+
+/* Focus sin contorno azul, con glow suave */
+.select-liquid select:focus {
+  outline: none;
+  box-shadow: 0 0 15px rgba(0,0,0,0.25);
+}
+
+/* Flecha personalizada */
+.select-liquid::after {
+  content: "▼";
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font-size: 0.9rem;
+  color: #333;
+  transition: transform 0.3s ease;
+}
+
+.select-liquid:hover::after {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+/* Opciones del desplegable */
+.select-liquid select option {
+  background: rgba(255, 255, 255, 0.9);
+  color: #111;
+  padding: 0.6rem;
+  font-weight: 500;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Hover en opciones */
+.select-liquid select option:hover {
+  background: rgba(0,0,0,0.05);
+  color: #000;
+}
+
+
+
+
+
+
+.form-control:invalid {
+  border: 2px solid rgb(129, 95, 78);
+  box-shadow: 0 0 12px rgb(145, 107, 64);
+}
+
+.invalid-feedback {
+  font-size: 0.9rem;
+  color: #111;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px) saturate(180%);
+  border-radius: 12px;
+  padding: 0.4rem 0.8rem;
+  margin-top: 0.5rem;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+
+
+
+
+
+.instrucciones {
+  font-size: 1rem;
+  font-weight: 600; /* negritas */
+  color: #111; /* texto negro elegante */
+  text-align: center;
+  margin-top: 0.5rem;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px) saturate(180%);
+  border-radius: 12px;
+  padding: 0.6rem 1rem;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+  animation: fadeInText 0.6s ease-out;
+}
+
+/* Animación suave */
+@keyframes fadeInText {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 

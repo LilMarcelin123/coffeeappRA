@@ -1,6 +1,8 @@
 import { mensajesAlert, mostrarConfirmacion } from '../FuncionesGenerales.js';
 
 $(document).ready(function() {
+
+	$("#btnAñadeItem").hide();
 	$("#btnConfirmaOrden").prop("disabled", true);
 	$("#btnConfirmaOrden").hide();
 	$("#cantidadProducto").prop("disabled", true);
@@ -186,6 +188,7 @@ $('#contenedorProductos').on("change",function() {
 	$("#cantidadProducto").prop("disabled", false);
 
 	$("#cantidadProducto").show();
+	$("#btnAñadeItem").show();
 
 });
 
@@ -240,7 +243,7 @@ $("#btnAñadeItem").on("click", function () {
 					
 					$("#selectCategoria").val('');
 					$("#selectProducto").val('');
-					$("#cantidadProducto").val('1');
+					$("#cantidadProducto").val('');
 					$("#contenedorOpcionesExtras").html('');
 
 					

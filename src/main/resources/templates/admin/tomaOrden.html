@@ -58,32 +58,28 @@
 <!-- CUERPO PRINCIPAL -->
 <main class="container card-main">
 	<div class="glass-card p-4 p-md-4 mb-4">
-		<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-			<div>
-				<h2 class="h4 mb-0">
-					<span th:text="${nombreUsuario}">Usuario</span>
-				</h2>
-				<p class="text-muted mb-0 subtitle-small">
-					Selecciona en la parte debajo los productos y subproductos
-					y al final confirma para guardar el producto en la orden.
-				</p>
+		<div class="d-flex justify-content-center align-items-center mb-3 flex-wrap gap-2 text-center">
+		  <div>
+		    <h2 class="h4 mb-2 fw-bold">
+		      <span th:text="${nombreUsuario}">Usuario</span>
+		    </h2>
+		    <p class="instrucciones fw-bold">
+		      Selecciona en la parte debajo los productos y subproductos<br>
+		      y al final confirma para guardar el producto en la orden.
+		    </p>
 
-				<div id="resultadoProceso" class="mt-3">
-				    <div class="alert alert-success p-2 mb-0">
-				        🧾 Orden iniciada: 
-						<strong th:text="${idOrden}"></strong>
-				    </div>
-					<input type="hidden" id="idOrden" th:value="${idOrden}">
-				</div>
-			</div>
-<!--			
-			<div>
-				<a class="btn btn-outline-danger btn-sm" th:href="@{/admin/inicio}">
-					Cerrar Orden
-                </a>
-            </div>
--->			
-        </div>
+		    <div id="resultadoProceso" class="orden-liquid mt-4">
+		      <div class="orden-header">
+		        <i class="bi bi-receipt-cutoff icon"></i>
+		        <span class="titulo">Orden iniciada</span>
+		      </div>
+		      <div class="orden-body">
+		        <strong th:text="${idOrden}" class="orden-id"></strong>
+		      </div>
+		      <input type="hidden" id="idOrden" th:value="${idOrden}">
+		    </div>
+		  </div>
+		</div>
 
         <hr>
 
@@ -102,15 +98,15 @@
 			    <div class="panel-card h-100 d-flex flex-column justify-content-between p-3">
 
 			        <!-- Select de categorías -->
-			        <div>
-			            <select id='selectCategoria' name="idCategoria" class="form-select" required>
-			                <option value="">Seleccione una categoría</option>
-			                <option th:each="cat : ${categorias}"
-			                        th:value="${cat.idcategoria}"
-			                        th:text="${cat.nnombrecategoria}">
-			                </option>
-			            </select>
-			        </div>
+					<div class="select-liquid">
+					  <select id="selectCategoria" name="idCategoria" class="form-select" required>
+					    <option value="">Seleccione una categoría</option>
+					    <option th:each="cat : ${categorias}"
+					            th:value="${cat.idcategoria}"
+					            th:text="${cat.nnombrecategoria}">
+					    </option>
+					  </select>
+					</div>
 
 			        <!-- SELECT de productos dinámico (DEBE estar fuera del <a>) -->
 						
@@ -119,16 +115,17 @@
 
 						<!-- Cantidad del producto (abajo y centrado) -->
 						<div class="mt-3 d-flex justify-content-center">
-						    <div style="width: 150px;">
-						  
-						        <input type="number"
-						               class="form-control text-center"
-						               name="cantidadProducto"
-						               id="cantidadProducto"
-						               min="1"
-						               max="10"
-						               value="1">
+						  <div style="width: 150px;">
+						    <input type="number"
+						           class="form-control text-center"
+						           name="cantidadProducto"
+						           id="cantidadProducto"
+						           required
+						           placeholder="Cantidad">
+						    <div class="invalid-feedback text-center">
+						      Debe ingresar una cantidad del producto
 						    </div>
+						  </div>
 						</div>
 
 						<div id="contenedorSubcategoria" class="mt-2 text-center"></div>
@@ -136,7 +133,7 @@
 						<div class="btn-acciones">
 						
 						    <button id="btnAñadeItem" class="boton-accion">
-						        Añadir Item
+						        Añadir Producto
 						        <i class="bi bi-layers-fill"></i>
 						    </button>
 						    <button id="btnConfirmaOrden" class="boton-accion">
@@ -165,19 +162,19 @@
 <footer class="footer-custom">
     <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
         <span>
-            &copy; 2025 ·
+            &copy; 2025
             <span th:text="${nombreNegocio}">Nombre del negocio</span>.
             Todos los derechos reservados.
         </span>
-        <span class="footer-right">
-            Desarrollado por
-			
-            <a th:href="@{/}" target="_blank">Tu marca</a>
+		<span class="footer-right">
+		  Soporte técnico 
+		  <a href="mailto:contactcheatcoder@gmail.com">Escríbenos</a>
+		</span>
 		
-        </span>
 		<!-- Tu logo / marca desarrollador -->
 				<div class="logo-circle">
-		           <img th:src="@{/img/icarous_logo.jpg}" alt="Logo desarrollador">
+		           <img th:src="@{/img/arboledasLogo.jpg}" alt="Logo desarrollador">
+				
 		       </div>
     </div>
 </footer>
