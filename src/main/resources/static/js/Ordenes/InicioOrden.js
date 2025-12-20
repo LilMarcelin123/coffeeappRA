@@ -1,5 +1,6 @@
 $(document).ready(function() {
-
+	$("#btnConfirmaOrden").prop("disabled", true);
+	$("#btnConfirmaOrden").hide();
 	$("#cantidadProducto").prop("disabled", true);
 	$("#cantidadProducto").hide();
 	
@@ -191,6 +192,9 @@ $('#contenedorProductos').on("change",function() {
 
 $("#btnAñadeItem").on("click", function () {
 
+	$("#btnConfirmaOrden").prop("disabled", false);
+	$("#btnConfirmaOrden").show();
+	
 	    const idOrden = $("#idOrden").val();          
 	    const idProducto = $("#selectProducto").val(); 
 	    const cantidadProducto = $("#cantidadProducto").val(); // input number
@@ -248,6 +252,13 @@ $("#btnAñadeItem").on("click", function () {
 		    });
 
 		});
+		
+		
+		$("#btnConfirmaOrden").on("click", function () {
+			console.log("CONFIRMA ORDEN");
+
+				});		
+		
 		
 		
 
