@@ -1,3 +1,5 @@
+import { mensajesAlert, mostrarConfirmacion } from '../FuncionesGenerales.js';
+
 $(document).ready(function() {
 	$("#btnConfirmaOrden").prop("disabled", true);
 	$("#btnConfirmaOrden").hide();
@@ -253,12 +255,22 @@ $("#btnAñadeItem").on("click", function () {
 
 		});
 		
-		
 		$("#btnConfirmaOrden").on("click", function () {
-			console.log("CONFIRMA ORDEN");
+		  console.log("CONFIRMA ORDEN");
 
-				});		
-		
+		  mostrarConfirmacion(
+		    "¿Seguro que quieres continuar con la orden?",
+		    () => { 
+		      console.log("El usuario confirmó la acción"); 
+
+		    }, 
+		    () => { 
+		      console.log("El usuario canceló la acción"); 
+
+		    }
+		  );
+		});
+
 		
 		
 
