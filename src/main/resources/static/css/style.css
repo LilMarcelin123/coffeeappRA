@@ -205,3 +205,163 @@ body {
 		       }
 
 
+			   
+			   
+			   .modal { z-index: 1055 !important; }
+			   .modal-backdrop { z-index: 1050 !important; }
+
+			   
+			   
+			   
+			   
+			   
+			   
+			   
+			   /* ================= MODALES – GLASS NEUTRO ================= */
+
+			   .modal-backdrop.show {
+			     background: rgba(12, 14, 20, 0.85);
+			     backdrop-filter: blur(4px);
+			   }
+
+			   /* Contenedor glass */
+			   .modal-content {
+			     background: rgba(255, 255, 255, 0.08) !important;
+			     border: 1px solid rgba(255, 255, 255, 0.12);
+			     border-radius: 16px;
+			     box-shadow:
+			       0 20px 50px rgba(0, 0, 0, 0.5),
+			       inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+			     backdrop-filter: blur(18px) saturate(180%);
+			     color: #222; /* texto negro elegante */
+			     position: relative;
+			     overflow: hidden;
+			   }
+
+			   /* Línea superior sutil */
+			   .modal-content::before {
+			     content: "";
+			     position: absolute;
+			     top: 0; left: 0; right: 0;
+			     height: 1px;
+			     background: linear-gradient(
+			       90deg,
+			       transparent,
+			       rgba(0, 0, 0, 0.25),
+			       transparent
+			     );
+			   }
+
+			   /* Header */
+			   .modal-header {
+			     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+			   }
+
+			   .modal-title {
+			     font-size: 1rem;
+			     font-weight: 600;
+			     letter-spacing: 0.5px;
+			     text-transform: uppercase;
+			     color: #111;
+			   }
+
+			   /* Body */
+			   .modal-body {
+			     color: #333;
+			   }
+
+			   .modal-body strong {
+			     color: #000;
+			     font-weight: 600;
+			   }
+
+			   /* Footer */
+			   .modal-footer {
+			     border-top: 1px solid rgba(0, 0, 0, 0.08);
+			   }
+
+			   /* Close */
+			   .btn-close {
+			     filter: invert(0);
+			     opacity: 0.6;
+			   }
+			   .btn-close:hover { opacity: 1; }
+
+		
+
+			   .btn {
+			     border-radius: 12px;
+			     font-weight: 600;
+			     letter-spacing: 0.35px;
+			     transition: all 0.25s ease;
+			     padding: 0.6rem 1.2rem;
+			   }
+
+			   /* Cancelar */
+			   .btn-secondary {
+			     background: rgba(255, 255, 255, 0.15) !important;
+			     border: 1px solid rgba(0, 0, 0, 0.1) !important;
+			     color: #111 !important;
+			   }
+
+			   .btn-secondary:hover {
+			     background: rgba(255, 255, 255, 0.25) !important;
+			   }
+
+			   /* Acción primaria */
+			   .btn-danger,
+			   .btn-warning {
+			     background: rgba(255, 255, 255, 0.2) !important;
+			     border: 1px solid rgba(0, 0, 0, 0.15) !important;
+			     color: #111 !important;
+			   }
+
+			   .btn-danger:hover,
+			   .btn-warning:hover {
+			     background: rgba(255, 255, 255, 0.3) !important;
+			   }
+
+			   /* Disabled */
+			   .btn:disabled {
+			     opacity: 0.4;
+			     cursor: not-allowed;
+			     box-shadow: none;
+			   }
+
+
+
+			   #listaOrdenesSeleccionadas,
+			   #listaOrdenesReabrir {
+			     list-style: none;
+			     padding-left: 0;
+			     margin-top: 10px;
+			   }
+
+			   #listaOrdenesSeleccionadas li,
+			   #listaOrdenesReabrir li {
+			     background: rgba(255, 255, 255, 0.12);
+			     border: 1px solid rgba(0, 0, 0, 0.1);
+			     border-radius: 12px;
+			     padding: 10px 14px;
+			     margin-bottom: 6px;
+			     color: #111;
+			     font-size: 0.95rem;
+			     transition: transform 0.2s ease, box-shadow 0.2s ease;
+			   }
+
+			   #listaOrdenesSeleccionadas li:hover,
+			   #listaOrdenesReabrir li:hover {
+			     transform: translateY(-2px);
+			     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+			   }
+
+
+
+			   #tbodyPendientes tr {
+			     transition: background 0.15s ease;
+			   }
+
+			   #tbodyPendientes tr:hover {
+			     background: rgba(0, 0, 0, 0.05);
+			   }
+

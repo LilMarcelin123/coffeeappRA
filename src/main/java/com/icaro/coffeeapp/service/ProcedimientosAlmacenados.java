@@ -3,7 +3,9 @@ package com.icaro.coffeeapp.service;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -87,5 +89,172 @@ public class ProcedimientosAlmacenados {
 
 		return idItem;
 	}
+	
+	
+	
+	public Integer spGestionarOrden(Integer pIdOrden, Integer pTipoProceso, Integer pIdRol) {
 
+        CallableStatement cs = null;
+        ResultSet rs = null;
+
+        try {
+            conexionJDBC.getConexion();
+
+            cs = ConexionJDBC.conn.prepareCall("{call sp_gestionar_orden(?,?,?)}");
+            cs.setInt(1, pIdOrden);
+            cs.setInt(2, pTipoProceso);
+
+            if (pIdRol == null) {
+                cs.setNull(3, Types.INTEGER);
+            } else {
+                cs.setInt(3, pIdRol);
+            }
+
+            boolean hasResultSet = cs.execute();
+
+            // Si el SP no devolvió ResultSet
+            if (!hasResultSet) {
+                return 0;
+            }
+
+            rs = cs.getResultSet();
+            int filas = 0;
+
+            while (rs.next()) {
+                filas++;
+            }
+
+            return filas;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1; 
+        } finally {
+            try { if (rs != null) rs.close(); } catch (Exception ignored) {}
+            try { if (cs != null) cs.close(); } catch (Exception ignored) {}
+            try { conexionJDBC.cerrarConexion(); } catch (Exception ignored) {}
+        }
+    }
+	
+	
+	
+	public List<Map<String, Object>> spGestionarOrdenSelect(Integer pIdOrden, Integer pTipoProceso, Integer pIdRol) {
+
+	    CallableStatement cs = null;
+	    ResultSet rs = null;
+
+	    try {
+	        conexionJDBC.getConexion();
+
+	        cs = ConexionJDBC.conn.prepareCall("{call sp_gestionar_orden(?,?,?)}");
+
+	        if (pIdOrden == null) cs.setNull(1, Types.INTEGER);
+	        else cs.setInt(1, pIdOrden);
+
+	        cs.setInt(2, pTipoProceso);
+
+	        if (pIdRol == null) cs.setNull(3, Types.INTEGER);
+	        else cs.setInt(3, pIdRol);
+
+	        boolean hasResultSet = cs.execute();
+	        if (!hasResultSet) return new ArrayList<>();
+
+	        rs = cs.getResultSet();
+	        if (rs == null) return new ArrayList<>();
+
+	        List<Map<String, Object>> lista = new ArrayList<>();
+	        ResultSetMetaData meta = rs.getMetaData();
+	        int colCount = meta.getColumnCount();
+
+	        while (rs.next()) {
+	            Map<String, Object> row = new HashMap<>();
+	            for (int i = 1; i <= colCount; i++) {
+	            	Object val = rs.getObject(i);
+
+	            	if (val instanceof java.time.LocalDateTime) {
+	            	    val = val.toString();
+	            	}
+	            	if (val instanceof java.sql.Timestamp) {
+	            	    val = ((java.sql.Timestamp) val).toLocalDateTime().toString();
+	            	}
+	            	if (val instanceof java.sql.Date) {
+	            	    val = val.toString();
+	            	}
+
+	            	row.put(meta.getColumnLabel(i), val);
+
+	            }
+	            lista.add(row);
+	        }
+
+	        return lista;
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return new ArrayList<>();
+	    } finally {
+	        try { if (rs != null) rs.close(); } catch (Exception ignored) {}
+	        try { if (cs != null) cs.close(); } catch (Exception ignored) {}
+	        try { conexionJDBC.cerrarConexion(); } catch (Exception ignored) {}
+	    }
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	public List<Map<String, Object>> spResumenOrden(Integer idOrden) {
+
+	    CallableStatement cs = null;
+	    ResultSet rs = null;
+
+	    try {
+	        conexionJDBC.getConexion();
+
+	        cs = ConexionJDBC.conn.prepareCall("{call sp_resumen_orden(?)}");
+	        cs.setInt(1, idOrden);
+
+	        boolean hasRs = cs.execute();
+	        if (!hasRs) return new ArrayList<>();
+
+	        rs = cs.getResultSet();
+	        if (rs == null) return new ArrayList<>();
+
+	        List<Map<String, Object>> lista = new ArrayList<>();
+	        ResultSetMetaData meta = rs.getMetaData();
+	        int colCount = meta.getColumnCount();
+
+	        while (rs.next()) {
+	            Map<String, Object> row = new HashMap<>();
+	            for (int i = 1; i <= colCount; i++) {
+	                row.put(meta.getColumnLabel(i), rs.getObject(i));
+	            }
+	            lista.add(row);
+	        }
+
+	        return lista;
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return new ArrayList<>();
+	    } finally {
+	        try { if (rs != null) rs.close(); } catch (Exception ignored) {}
+	        try { if (cs != null) cs.close(); } catch (Exception ignored) {}
+	        try { conexionJDBC.cerrarConexion(); } catch (Exception ignored) {}
+	    }
+	
+}
 }

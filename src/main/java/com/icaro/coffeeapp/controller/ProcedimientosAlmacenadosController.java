@@ -74,6 +74,41 @@ public class ProcedimientosAlmacenadosController {
 	    );
 	}
 
+	
+	
+	
+	@PostMapping("/admin/orden/gestionar")
+	@ResponseBody
+	public Map<String, Object> gestionarOrden(
+	        @RequestParam("idOrden") Integer idOrden,
+	        @RequestParam("tipoProceso") Integer tipoProceso,
+	        @RequestParam(value = "idRol", required = false) Integer idRol
+	) {
+
+	    Integer filas = procedimientosAlmacenados.spGestionarOrden(idOrden, tipoProceso, idRol);
+
+	    return Map.of(
+	            "filas", filas,
+	            "idOrden", idOrden,
+	            "tipoProceso", tipoProceso
+	    );
+	}
+
+	
+	@GetMapping("/admin/orden/resumen")
+	@ResponseBody
+	public List<Map<String, Object>> resumenOrden(@RequestParam("idOrden") Integer idOrden) {
+	    return procedimientosAlmacenados.spResumenOrden(idOrden);
+	}
+
+	
+	@GetMapping("/admin/orden/pendientes")
+	@ResponseBody
+	public List<Map<String, Object>> getOrdenesPendientes() {
+	    return procedimientosAlmacenados.spGestionarOrdenSelect(null, 4, null);
+	}
+
+	
 
 	
 }	

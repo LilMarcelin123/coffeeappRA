@@ -1,5 +1,64 @@
 import { mensajesAlert, mostrarConfirmacion } from '../FuncionesGenerales.js';
 
+function renderResumenOrden(lista) {
+  const contenedor = document.getElementById("contenedorResumenOrden");
+  const tpl = document.getElementById("tplResumenItem");
+  const totalVista = document.getElementById("totalOrdenVista");
+
+  // limpiar
+  contenedor.innerHTML = "";
+
+  let total = 0;
+
+  if (!lista || lista.length === 0) {
+    // si quieres, aquí puedes dejar un placeholder en HTML y solo mostrarlo con CSS
+    totalVista.textContent = "$0.00";
+    return;
+  }
+
+  lista.forEach(item => {
+    const cantidad = Number(item.cantidad || 0);
+    const producto = (item.producto || "").toString();
+    const extrasTxt = (item.extras || "").toString().trim();
+    const totalItem = Number(item.total_item || 0);
+
+    total += totalItem;
+
+    const node = tpl.content.cloneNode(true);
+
+    node.querySelector(".cantidad").textContent = `${cantidad}x`;
+    node.querySelector(".producto").textContent = producto;
+    node.querySelector(".total-item").textContent = `$${totalItem.toFixed(2)}`;
+
+    const extrasEl = node.querySelector(".extras");
+    if (extrasTxt !== "") {
+      extrasEl.style.display = "block";
+      extrasEl.textContent = `+ ${extrasTxt}`;
+    }
+
+    contenedor.appendChild(node);
+  });
+
+  totalVista.textContent = `$${total.toFixed(2)}`;
+}
+
+function cargarResumenOrden() {
+  const idOrden = $("#idOrden").val();
+
+  $.ajax({
+    url: "/admin/orden/resumen",
+    type: "GET",
+    data: { idOrden: idOrden },
+    success: function(lista) {
+      renderResumenOrden(lista);
+    },
+    error: function(xhr) {
+      console.log("Error resumen:", xhr.responseText);
+    }
+  });
+}
+
+
 $(document).ready(function() {
 
 	$("#btnAñadeItem").hide();
@@ -246,7 +305,7 @@ $("#btnAñadeItem").on("click", function () {
 					$("#cantidadProducto").val('');
 					$("#contenedorOpcionesExtras").html('');
 
-					
+					cargarResumenOrden();
 					
 		        },
 		        error: function (xhr, status, error) {
@@ -260,12 +319,26 @@ $("#btnAñadeItem").on("click", function () {
 		
 		$("#btnConfirmaOrden").on("click", function () {
 		  console.log("CONFIRMA ORDEN");
-
+		//  mensajesAlert("TONTO TONTO con exito, te amo|bg-warning");
 		  mostrarConfirmacion(
 		    "¿Seguro que quieres continuar con la orden?",
 		    () => { 
 		      console.log("El usuario confirmó la acción"); 
+			
+			  $.ajax({
+			    url: "/admin/orden/gestionar",
+			    type: "POST",
+			    data: { idOrden: $("#idOrden").val(),
+					 	tipoProceso: 2,
+					    idRol: 1 },
+			    success: function(resp) {
+			      console.log("Preparaciones generadas:", resp.filas);
+			    }
+			  });
 
+			  
+			  
+			  
 		    }, 
 		    () => { 
 		      console.log("El usuario canceló la acción"); 
