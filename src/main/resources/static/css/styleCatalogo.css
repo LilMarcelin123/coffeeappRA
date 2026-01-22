@@ -1,0 +1,199 @@
+/* =========================
+   LIQUID / FLUID - NEUTRO
+   (pegar al FINAL del CSS)
+   ========================= */
+
+:root{
+  --liq-ink: rgba(255,255,255,.92);
+  --liq-muted: rgba(255,255,255,.68);
+  --liq-border: rgba(255,255,255,.14);
+  --liq-border-2: rgba(255,255,255,.22);
+  --liq-surface: rgba(255,255,255,.055);
+  --liq-surface-2: rgba(255,255,255,.035);
+  --liq-deep: rgba(0,0,0,.28);
+  --liq-deep-2: rgba(0,0,0,.18);
+  --liq-shadow: 0 18px 55px rgba(0,0,0,.45);
+  --liq-shadow-soft: 0 10px 28px rgba(0,0,0,.28);
+}
+
+/* Fondo con “corrientes” */
+body{
+  position: relative;
+}
+body::before{
+  content:"";
+  position: fixed;
+  inset: -20%;
+  z-index: -2;
+  background:
+    radial-gradient(900px 520px at 12% 8%, rgba(255,255,255,.10), transparent 60%),
+    radial-gradient(760px 460px at 85% 12%, rgba(255,255,255,.08), transparent 58%),
+    radial-gradient(820px 520px at 70% 92%, rgba(255,255,255,.07), transparent 60%),
+    radial-gradient(680px 460px at 18% 80%, rgba(255,255,255,.06), transparent 60%);
+  filter: blur(10px);
+  opacity: .9;
+  pointer-events:none;
+}
+
+/* “Blob” líquido animado encima del fondo */
+body::after{
+  content:"";
+  position: fixed;
+  width: 900px;
+  height: 900px;
+  left: -260px;
+  top: -260px;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,.14), transparent 55%),
+    radial-gradient(circle at 70% 65%, rgba(255,255,255,.08), transparent 62%),
+    radial-gradient(circle at 45% 80%, rgba(255,255,255,.06), transparent 60%);
+  filter: blur(18px);
+  opacity: .55;
+  animation: blobFloat 10s ease-in-out infinite;
+  pointer-events:none;
+}
+
+@keyframes blobFloat{
+  0%   { transform: translate(0,0) scale(1); border-radius: 52% 48% 56% 44% / 50% 58% 42% 50%; }
+  25%  { transform: translate(120px, 80px) scale(1.05); border-radius: 44% 56% 48% 52% / 58% 44% 56% 42%; }
+  50%  { transform: translate(260px, 120px) scale(0.98); border-radius: 56% 44% 52% 48% / 44% 56% 48% 52%; }
+  75%  { transform: translate(140px, 220px) scale(1.06); border-radius: 48% 52% 44% 56% / 52% 46% 54% 48%; }
+  100% { transform: translate(0,0) scale(1); border-radius: 52% 48% 56% 44% / 50% 58% 42% 50%; }
+}
+
+/* Cards con borde “líquido” */
+.glass-card{
+  border: 1px solid var(--liq-border);
+  background:
+    linear-gradient(180deg, var(--liq-surface), var(--liq-surface-2));
+  box-shadow: var(--liq-shadow);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Borde líquido (shimmer neutro) */
+.glass-card::after{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  background:
+    conic-gradient(
+      from 180deg,
+      rgba(255,255,255,.00),
+      rgba(255,255,255,.12),
+      rgba(255,255,255,.00),
+      rgba(255,255,255,.10),
+      rgba(255,255,255,.00)
+    );
+  filter: blur(8px);
+  opacity: .35;
+  animation: liquidShimmer 5.5s linear infinite;
+  pointer-events:none;
+  mix-blend-mode: screen;
+}
+
+@keyframes liquidShimmer{
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Inputs: “metal líquido” */
+#formGestionCatalogo .form-control,
+#formGestionCatalogo .form-select,
+#formGestionCatalogo textarea{
+  background:
+    radial-gradient(120% 120% at 18% 0%, rgba(255,255,255,.12), transparent 60%),
+    radial-gradient(110% 110% at 90% 40%, rgba(255,255,255,.06), transparent 60%),
+    rgba(0,0,0,.22);
+  border: 1px solid rgba(255,255,255,.14);
+  color: var(--liq-ink);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.06),
+    0 10px 22px rgba(0,0,0,.18);
+}
+
+#formGestionCatalogo .form-control:focus,
+#formGestionCatalogo .form-select:focus,
+#formGestionCatalogo textarea:focus{
+  border-color: var(--liq-border-2);
+  box-shadow:
+    0 0 0 .22rem rgba(255,255,255,.10),
+    0 14px 30px rgba(0,0,0,.28);
+  transform: translateY(-1px);
+}
+
+/* Botón principal: “puddle” */
+#btnEjecutarCatalogo.btn{
+  border: 1px solid rgba(255,255,255,.18);
+  color: rgba(255,255,255,.92);
+  background:
+    radial-gradient(140% 140% at 20% 0%, rgba(255,255,255,.16), transparent 55%),
+    radial-gradient(120% 120% at 85% 30%, rgba(255,255,255,.08), transparent 60%),
+    rgba(255,255,255,.08);
+  box-shadow: var(--liq-shadow-soft);
+  position: relative;
+  overflow: hidden;
+}
+
+#btnEjecutarCatalogo.btn::before{
+  content:"";
+  position:absolute;
+  inset:-40%;
+  background:
+    radial-gradient(circle at 30% 40%, rgba(255,255,255,.22), transparent 55%),
+    radial-gradient(circle at 70% 65%, rgba(255,255,255,.12), transparent 60%);
+  opacity:.55;
+  filter: blur(10px);
+  transform: translateX(-18%);
+  transition: transform .35s ease, opacity .35s ease;
+  pointer-events:none;
+}
+
+#btnEjecutarCatalogo.btn:hover{
+  transform: translateY(-1px);
+  border-color: rgba(255,255,255,.26);
+  background:
+    radial-gradient(140% 140% at 20% 0%, rgba(255,255,255,.18), transparent 55%),
+    radial-gradient(120% 120% at 85% 30%, rgba(255,255,255,.10), transparent 60%),
+    rgba(255,255,255,.10);
+}
+
+#btnEjecutarCatalogo.btn:hover::before{
+  transform: translateX(18%);
+  opacity:.70;
+}
+
+/* Outline neutro suave */
+#btnLimpiarForm.btn,
+.btn.btn-outline-light{
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(0,0,0,.10);
+  color: rgba(255,255,255,.86);
+  box-shadow: 0 10px 22px rgba(0,0,0,.18);
+}
+
+#btnLimpiarForm.btn:hover,
+.btn.btn-outline-light:hover{
+  background: rgba(255,255,255,.07);
+  border-color: rgba(255,255,255,.24);
+  transform: translateY(-1px);
+}
+
+/* Resultado: panel líquido oscuro */
+#resultadoCatalogo{
+  background:
+    radial-gradient(120% 120% at 20% 0%, rgba(255,255,255,.08), transparent 60%),
+    rgba(0,0,0,.30);
+  border: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.88);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+/* Micro-animación sutil en cards al hover (sin colores) */
+.glass-card:hover{
+  transform: translateY(-1px);
+  transition: transform .18s ease;
+}

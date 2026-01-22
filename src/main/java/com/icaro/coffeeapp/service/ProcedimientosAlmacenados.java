@@ -6,8 +6,10 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.math.BigDecimal;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -204,18 +206,6 @@ public class ProcedimientosAlmacenados {
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	public List<Map<String, Object>> spResumenOrden(Integer idOrden) {
 
 	    CallableStatement cs = null;
@@ -257,4 +247,109 @@ public class ProcedimientosAlmacenados {
 	    }
 	
 }
+	
+	
+public int spGestionCatalogo(Integer vpTipoProceso, String vNombre, java.math.BigDecimal vPrecio, String vDescripcion,
+		Integer vRol, Integer vId) {
+	CallableStatement cs = null;
+
+	try {
+		conexionJDBC.getConexion();
+
+		cs = ConexionJDBC.conn.prepareCall("{call sp_gestion_catalogo(?,?,?,?,?,?)}");
+
+		// 1) tipo proceso (obligatorio)
+		cs.setInt(1, vpTipoProceso);
+
+		// 2) nombre
+		if (vNombre == null)
+			cs.setNull(2, Types.VARCHAR);
+		else
+			cs.setString(2, vNombre);
+
+		// 3) precio
+		if (vPrecio == null)
+			cs.setNull(3, Types.DECIMAL);
+		else
+			cs.setBigDecimal(3, vPrecio);
+
+		// 4) descripcion
+		if (vDescripcion == null)
+			cs.setNull(4, Types.VARCHAR);
+		else
+			cs.setString(4, vDescripcion);
+
+		// 5) rol
+		if (vRol == null)
+			cs.setNull(5, Types.INTEGER);
+		else
+			cs.setInt(5, vRol);
+
+		// 6) id (Vid)
+		if (vId == null)
+			cs.setNull(6, Types.INTEGER);
+		else
+			cs.setInt(6, vId);
+
+		cs.execute();
+
+		int updateCount = cs.getUpdateCount();
+		return updateCount;
+
+	} catch (Exception e) {
+		e.printStackTrace();
+		return -1;
+	} finally {
+		try {
+			if (cs != null)
+				cs.close();
+		} catch (Exception ignored) {
+		}
+		try {
+			conexionJDBC.cerrarConexion();
+		} catch (Exception ignored) {
+		}
+	}
+}
+
+
+	
+public List<Map<String, Object>> spVistaCatalogos(Integer vpTipoProceso) {
+
+    CallableStatement cs = null;
+    ResultSet rs = null;
+    List<Map<String, Object>> lista = new ArrayList<>();
+
+    try {
+        conexionJDBC.getConexion();
+
+        cs = ConexionJDBC.conn.prepareCall("{CALL sp_vista_catalogos(?)}");
+        cs.setInt(1, vpTipoProceso);
+
+        rs = cs.executeQuery();
+
+        ResultSetMetaData meta = rs.getMetaData();
+        int columnas = meta.getColumnCount();
+
+        while (rs.next()) {
+            Map<String, Object> fila = new LinkedHashMap<>();
+            for (int i = 1; i <= columnas; i++) {
+                fila.put(meta.getColumnLabel(i), rs.getObject(i));
+            }
+            lista.add(fila);
+        }
+
+        return lista;
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        return List.of();
+    } finally {
+        try { if (rs != null) rs.close(); } catch (Exception ignored) {}
+        try { if (cs != null) cs.close(); } catch (Exception ignored) {}
+        try { conexionJDBC.cerrarConexion(); } catch (Exception ignored) {}
+    }
+}
+
+
 }

@@ -51,6 +51,13 @@ public class OrdenesController {
         return "admin/tomaOrden";
     }
 
+
+    @GetMapping("/admin/gestionCatalogo")
+    public String mostrarGestionCatalogo(Model model) {
+
+        return "admin/gestionCatalogo"; 
+    }
+
     
     @GetMapping("/api/productosPorCategoria/{idCategoria}")
     @ResponseBody

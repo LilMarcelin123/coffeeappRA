@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
+import java.math.BigDecimal;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.icaro.coffeeapp.service.ProcedimientosAlmacenados;
-import com.icaro.coffeeapp.utils.ConexionJDBC;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -110,5 +110,49 @@ public class ProcedimientosAlmacenadosController {
 
 	
 
+	@PostMapping("/admin/catalogo/gestionar")
+	@ResponseBody
+	public Map<String, Object> gestionarCatalogo(
+	        @RequestParam Integer tipoProceso,
+	        @RequestParam(required = false) String nombre,
+	        @RequestParam(required = false) Double precio,
+	        @RequestParam(required = false) String descripcion,
+	        @RequestParam(required = false) Integer rol,
+	        @RequestParam(required = false) Integer id
+	) {
+
+
+	    java.math.BigDecimal bdPrecio = (precio == null) ? null : java.math.BigDecimal.valueOf(precio);
+
+	    int filas = procedimientosAlmacenados.spGestionCatalogo(
+	            tipoProceso,
+	            nombre,
+	            bdPrecio,
+	            descripcion,
+	            rol,
+	            id
+	    );
+
+	    return Map.of(
+	            "ok", filas != -1,
+	            "filas", filas,
+	            "tipoProceso", tipoProceso,
+	            "id", id == null ? 0 : id
+	    );
+	}
+	
+	
+	
+	
+	@GetMapping("/admin/catalogo/vista")
+	@ResponseBody
+	public List<Map<String, Object>> obtenerVistaCatalogo(
+	        @RequestParam("tipoProceso") Integer tipoProceso
+	) {
+	    return procedimientosAlmacenados.spVistaCatalogos(tipoProceso);
+	}
+
+
+	
 	
 }	

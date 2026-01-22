@@ -42,6 +42,28 @@ $(document).ready(function () {
 	  );
 	});
 
+//BOTON PARA ENTRAR A GESTIONAR INVENTARIO:
+	
+	$("#btnModalGestCat").on("click", function () {
+	  mostrarConfirmacion2(
+	    "¿Seguro que quieres modificar el catalogo?",
+	    () => { 
+	   window.location.href = "/admin/gestionCatalogo";
+	    }, 
+	    () => { 
+	      console.log("El usuario canceló la acción");
+	    }
+	  );
+	});
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
   // ---- Modal confirmación cierre ----
   const modalElCerrar = document.getElementById("modalConfirmCerrar");
