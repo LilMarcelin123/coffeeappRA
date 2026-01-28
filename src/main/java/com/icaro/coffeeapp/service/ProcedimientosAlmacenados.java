@@ -291,10 +291,9 @@ public int spGestionCatalogo(Integer vpTipoProceso, String vNombre, java.math.Bi
 		else
 			cs.setInt(6, vId);
 
-		cs.execute();
+		int filas = cs.executeUpdate();
+		return filas;
 
-		int updateCount = cs.getUpdateCount();
-		return updateCount;
 
 	} catch (Exception e) {
 		e.printStackTrace();
