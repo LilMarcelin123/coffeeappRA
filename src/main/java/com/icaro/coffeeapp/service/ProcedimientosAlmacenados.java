@@ -1,8 +1,10 @@
 package com.icaro.coffeeapp.service;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -249,106 +251,75 @@ public class ProcedimientosAlmacenados {
 }
 	
 	
-public int spGestionCatalogo(Integer vpTipoProceso, String vNombre, java.math.BigDecimal vPrecio, String vDescripcion,
-		Integer vRol, Integer vId) {
-	CallableStatement cs = null;
+	
+	public int spGestionCatalogo(Integer vpTipoProceso, String vNombre, BigDecimal vPrecio,
+            String vDescripcion, Integer vRol, Integer vId) {
+String sql = "{call sp_gestion_catalogo(?,?,?,?,?,?)}";
+try (Connection conn = conexionJDBC.getConexion2();
+CallableStatement cs = conn.prepareCall(sql)) {
 
-	try {
-		conexionJDBC.getConexion();
+cs.setInt(1, vpTipoProceso);
+if (vNombre != null) cs.setString(2, vNombre); else cs.setNull(2, Types.VARCHAR);
+if (vPrecio != null) cs.setBigDecimal(3, vPrecio); else cs.setNull(3, Types.DECIMAL);
+if (vDescripcion != null) cs.setString(4, vDescripcion); else cs.setNull(4, Types.VARCHAR);
+if (vRol != null) cs.setInt(5, vRol); else cs.setNull(5, Types.INTEGER);
+if (vId != null) cs.setInt(6, vId); else cs.setNull(6, Types.INTEGER);
 
-		cs = ConexionJDBC.conn.prepareCall("{call sp_gestion_catalogo(?,?,?,?,?,?)}");
-
-		// 1) tipo proceso (obligatorio)
-		cs.setInt(1, vpTipoProceso);
-
-		// 2) nombre
-		if (vNombre == null)
-			cs.setNull(2, Types.VARCHAR);
-		else
-			cs.setString(2, vNombre);
-
-		// 3) precio
-		if (vPrecio == null)
-			cs.setNull(3, Types.DECIMAL);
-		else
-			cs.setBigDecimal(3, vPrecio);
-
-		// 4) descripcion
-		if (vDescripcion == null)
-			cs.setNull(4, Types.VARCHAR);
-		else
-			cs.setString(4, vDescripcion);
-
-		// 5) rol
-		if (vRol == null)
-			cs.setNull(5, Types.INTEGER);
-		else
-			cs.setInt(5, vRol);
-
-		// 6) id (Vid)
-		if (vId == null)
-			cs.setNull(6, Types.INTEGER);
-		else
-			cs.setInt(6, vId);
-
-		int filas = cs.executeUpdate();
-		return filas;
-
-
-	} catch (Exception e) {
-		e.printStackTrace();
-		return -1;
-	} finally {
-		try {
-			if (cs != null)
-				cs.close();
-		} catch (Exception ignored) {
-		}
-		try {
-			conexionJDBC.cerrarConexion();
-		} catch (Exception ignored) {
-		}
-	}
+return cs.executeUpdate();
+} catch (SQLException | ClassNotFoundException e) {
+e.printStackTrace();
+return -1;
+}
 }
 
+
+	public List<Map<String, Object>> obtenerRoles() {
+	    List<Map<String, Object>> roles = new ArrayList<>();
+	    String sql = "SELECT id_rol, rol, description FROM sys_roles_usuario";
+
+	    try (Connection conn = conexionJDBC.getConexion2();
+	         Statement st = conn.createStatement();
+	         ResultSet rs = st.executeQuery(sql)) {
+
+	        while (rs.next()) {
+	            Map<String, Object> row = new HashMap<>();
+	            row.put("ID", rs.getInt("id_rol"));
+	            row.put("Nombre", rs.getString("rol"));
+	            row.put("Descripcion", rs.getString("description"));
+	            roles.add(row);
+	        }
+	    } catch (SQLException | ClassNotFoundException e) {
+	        e.printStackTrace();
+	    }
+	    return roles;
+	}
 
 	
-public List<Map<String, Object>> spVistaCatalogos(Integer vpTipoProceso) {
+	public List<Map<String, Object>> spVistaCatalogos(Integer vpTipoProceso) {
+	    List<Map<String, Object>> lista = new ArrayList<>();
+	    String sql = "{CALL sp_vista_catalogos(?)}";
 
-    CallableStatement cs = null;
-    ResultSet rs = null;
-    List<Map<String, Object>> lista = new ArrayList<>();
+	    try (Connection conn = conexionJDBC.getConexion2();
+	         CallableStatement cs = conn.prepareCall(sql)) {
 
-    try {
-        conexionJDBC.getConexion();
+	        cs.setInt(1, vpTipoProceso);
+	        try (ResultSet rs = cs.executeQuery()) {
+	            ResultSetMetaData meta = rs.getMetaData();
+	            int columnas = meta.getColumnCount();
 
-        cs = ConexionJDBC.conn.prepareCall("{CALL sp_vista_catalogos(?)}");
-        cs.setInt(1, vpTipoProceso);
-
-        rs = cs.executeQuery();
-
-        ResultSetMetaData meta = rs.getMetaData();
-        int columnas = meta.getColumnCount();
-
-        while (rs.next()) {
-            Map<String, Object> fila = new LinkedHashMap<>();
-            for (int i = 1; i <= columnas; i++) {
-                fila.put(meta.getColumnLabel(i), rs.getObject(i));
-            }
-            lista.add(fila);
-        }
-
-        return lista;
-
-    } catch (Exception e) {
-        e.printStackTrace();
-        return List.of();
-    } finally {
-        try { if (rs != null) rs.close(); } catch (Exception ignored) {}
-        try { if (cs != null) cs.close(); } catch (Exception ignored) {}
-        try { conexionJDBC.cerrarConexion(); } catch (Exception ignored) {}
-    }
-}
+	            while (rs.next()) {
+	                Map<String, Object> fila = new LinkedHashMap<>();
+	                for (int i = 1; i <= columnas; i++) {
+	                    fila.put(meta.getColumnLabel(i), rs.getObject(i));
+	                }
+	                lista.add(fila);
+	            }
+	        }
+	    } catch (SQLException | ClassNotFoundException e) {
+	        e.printStackTrace();
+	    }
+	    return lista;
+	}
 
 
 }

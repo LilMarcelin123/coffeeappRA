@@ -110,6 +110,17 @@ public class ProcedimientosAlmacenadosController {
 
 	
 
+	
+	
+	
+	
+	
+	@GetMapping("/admin/catalogo/vistaRoles")
+	@ResponseBody
+	public List<Map<String, Object>> vistaRoles() {
+	    return procedimientosAlmacenados.obtenerRoles();
+	}
+
 	@PostMapping("/admin/catalogo/gestionar")
 	@ResponseBody
 	public Map<String, Object> gestionarCatalogo(
@@ -120,8 +131,6 @@ public class ProcedimientosAlmacenadosController {
 	        @RequestParam(required = false) Integer rol,
 	        @RequestParam(required = false) Integer id
 	) {
-
-
 	    java.math.BigDecimal bdPrecio = (precio == null) ? null : java.math.BigDecimal.valueOf(precio);
 
 	    int filas = procedimientosAlmacenados.spGestionCatalogo(
@@ -140,10 +149,7 @@ public class ProcedimientosAlmacenadosController {
 	            "id", id == null ? 0 : id
 	    );
 	}
-	
-	
-	
-	
+
 	@GetMapping("/admin/catalogo/vista")
 	@ResponseBody
 	public List<Map<String, Object>> obtenerVistaCatalogo(
@@ -151,8 +157,4 @@ public class ProcedimientosAlmacenadosController {
 	) {
 	    return procedimientosAlmacenados.spVistaCatalogos(tipoProceso);
 	}
-
-
-	
-	
-}	
+}
