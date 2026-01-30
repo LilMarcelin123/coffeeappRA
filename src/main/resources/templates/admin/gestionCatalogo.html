@@ -5,33 +5,43 @@
     <meta charset="UTF-8">
     <title>Gestión de Catálogo</title>
 
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <!-- Custom CSS -->
     <link rel="stylesheet" th:href="@{/css/styleCatalogo.css}">
 </head>
 
-<body>
+<body style="font-family: 'Poppins', sans-serif; background-color: #f8f9fa;">
 
 <!-- HEADER -->
 <header class="container-fluid px-0">
-    <div class="hero-section" style="background-image: url('/img/granoscafe.jpg');">
-        <div class="hero-overlay">
+    <div class="hero-section" style="background-image: url('/img/granoscafe.jpg'); height: 25vh; background-size: cover; background-position: center;">
+        <div class="hero-overlay d-flex align-items-center justify-content-center text-center" style="background: rgba(0,0,0,0.55); height: 100%; color: #fff;">
             <div class="container">
-                <h1 class="hero-title">Gestión de Catálogo</h1>
-                <p class="opacity-75">Administración de categorías, productos y opciones</p>
+                <h1 class="hero-title fw-bold animate__animated animate__fadeInDown">Gestión de Catálogo</h1>
+                <p class="opacity-75 animate__animated animate__fadeInUp">Administración de categorías, productos y opciones</p>
             </div>
         </div>
     </div>
 </header>
 
 <!-- MAIN -->
-<main class="container card-main">
+<main class="container card-main py-5">
 
     <!-- PASO 1 -->
-    <div class="glass-card p-4 mb-4">
-        <h5 class="fw-bold mb-3">️⃣ ¿Qué deseas gestionar?</h5>
-
-        <select id="tipoProceso" class="form-select">
+    <div class="glass-card p-4 mb-5 animate__animated animate__fadeInDown" style="background: rgba(255,255,255,0.9); border-radius: 12px; backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+        <h5 class="fw-bold mb-3 text-center">¿Qué deseas gestionar?</h5>
+        <select id="tipoProceso" class="form-select text-center shadow-sm">
             <option value="" selected disabled>Selecciona una opción</option>
             <option value="1">Categorías</option>
             <option value="2">Subcategorías</option>
@@ -39,52 +49,52 @@
             <option value="4">Opciones de subcategoría</option>
         </select>
     </div>
-	<!-- PASO 2: TABLA DE RESULTADOS -->
-	<div class="glass-card p-4 mb-4">
-	    <h5 class="fw-bold mb-3">📋 Resultados</h5>
 
-	    <div class="table-responsive">
-	        <table class="table table-hover align-middle">
-	            <thead class="table-dark">
-	                <tr id="tablaCatalogoHead"></tr>
-	            </thead>
-	            <tbody id="tablaCatalogoBody"></tbody>
-	        </table>
-	    </div>
-	</div>
-	
-	
-	
-	
-	
-	
-	
-	<div class="glass-card p-4 mb-4">
-	    <h5 class="fw-bold mb-3">⚙️ Acciones</h5>
+    <!-- PASO 2: TABLA DE RESULTADOS -->
+    <div class="glass-card p-4 mb-5 animate__animated animate__fadeInUp" style="background: rgba(255,255,255,0.9); border-radius: 12px; backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+        <h5 class="fw-bold mb-3 text-center">Resultados</h5>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle shadow-sm">
+                <thead class="table-dark">
+                    <tr id="tablaCatalogoHead"></tr>
+                </thead>
+                <tbody id="tablaCatalogoBody"></tbody>
+            </table>
+        </div>
+    </div>
 
-	    <div class="d-flex gap-2">
-	        <button id="btnInsertar" class="btn btn-success" disabled>
-	            ➕ Insertar
-	        </button>
-
-	        <button id="btnEditar" class="btn btn-warning" disabled>
-	            ✏️ Editar
-	        </button>
-
-	        <button id="btnEliminar" class="btn btn-danger" disabled>
-	            🗑️ Eliminar
-	        </button>
-	    </div>
-	</div>
+    <!-- PASO 3: ACCIONES -->
+    <div class="glass-card p-4 mb-5 animate__animated animate__fadeInUp" style="background: rgba(255,255,255,0.9); border-radius: 12px; backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+        <h5 class="fw-bold mb-4 text-center">Acciones</h5>
+        <div class="d-flex justify-content-center gap-4">
+            <button id="btnInsertar" class="btn btn-success btn-lg rounded-circle shadow-sm" disabled>
+                <i class="bi bi-plus-lg"></i>
+            </button>
+            <button id="btnEditar" class="btn btn-warning btn-lg rounded-circle shadow-sm" disabled>
+                <i class="bi bi-pencil"></i>
+            </button>
+            <button id="btnEliminar" class="btn btn-danger btn-lg rounded-circle shadow-sm" disabled>
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    </div>
 	
 	
+	
+	
+	<div class="d-flex justify-content-start mb-4"> 
+		<a href="/admin/inicio" class="btn btn-outline-secondary px-4 shadow-sm"> 
+			<i class="bi bi-arrow-left"></i> Regresar </a> </div>
+</main>
 
 <!-- FOOTER -->
-<footer class="footer-custom">
+<footer class="footer-custom bg-dark text-light py-3 mt-4">
     <div class="container text-center">
         &copy; 2025 - Gestión de Catálogo
     </div>
 </footer>
+
+
 
 <!-- MODALES -->
 <div th:replace="~{admin/Generales :: modalAlertas}"></div>
