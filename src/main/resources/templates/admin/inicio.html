@@ -166,13 +166,17 @@
 					<p class="panel-text">
 			            Presione el botón
 			        </p>
-					<button id="btnModalGestUser" class="btn btn-lg w-100" style="background:#48392D; color:white;">
-						<p>
-				         	<i class="bi bi-file-earmark-person-fill"></i>
-				        </p>
+					<button id="btnModalGestUser" 
+					        class="btn btn-lg w-100" 
+					        style="background:#48392D; color:white;" 
+					        disabled>
+					    <p>
+					        <i class="bi bi-file-earmark-person-fill"></i>
+					    </p>
 					</button>
                 </div>
             </div>
+			
         </div>
     </div>
 </main>
@@ -197,6 +201,10 @@
 		       </div>
     </div>
 </footer>
+
+
+
+
 <!-- Modal confirmación (Bootstrap) -->
 <div class="modal fade" id="modalConfirmCerrar" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -208,8 +216,17 @@
 
       <div class="modal-body">
         <p class="mb-2">Vas a cerrar estas órdenes:</p>
-
         <ul id="listaOrdenesSeleccionadas" class="mb-3"></ul>
+
+        <!-- Selector de método de pago -->
+        <div class="mb-3">
+          <label for="selectMetodoPago" class="form-label">Método de pago</label>
+          <select id="selectMetodoPago" class="form-select">
+            <option value="" selected disabled>Seleccione...</option>
+            <option value="1">Efectivo</option>
+            <option value="2">Tarjeta</option>
+          </select>
+        </div>
 
         <div class="alert alert-warning mb-0">
           Al cerrar, la orden pasa a <strong>CERRADA</strong> y ya no aparecerá para los operadores.
@@ -218,11 +235,20 @@
 
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" id="btnConfirmarCerrar" class="btn btn-success">Sí, cerrar</button>
+        <!-- Botón deshabilitado hasta que se seleccione método de pago -->
+        <button type="button" id="btnConfirmarCerrar" class="btn btn-success" disabled>Sí, cerrar</button>
       </div>
     </div>
   </div>
 </div>
+
+
+
+
+
+
+
+
 
 <div class="modal fade" id="modalConfirmReabrir" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">

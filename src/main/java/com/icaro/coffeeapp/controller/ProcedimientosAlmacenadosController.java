@@ -2,6 +2,7 @@ package com.icaro.coffeeapp.controller;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.math.BigDecimal;
@@ -77,22 +78,26 @@ public class ProcedimientosAlmacenadosController {
 	
 	
 	
+
 	@PostMapping("/admin/orden/gestionar")
 	@ResponseBody
 	public Map<String, Object> gestionarOrden(
 	        @RequestParam("idOrden") Integer idOrden,
 	        @RequestParam("tipoProceso") Integer tipoProceso,
-	        @RequestParam(value = "idRol", required = false) Integer idRol
+	        @RequestParam(value = "idRol", required = false) Integer idRol,
+	        @RequestParam(value = "pTipoPago", required = false) Integer pTipoPago
 	) {
+	    Integer filas = procedimientosAlmacenados.spGestionarOrden(idOrden, tipoProceso, idRol, pTipoPago);
 
-	    Integer filas = procedimientosAlmacenados.spGestionarOrden(idOrden, tipoProceso, idRol);
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("filas", filas);
+	    response.put("idOrden", idOrden);
+	    response.put("tipoProceso", tipoProceso);
+	    response.put("pTipoPago", pTipoPago);
 
-	    return Map.of(
-	            "filas", filas,
-	            "idOrden", idOrden,
-	            "tipoProceso", tipoProceso
-	    );
+	    return response;
 	}
+
 
 	
 	@GetMapping("/admin/orden/resumen")
@@ -100,16 +105,15 @@ public class ProcedimientosAlmacenadosController {
 	public List<Map<String, Object>> resumenOrden(@RequestParam("idOrden") Integer idOrden) {
 	    return procedimientosAlmacenados.spResumenOrden(idOrden);
 	}
-
 	
+	
+
 	@GetMapping("/admin/orden/pendientes")
 	@ResponseBody
 	public List<Map<String, Object>> getOrdenesPendientes() {
-	    return procedimientosAlmacenados.spGestionarOrdenSelect(null, 4, null);
+	    // Para listar pendientes no se necesita pTipoPago
+	    return procedimientosAlmacenados.spGestionarOrdenSelect(null, 4, null, null);
 	}
-
-	
-
 	
 	
 	

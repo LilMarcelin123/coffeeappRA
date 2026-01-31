@@ -15,6 +15,8 @@ function abrirModalSeguro(modalId) {
   return modal;
 }
 
+
+
 $(document).ready(function () {
 	
 	
@@ -108,15 +110,28 @@ $(document).ready(function () {
 
   // Confirmar cierre
   $("#btnConfirmarCerrar").on("click", function () {
-    const ids = obtenerIdsSeleccionados();
-    if (ids.length === 0) {
-      modalConfirmCerrar.hide();
-      return;
-    }
-    cerrarOrdenes(ids);
+      const ids = obtenerIdsSeleccionados();
+      if (ids.length === 0) {
+        $("#modalConfirmCerrar").modal("hide");
+        return;
+      }
+      cerrarOrdenes(ids); // aquí ya se manda pTipoPago desde dentro
   });
 
+  
+  
+  $("#selectMetodoPago").on("change", function () {
+    if ($(this).val()) {
+      $("#btnConfirmarCerrar").prop("disabled", false);
+    } else {
+      $("#btnConfirmarCerrar").prop("disabled", true);
+    }
+  });
 
+  
+  
+  
+  
   $("#btnReabrirSeleccionadas").on("click", function () {
     const ids = obtenerIdsSeleccionados();
     if (ids.length === 0) return;
@@ -241,21 +256,33 @@ function renderListaReabrir(ids) {
   });
 }
 
+
+
+
+
 function cerrarOrdenes(ids) {
   $("#btnConfirmarCerrar").prop("disabled", true);
+
+  // Tomamos el método de pago seleccionado en el modal
+  const metodoPago = $("#selectMetodoPago").val(); // 1 = efectivo, 2 = tarjeta
 
   const requests = ids.map(idOrden =>
     $.ajax({
       url: "/admin/orden/gestionar",
       type: "POST",
-      data: { idOrden: idOrden, tipoProceso: 1, idRol: 1 }
+      data: { 
+        idOrden: idOrden, 
+        tipoProceso: 1, 
+        idRol: 1, 
+        pTipoPago: metodoPago 
+      }
     })
   );
 
   $.when.apply($, requests)
     .done(function () {
       $("#btnConfirmarCerrar").prop("disabled", false);
-      modalConfirmCerrar.hide();
+      $("#modalConfirmCerrar").modal("hide");
       cargarPendientes();
     })
     .fail(function (xhr) {
@@ -264,6 +291,16 @@ function cerrarOrdenes(ids) {
       alert("No se pudieron cerrar una o más órdenes.");
     });
 }
+
+
+
+
+
+
+
+
+
+
 
 function reabrirOrdenes(ids) {
   $("#btnConfirmarReabrir").prop("disabled", true);

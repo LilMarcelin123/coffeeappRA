@@ -96,53 +96,8 @@ public class ProcedimientosAlmacenados {
 	
 	
 	
-	public Integer spGestionarOrden(Integer pIdOrden, Integer pTipoProceso, Integer pIdRol) {
-
-        CallableStatement cs = null;
-        ResultSet rs = null;
-
-        try {
-            conexionJDBC.getConexion();
-
-            cs = ConexionJDBC.conn.prepareCall("{call sp_gestionar_orden(?,?,?)}");
-            cs.setInt(1, pIdOrden);
-            cs.setInt(2, pTipoProceso);
-
-            if (pIdRol == null) {
-                cs.setNull(3, Types.INTEGER);
-            } else {
-                cs.setInt(3, pIdRol);
-            }
-
-            boolean hasResultSet = cs.execute();
-
-            // Si el SP no devolvió ResultSet
-            if (!hasResultSet) {
-                return 0;
-            }
-
-            rs = cs.getResultSet();
-            int filas = 0;
-
-            while (rs.next()) {
-                filas++;
-            }
-
-            return filas;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return -1; 
-        } finally {
-            try { if (rs != null) rs.close(); } catch (Exception ignored) {}
-            try { if (cs != null) cs.close(); } catch (Exception ignored) {}
-            try { conexionJDBC.cerrarConexion(); } catch (Exception ignored) {}
-        }
-    }
 	
-	
-	
-	public List<Map<String, Object>> spGestionarOrdenSelect(Integer pIdOrden, Integer pTipoProceso, Integer pIdRol) {
+	public Integer spGestionarOrden(Integer pIdOrden, Integer pTipoProceso, Integer pIdRol, Integer pTipoPago) {
 
 	    CallableStatement cs = null;
 	    ResultSet rs = null;
@@ -150,7 +105,58 @@ public class ProcedimientosAlmacenados {
 	    try {
 	        conexionJDBC.getConexion();
 
-	        cs = ConexionJDBC.conn.prepareCall("{call sp_gestionar_orden(?,?,?)}");
+	        cs = ConexionJDBC.conn.prepareCall("{call sp_gestionar_orden(?,?,?,?)}");
+	        cs.setInt(1, pIdOrden);
+	        cs.setInt(2, pTipoProceso);
+
+	        if (pIdRol == null) {
+	            cs.setNull(3, Types.INTEGER);
+	        } else {
+	            cs.setInt(3, pIdRol);
+	        }
+
+	        if (pTipoPago == null) {
+	            cs.setNull(4, Types.INTEGER);
+	        } else {
+	            cs.setInt(4, pTipoPago);
+	        }
+
+	        boolean hasResultSet = cs.execute();
+
+	        if (!hasResultSet) {
+	            return 0;
+	        }
+
+	        rs = cs.getResultSet();
+	        int filas = 0;
+
+	        while (rs.next()) {
+	            filas++;
+	        }
+
+	        return filas;
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return -1; 
+	    } finally {
+	        try { if (rs != null) rs.close(); } catch (Exception ignored) {}
+	        try { if (cs != null) cs.close(); } catch (Exception ignored) {}
+	        try { conexionJDBC.cerrarConexion(); } catch (Exception ignored) {}
+	    }
+	}
+
+	
+	
+	public List<Map<String, Object>> spGestionarOrdenSelect(Integer pIdOrden, Integer pTipoProceso, Integer pIdRol, Integer pTipoPago) {
+
+	    CallableStatement cs = null;
+	    ResultSet rs = null;
+
+	    try {
+	        conexionJDBC.getConexion();
+
+	        cs = ConexionJDBC.conn.prepareCall("{call sp_gestionar_orden(?,?,?,?)}");
 
 	        if (pIdOrden == null) cs.setNull(1, Types.INTEGER);
 	        else cs.setInt(1, pIdOrden);
@@ -159,6 +165,9 @@ public class ProcedimientosAlmacenados {
 
 	        if (pIdRol == null) cs.setNull(3, Types.INTEGER);
 	        else cs.setInt(3, pIdRol);
+
+	        if (pTipoPago == null) cs.setNull(4, Types.INTEGER);
+	        else cs.setInt(4, pTipoPago);
 
 	        boolean hasResultSet = cs.execute();
 	        if (!hasResultSet) return new ArrayList<>();
@@ -173,20 +182,19 @@ public class ProcedimientosAlmacenados {
 	        while (rs.next()) {
 	            Map<String, Object> row = new HashMap<>();
 	            for (int i = 1; i <= colCount; i++) {
-	            	Object val = rs.getObject(i);
+	                Object val = rs.getObject(i);
 
-	            	if (val instanceof java.time.LocalDateTime) {
-	            	    val = val.toString();
-	            	}
-	            	if (val instanceof java.sql.Timestamp) {
-	            	    val = ((java.sql.Timestamp) val).toLocalDateTime().toString();
-	            	}
-	            	if (val instanceof java.sql.Date) {
-	            	    val = val.toString();
-	            	}
+	                if (val instanceof java.time.LocalDateTime) {
+	                    val = val.toString();
+	                }
+	                if (val instanceof java.sql.Timestamp) {
+	                    val = ((java.sql.Timestamp) val).toLocalDateTime().toString();
+	                }
+	                if (val instanceof java.sql.Date) {
+	                    val = val.toString();
+	                }
 
-	            	row.put(meta.getColumnLabel(i), val);
-
+	                row.put(meta.getColumnLabel(i), val);
 	            }
 	            lista.add(row);
 	        }
@@ -202,6 +210,10 @@ public class ProcedimientosAlmacenados {
 	        try { conexionJDBC.cerrarConexion(); } catch (Exception ignored) {}
 	    }
 	}
+
+	
+	
+	
 	
 	
 	
