@@ -9,14 +9,12 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-	
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -26,15 +24,35 @@ public class SecurityConfig {
                 headers.frameOptions(frameOptions -> frameOptions.sameOrigin())
             )
             .authorizeHttpRequests(auth -> auth
-            	.requestMatchers("/login", "/img/**", "/css/**", "/js/**", "/webjars/**").permitAll()
-            	   .requestMatchers("/admin/**").hasRole("ADMINISTRADOR")
-            	   .requestMatchers("/tomaOrden/**").hasRole("ADMINISTRADOR")
-            	   
+                // Recursos públicos + postLogin
+                .requestMatchers("/login", "/postLogin",
+                                 "/img/**", "/css/**", "/js/**", "/webjars/**").permitAll()
+
+                // Admin
+                .requestMatchers("/admin/**").hasRole("ADMINISTRADOR")
+                .requestMatchers("/tomaOrden/**").hasRole("ADMINISTRADOR")
+
+                // Vistas por rol de operador
+                .requestMatchers("/bebcalientes/**").hasRole("OPERADOR_BEBIDAS_CALIENTES")
+                .requestMatchers("/salados/**").hasRole("OPERADOR_SALADOS")
+                .requestMatchers("/crepas/**").hasRole("OPERADOR_CREPAS_WAFFLES")
+                .requestMatchers("/bebfrias/**").hasRole("OPERADOR_BEBIDAS_FRIAS")
+                .requestMatchers("/fitness/**").hasRole("OPERADOR_FITNESS")
+
+                // Endpoint AJAX compartido para todos los operadores
+                .requestMatchers("/operador/**").hasAnyRole(
+                    "OPERADOR_SALADOS",
+                    "OPERADOR_CREPAS_WAFFLES",
+                    "OPERADOR_BEBIDAS_CALIENTES",
+                    "OPERADOR_BEBIDAS_FRIAS",
+                    "OPERADOR_FITNESS"
+                )
+
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
                 .loginPage("/login")
-                .defaultSuccessUrl("/postLogin", true)  // 👈 TODOS pasan por aquí después del login
+                .defaultSuccessUrl("/postLogin", true)
                 .permitAll()
             )
             .logout(logout -> logout

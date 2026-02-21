@@ -364,4 +364,15 @@ body {
 			   #tbodyPendientes tr:hover {
 			     background: rgba(0, 0, 0, 0.05);
 			   }
+			   
+			   
+			   #btnModalReportes {
+			       background: #48392D;
+			       color: white;
+			   }
+
+			   #btnModalReportes:hover {
+			       background: #5c4a3a;
+			       color: white;
+			   }
 

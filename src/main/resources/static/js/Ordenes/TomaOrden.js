@@ -4,322 +4,283 @@ let modalConfirmCerrar = null;
 let modalConfirmReabrir = null;
 
 function abrirModalSeguro(modalId) {
-  document.querySelectorAll(".modal-backdrop").forEach(b => b.remove());
-  document.body.classList.remove("modal-open");
-  document.body.style.removeProperty("overflow");
-  document.body.style.removeProperty("padding-right");
+    document.querySelectorAll(".modal-backdrop").forEach(b => b.remove());
+    document.body.classList.remove("modal-open");
+    document.body.style.removeProperty("overflow");
+    document.body.style.removeProperty("padding-right");
 
-  const el = document.getElementById(modalId);
-  const modal = bootstrap.Modal.getOrCreateInstance(el, { backdrop: true, keyboard: true });
-  modal.show();
-  return modal;
+    const el = document.getElementById(modalId);
+    const modal = bootstrap.Modal.getOrCreateInstance(el, { backdrop: true, keyboard: true });
+    modal.show();
+    return modal;
 }
 
-
-
 $(document).ready(function () {
+
+    // ---- Iniciar nueva orden ----
+    $("#btnModalOrden").on("click", function () {
+        mostrarConfirmacion2(
+            "¿Seguro que quieres iniciar una orden?",
+            () => {
+                $.ajax({
+                    url: "/procesoInicialOrden",
+                    type: "GET",
+                    data: { tipoProceso: 1 },
+                    success: function (data) {
+                        window.location.href = "/admin/tomaOrden?idOrden=" + data.idOrden;
+                    },
+                    error: function () {
+                        alert("No se pudo iniciar la orden, intenta de nuevo.");
+                    }
+                });
+            },
+            () => { console.log("El usuario canceló la acción"); }
+        );
+    });
+
+    // ---- Gestión catálogo ----
+    $("#btnModalGestCat").on("click", function () {
+        mostrarConfirmacion2(
+            "¿Seguro que quieres modificar el catalogo?",
+            () => { window.location.href = "/admin/gestionCatalogo"; },
+            () => { console.log("El usuario canceló la acción"); }
+        );
+    });
 	
 	
-	
-	$("#btnModalOrden").on("click", function () {
-	  mostrarConfirmacion2(
-	    "¿Seguro que quieres iniciar una orden?",
-	    () => { 
-	      $.ajax({
-	        url: "/procesoInicialOrden",
-	        type: "GET",
-	        data: { tipoProceso: 1 },
-	        success: function (data) {
-	          const idOrden = data.idOrden;
-	          window.location.href = "/admin/tomaOrden?idOrden=" + idOrden;
-	        },
-	        error: function () {
-	          alert("No se pudo iniciar la orden, intenta de nuevo.");
-	        }
-	      });
-	    }, 
-	    () => { 
-	      console.log("El usuario canceló la acción");
-	    }
-	  );
+	// ---- reportes boton ----
+	$("#btnModalReportes").on("click", function () {
+	    mostrarConfirmacion2(
+	        "¿Seguro que quieres ir a generar reportes?",
+	        () => { window.location.href = "/admin/GeneracionReportes"; },
+	        () => { console.log("El usuario canceló la acción"); }
+	    );
 	});
-
-//BOTON PARA ENTRAR A GESTIONAR INVENTARIO:
-	
-	$("#btnModalGestCat").on("click", function () {
-	  mostrarConfirmacion2(
-	    "¿Seguro que quieres modificar el catalogo?",
-	    () => { 
-	   window.location.href = "/admin/gestionCatalogo";
-	    }, 
-	    () => { 
-	      console.log("El usuario canceló la acción");
-	    }
-	  );
-	});
-	
-	
-	
-	
-	
-	
-	
 	
 	
 
-  // ---- Modal confirmación cierre ----
-  const modalElCerrar = document.getElementById("modalConfirmCerrar");
-  modalConfirmCerrar = bootstrap.Modal.getOrCreateInstance(modalElCerrar);
+    // ---- Modal confirmación cierre ----
+    const modalElCerrar = document.getElementById("modalConfirmCerrar");
+    modalConfirmCerrar = bootstrap.Modal.getOrCreateInstance(modalElCerrar);
 
-  modalElCerrar.addEventListener("hidden.bs.modal", function () {
-    document.querySelectorAll(".modal-backdrop").forEach(b => b.remove());
-    document.body.classList.remove("modal-open");
-    document.body.style.removeProperty("overflow");
-    document.body.style.removeProperty("padding-right");
-  });
+    modalElCerrar.addEventListener("hidden.bs.modal", function () {
+        document.querySelectorAll(".modal-backdrop").forEach(b => b.remove());
+        document.body.classList.remove("modal-open");
+        document.body.style.removeProperty("overflow");
+        document.body.style.removeProperty("padding-right");
+        // Resetear selector de pago
+        $("#selectMetodoPago").val("");
+        $("#btnConfirmarCerrar").prop("disabled", true);
+    });
 
-  // ---- Modal confirmación reabrir ----
-  const modalElReabrir = document.getElementById("modalConfirmReabrir");
-  modalConfirmReabrir = bootstrap.Modal.getOrCreateInstance(modalElReabrir);
+    // ---- Modal confirmación reabrir ----
+    const modalElReabrir = document.getElementById("modalConfirmReabrir");
+    modalConfirmReabrir = bootstrap.Modal.getOrCreateInstance(modalElReabrir);
 
-  modalElReabrir.addEventListener("hidden.bs.modal", function () {
-    document.querySelectorAll(".modal-backdrop").forEach(b => b.remove());
-    document.body.classList.remove("modal-open");
-    document.body.style.removeProperty("overflow");
-    document.body.style.removeProperty("padding-right");
-  });
+    modalElReabrir.addEventListener("hidden.bs.modal", function () {
+        document.querySelectorAll(".modal-backdrop").forEach(b => b.remove());
+        document.body.classList.remove("modal-open");
+        document.body.style.removeProperty("overflow");
+        document.body.style.removeProperty("padding-right");
+    });
 
-  // ---- Cargar tabla pendientes ----
-  cargarPendientes();
+    // ---- Cargar tabla pendientes ----
+    cargarPendientes();
 
-  // Select all
-  $("#chkAll").on("change", function () {
-    const checked = $(this).is(":checked");
-    $(".chkRow").prop("checked", checked);
-    actualizarBotonesAccion();
-  });
+    // ---- Select all ----
+    $("#chkAll").on("change", function () {
+        $(".chkRow").prop("checked", $(this).is(":checked"));
+        actualizarBotonesAccion();
+    });
 
-  // Abrir modal CERRAR con seleccionadas
-  $("#btnCerrarSeleccionadas").on("click", function () {
-    const ids = obtenerIdsSeleccionados();
-    if (ids.length === 0) return;
+    // ---- Abrir modal CERRAR ----
+    $("#btnCerrarSeleccionadas").on("click", function () {
+        const ids = obtenerIdsSeleccionados();
+        if (ids.length === 0) return;
+        renderListaConfirmacion(ids);
+        modalConfirmCerrar = abrirModalSeguro("modalConfirmCerrar");
+    });
 
-    renderListaConfirmacion(ids); // usa tu lista de cierre
-    modalConfirmCerrar = abrirModalSeguro("modalConfirmCerrar");
-  });
+    // ---- Confirmar cierre ----
+    $("#btnConfirmarCerrar").on("click", function () {
+        const ids = obtenerIdsSeleccionados();
+        if (ids.length === 0) {
+            $("#modalConfirmCerrar").modal("hide");
+            return;
+        }
+        cerrarOrdenes(ids);
+    });
 
-  // Confirmar cierre
-  $("#btnConfirmarCerrar").on("click", function () {
-      const ids = obtenerIdsSeleccionados();
-      if (ids.length === 0) {
-        $("#modalConfirmCerrar").modal("hide");
-        return;
-      }
-      cerrarOrdenes(ids); // aquí ya se manda pTipoPago desde dentro
-  });
+    // ---- Habilitar botón cerrar al seleccionar método de pago ----
+    $("#selectMetodoPago").on("change", function () {
+        $("#btnConfirmarCerrar").prop("disabled", !$(this).val());
+    });
 
-  
-  
-  $("#selectMetodoPago").on("change", function () {
-    if ($(this).val()) {
-      $("#btnConfirmarCerrar").prop("disabled", false);
-    } else {
-      $("#btnConfirmarCerrar").prop("disabled", true);
-    }
-  });
+    // ---- Abrir modal REABRIR — solo una orden a la vez ----
+    $("#btnReabrirSeleccionadas").on("click", function () {
+        const ids = obtenerIdsSeleccionados();
+        if (ids.length === 0) return;
 
-  
-  
-  
-  
-  $("#btnReabrirSeleccionadas").on("click", function () {
-    const ids = obtenerIdsSeleccionados();
-    if (ids.length === 0) return;
+        if (ids.length > 1) {
+            alert("Solo puedes reabrir una orden a la vez.");
+            return;
+        }
 
-    renderListaReabrir(ids);
-    modalConfirmReabrir = abrirModalSeguro("modalConfirmReabrir");
-  });
+        renderListaReabrir(ids);
+        modalConfirmReabrir = abrirModalSeguro("modalConfirmReabrir");
+    });
 
-  // Confirmar reabrir
-  $("#btnConfirmarReabrir").on("click", function () {
-    const ids = obtenerIdsSeleccionados();
-    if (ids.length === 0) {
-      modalConfirmReabrir.hide();
-      return;
-    }
-
-    modalConfirmReabrir.hide();  
-    reabrirOrdenes(ids);
-  });
+    // ---- Confirmar reabrir ----
+    $("#btnConfirmarReabrir").on("click", function () {
+        const ids = obtenerIdsSeleccionados();
+        if (ids.length === 0) {
+            modalConfirmReabrir.hide();
+            return;
+        }
+        modalConfirmReabrir.hide();
+        reabrirOrdenes(ids);
+    });
 
 });
 
 // ---------------- Funciones tabla ----------------
 
 function cargarPendientes() {
-  $.ajax({
-    url: "/admin/orden/pendientes",
-    type: "GET",
-    success: function (lista) {
-      renderPendientes(lista);
-    },
-    error: function (xhr) {
-      console.log("Error pendientes:", xhr.responseText);
-    }
-  });
+    $.ajax({
+        url: "/admin/orden/pendientes",
+        type: "GET",
+        success: function (lista) { renderPendientes(lista); },
+        error: function (xhr) { console.log("Error pendientes:", xhr.responseText); }
+    });
 }
 
 function renderPendientes(lista) {
-  const tbody = document.getElementById("tbodyPendientes");
-  const tpl = document.getElementById("tplPendienteRow");
+    const tbody = document.getElementById("tbodyPendientes");
+    const tpl   = document.getElementById("tplPendienteRow");
 
-  tbody.innerHTML = "";
+    tbody.innerHTML = "";
 
-  (lista || []).forEach(o => {
-    const idOrden = o.id_orden;
-    const node = tpl.content.cloneNode(true);
-    const tr = node.querySelector("tr");
+    (lista || []).forEach(o => {
+        const idOrden = o.id_orden;
+        const node    = tpl.content.cloneNode(true);
+        const tr      = node.querySelector("tr");
 
-    tr.dataset.idOrden = idOrden;
+        tr.dataset.idOrden = idOrden;
 
-    node.querySelector(".col-id").textContent = idOrden ?? "";
-    node.querySelector(".col-hora").textContent = o.t_hora_creacion ?? "";
-    node.querySelector(".col-total").textContent =
-      (o.p_total != null) ? `$${Number(o.p_total).toFixed(2)}` : "$0.00";
-    node.querySelector(".col-resumen").textContent = o.resumen ?? "";
+        node.querySelector(".col-id").textContent     = idOrden ?? "";
+        node.querySelector(".col-hora").textContent   = o.t_hora_creacion ?? "";
+        node.querySelector(".col-total").textContent  =
+            (o.p_total != null) ? `$${Number(o.p_total).toFixed(2)}` : "$0.00";
+        node.querySelector(".col-resumen").textContent = o.resumen ?? "";
 
-    const chk = node.querySelector(".chkRow");
+        const chk = node.querySelector(".chkRow");
 
-    chk.addEventListener("change", function () {
-      const total = $("#tbodyPendientes .chkRow").length;
-      const marcados = $("#tbodyPendientes .chkRow:checked").length;
-      $("#chkAll").prop("checked", total > 0 && marcados === total);
+        chk.addEventListener("change", function () {
+            const total   = $("#tbodyPendientes .chkRow").length;
+            const marcados = $("#tbodyPendientes .chkRow:checked").length;
+            $("#chkAll").prop("checked", total > 0 && marcados === total);
+            actualizarBotonesAccion();
+        });
 
-      actualizarBotonesAccion();
+        tr.addEventListener("click", function (e) {
+            const tag = e.target.tagName.toLowerCase();
+            if (tag === "input" || tag === "button" || tag === "a") return;
+
+            chk.checked = !chk.checked;
+
+            const total   = $("#tbodyPendientes .chkRow").length;
+            const marcados = $("#tbodyPendientes .chkRow:checked").length;
+            $("#chkAll").prop("checked", total > 0 && marcados === total);
+            actualizarBotonesAccion();
+        });
+
+        tbody.appendChild(node);
     });
 
-    tr.addEventListener("click", function (e) {
-      const tag = e.target.tagName.toLowerCase();
-      if (tag === "input" || tag === "button" || tag === "a") return;
-
-      chk.checked = !chk.checked;
-
-      const total = $("#tbodyPendientes .chkRow").length;
-      const marcados = $("#tbodyPendientes .chkRow:checked").length;
-      $("#chkAll").prop("checked", total > 0 && marcados === total);
-
-      actualizarBotonesAccion();
-    });
-
-    tbody.appendChild(node);
-  });
-
-  $("#chkAll").prop("checked", false);
-  actualizarBotonesAccion();
+    $("#chkAll").prop("checked", false);
+    actualizarBotonesAccion();
 }
 
 function obtenerIdsSeleccionados() {
-  const ids = [];
-  $("#tbodyPendientes tr").each(function () {
-    const tr = this;
-    const chk = tr.querySelector(".chkRow");
-    if (chk && chk.checked) ids.push(Number(tr.dataset.idOrden));
-  });
-  return ids;
+    const ids = [];
+    $("#tbodyPendientes tr").each(function () {
+        const chk = this.querySelector(".chkRow");
+        if (chk && chk.checked) ids.push(Number(this.dataset.idOrden));
+    });
+    return ids;
 }
 
 function actualizarBotonesAccion() {
-  const ids = obtenerIdsSeleccionados();
-  const disabled = ids.length === 0;
-
-  $("#btnCerrarSeleccionadas").prop("disabled", disabled);
-  $("#btnReabrirSeleccionadas").prop("disabled", disabled);
+    const disabled = obtenerIdsSeleccionados().length === 0;
+    $("#btnCerrarSeleccionadas").prop("disabled", disabled);
+    $("#btnReabrirSeleccionadas").prop("disabled", disabled);
 }
 
 function renderListaConfirmacion(ids) {
-  const ul = document.getElementById("listaOrdenesSeleccionadas");
-  ul.innerHTML = "";
-  ids.forEach(id => {
-    const li = document.createElement("li");
-    li.textContent = `Orden #${id}`;
-    ul.appendChild(li);
-  });
+    const ul = document.getElementById("listaOrdenesSeleccionadas");
+    ul.innerHTML = "";
+    ids.forEach(id => {
+        const li = document.createElement("li");
+        li.textContent = `Orden #${id}`;
+        ul.appendChild(li);
+    });
 }
 
 function renderListaReabrir(ids) {
-  const ul = document.getElementById("listaOrdenesReabrir");
-  ul.innerHTML = "";
-  ids.forEach(id => {
-    const li = document.createElement("li");
-    li.textContent = `Orden #${id}`;
-    ul.appendChild(li);
-  });
+    const ul = document.getElementById("listaOrdenesReabrir");
+    ul.innerHTML = "";
+    ids.forEach(id => {
+        const li = document.createElement("li");
+        li.textContent = `Orden #${id}`;
+        ul.appendChild(li);
+    });
 }
 
-
-
-
+// ---------------- Acciones ----------------
 
 function cerrarOrdenes(ids) {
-  $("#btnConfirmarCerrar").prop("disabled", true);
+    $("#btnConfirmarCerrar").prop("disabled", true);
 
-  // Tomamos el método de pago seleccionado en el modal
-  const metodoPago = $("#selectMetodoPago").val(); // 1 = efectivo, 2 = tarjeta
+    const metodoPago = $("#selectMetodoPago").val();
 
-  const requests = ids.map(idOrden =>
-    $.ajax({
-      url: "/admin/orden/gestionar",
-      type: "POST",
-      data: { 
-        idOrden: idOrden, 
-        tipoProceso: 1, 
-        idRol: 1, 
-        pTipoPago: metodoPago 
-      }
-    })
-  );
+    const requests = ids.map(idOrden =>
+        $.ajax({
+            url: "/admin/orden/gestionar",
+            type: "POST",
+            data: { idOrden: idOrden, tipoProceso: 1, idRol: 1, pTipoPago: metodoPago }
+        })
+    );
 
-  $.when.apply($, requests)
-    .done(function () {
-      $("#btnConfirmarCerrar").prop("disabled", false);
-      $("#modalConfirmCerrar").modal("hide");
-      cargarPendientes();
-    })
-    .fail(function (xhr) {
-      $("#btnConfirmarCerrar").prop("disabled", false);
-      console.log("Error cerrando:", xhr.responseText);
-      alert("No se pudieron cerrar una o más órdenes.");
-    });
+    $.when.apply($, requests)
+        .done(function () {
+            $("#btnConfirmarCerrar").prop("disabled", false);
+            $("#modalConfirmCerrar").modal("hide");
+            cargarPendientes();
+        })
+        .fail(function (xhr) {
+            $("#btnConfirmarCerrar").prop("disabled", false);
+            console.log("Error cerrando:", xhr.responseText);
+            alert("No se pudieron cerrar una o más órdenes.");
+        });
 }
-
-
-
-
-
-
-
-
-
-
 
 function reabrirOrdenes(ids) {
-  $("#btnConfirmarReabrir").prop("disabled", true);
-  console.log('entra: '+ids);
-  const requests = ids.map(idOrden =>
+    $("#btnConfirmarReabrir").prop("disabled", true);
+
+    const idOrden = ids[0]; // siempre una sola
+
     $.ajax({
-      url: "/admin/orden/gestionar",
-      type: "POST",
-      data: { idOrden: idOrden, tipoProceso: 5, idRol: 1 }
-    })
-
-  );
-
-  $.when.apply($, requests)
-    .always(function () {                 
-      $("#btnConfirmarReabrir").prop("disabled", false);
-      modalConfirmReabrir.hide();        
-      cargarPendientes();
+        url: "/admin/orden/gestionar",
+        type: "POST",
+        data: { idOrden: idOrden, tipoProceso: 6, idRol: null, pTipoPago: null },
+        success: function () {
+            // Redirigir a toma de orden con items ya cargados
+            window.location.href = "/admin/tomaOrden?idOrden=" + idOrden;
+        },
+        error: function (xhr) {
+            $("#btnConfirmarReabrir").prop("disabled", false);
+            console.error("Error reabriendo:", xhr.responseText);
+            alert("No se pudo reabrir la orden.");
+        }
     });
 }
-
-
