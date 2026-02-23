@@ -59,23 +59,25 @@ public class ProcedimientosAlmacenados {
 	}
 
 	
-	
-public Integer spAgregarItemConExtras(Integer idOrden, Integer idProducto, 
-            Integer cantidadProducto, String listaExtrasJson) {
+	public Integer spAgregarItemConExtras(Integer idOrden, Integer idProducto,
+	        Integer cantidadProducto, String listaExtrasJson, String comentario) {
 Integer idItem = null;
 
 try {
 conexionJDBC.getConexion();
 CallableStatement cs = ConexionJDBC.conn.prepareCall("{call sp_agregar_item_con_extras(?, ?, ?, ?)}");
 
+cs = ConexionJDBC.conn.prepareCall("{call sp_agregar_item_con_extras(?, ?, ?, ?, ?)}");
 cs.setInt(1, idOrden);
 cs.setInt(2, idProducto);
 cs.setInt(3, cantidadProducto);
 cs.setString(4, listaExtrasJson);
+if (comentario == null || comentario.isBlank()) cs.setNull(5, Types.VARCHAR);
+else                                             cs.setString(5, comentario);
 
 boolean isResultSet = cs.execute();
 
-// Recorrer todos los resultados hasta encontrar el SELECT
+
 while (true) {
 if (isResultSet) {
 try (ResultSet rs = cs.getResultSet()) {

@@ -59,31 +59,24 @@ public class ProcedimientosAlmacenadosController {
 	}
 	
 	
-	
 	@PostMapping("/admin/orden/agregarItem")
 	@ResponseBody
 	public Map<String, Object> agregarItem(
 	        @RequestParam("idOrden") Integer idOrden,
 	        @RequestParam("idProducto") Integer idProducto,
 	        @RequestParam("cantidadProducto") Integer cantidadProducto,
-	        @RequestParam("listaExtrasJson") String listaExtrasJson) {
-
-	//    log.info(">>> agregarItem() idOrden={}, idProducto={}, cantidadProducto={}, listaExtrasJson={}",
-	  //          idOrden, idProducto, cantidadProducto, listaExtrasJson);
+	        @RequestParam("listaExtrasJson") String listaExtrasJson,
+	        @RequestParam(value = "comentario", required = false) String comentario) {
 
 	    Integer idItem = procedimientosAlmacenados.spAgregarItemConExtras(
-	            idOrden,
-	            idProducto,
-	            cantidadProducto,
-	            listaExtrasJson
+	            idOrden, idProducto, cantidadProducto, listaExtrasJson, comentario
 	    );
 
-	    return Map.of(
-	            "idItem", idItem,
-	            "mensaje", "Item agregado correctamente"
-	    );
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("idItem",  idItem);
+	    response.put("mensaje", idItem != null ? "Item agregado correctamente" : "Error al agregar item");
+	    return response;
 	}
-
 	
 	
 	

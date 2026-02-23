@@ -4,87 +4,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reportes</title>
+    <title>Reportes — Rincón Arboledas</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=SF+Pro+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" th:href="@{/css/styleGeneracionReportes.css}">
 </head>
 
 <body>
 
-<!-- MESH GRADIENT FONDO -->
-<div class="mesh-bg" aria-hidden="true"></div>
-
-<!-- HEADER -->
-<header class="rpt-header">
-    <div class="rpt-header-inner">
-        <div class="rpt-header-left">
-            <a th:href="@{/admin/inicio}" class="btn-back">
-                <i class="bi bi-chevron-left"></i>
-            </a>
-            <div>
-                <p class="rpt-eyebrow">
-                    <i class="bi bi-chart-bar-fill"></i> Análisis
-                </p>
-                <h1 class="rpt-title">Reportes</h1>
-            </div>
-        </div>
-        <div class="rpt-header-right">
-            <span class="rpt-negocio" th:text="${nombreNegocio}">Nombre del negocio</span>
-            <div class="rpt-logo">
-                <img th:src="@{/img/arboledasLogo.jpg}" alt="Logo">
-            </div>
-        </div>
+<!-- ══ FRANJA IMAGEN ════════════════════════════════════════ -->
+<header class="rpt-strip">
+    <img class="rpt-strip__img" src="/img/granoscafe.jpg" alt="" aria-hidden="true">
+    <div class="rpt-strip__overlay"></div>
+    <div class="rpt-strip__content">
+        <span class="hero-badge">
+            <i class="bi bi-bar-chart-fill"></i> Reportes
+        </span>
+        <a th:href="@{/admin/inicio}" class="btn-back-strip">
+            <i class="bi bi-chevron-left"></i> Inicio
+        </a>
     </div>
 </header>
 
-<!-- MAIN -->
+<!-- ══ TÍTULO GRANDE ════════════════════════════════════════ -->
+<div class="header-block">
+    <div>
+        <p class="header-eyebrow">Análisis del día</p>
+        <h1 class="header-main-title">Reportes <em>&amp; Corte</em></h1>
+        <div class="header-divider"></div>
+    </div>
+    <div class="header-meta">
+        <span class="header-negocio" th:text="${nombreNegocio}">Rincón Arboledas</span>
+        <div class="header-logo">
+            <img th:src="@{/img/arboledasLogo.jpg}" alt="Logo">
+        </div>
+    </div>
+</div>
+
+<!-- ══ MAIN ═════════════════════════════════════════════════ -->
 <main class="rpt-main">
 
-    <!-- ══════════════════════════════════
-         SECCIÓN 1 — DETALLE DE ÓRDENES
-    ══════════════════════════════════ -->
-    <section class="glass-section reveal">
+    <!-- ── SECCIÓN 1: DETALLE DE ÓRDENES ─────────────────── -->
+    <section class="panel-card reveal">
 
         <!-- Cabecera -->
-        <div class="gs-header">
-            <div class="gs-title-group">
-                <div class="gs-icon">
-                    <i class="bi bi-receipt-cutoff"></i>
-                </div>
+        <div class="section-head">
+            <div class="section-title-group">
+                <span class="section-icon"><i class="bi bi-receipt-cutoff"></i></span>
                 <div>
-                    <h2 class="gs-title">Detalle de Órdenes</h2>
-                    <p class="gs-sub">Historial de transacciones cerradas</p>
+                    <h2 class="section-title">Detalle de Órdenes</h2>
+                    <p class="section-sub">Historial de transacciones cerradas hoy</p>
                 </div>
             </div>
 
-            <!-- FILTROS -->
-            <div class="filter-pill-group">
-                <button class="filter-pill active" id="btnFiltroTodos" data-filtro="">
-                    <i class="bi bi-square-fill"></i> Todos
+            <!-- Filtros -->
+            <div class="filter-group" role="group" aria-label="Filtro por método de pago">
+                <button class="filter-pill active" data-filtro="" aria-pressed="true">
+                    <i class="bi bi-list-ul"></i> Todos
                 </button>
-                <button class="filter-pill" id="btnFiltroEfectivo" data-filtro="1">
+                <button class="filter-pill" data-filtro="1" aria-pressed="false">
                     <i class="bi bi-cash-coin"></i> Efectivo
                 </button>
-                <button class="filter-pill" id="btnFiltroTarjeta" data-filtro="2">
-                    <i class="bi bi-creditcard"></i> Tarjeta
+                <button class="filter-pill" data-filtro="2" aria-pressed="false">
+                    <i class="bi bi-credit-card-fill"></i> Tarjeta
                 </button>
             </div>
         </div>
 
-        <!-- Toolbar tabla -->
+        <!-- Toolbar -->
         <div class="table-toolbar">
             <span class="tbl-count" id="labelConteo">— registros</span>
-            <div class="search-wrap">
-                <i class="bi bi-search"></i>
-                <input type="text" id="inputBuscar" placeholder="Buscar orden…">
-            </div>
+            <label class="search-wrap">
+                <i class="bi bi-search" aria-hidden="true"></i>
+                <input type="text" id="inputBuscar" placeholder="Buscar orden…" autocomplete="off">
+            </label>
         </div>
 
         <!-- Tabla -->
-        <div class="table-responsive">
-            <table class="rpt-table" id="tablaDetalle">
+        <div class="table-wrap">
+            <table class="rpt-table" id="tablaDetalle" aria-label="Detalle de órdenes">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -100,7 +100,7 @@
                         <td colspan="6">
                             <div class="empty-state">
                                 <i class="bi bi-arrow-down-circle"></i>
-                                <span>Sin datos aún</span>
+                                <span>Cargando datos…</span>
                             </div>
                         </td>
                     </tr>
@@ -108,34 +108,29 @@
             </table>
         </div>
 
-        <!-- Barra descarga -->
+        <!-- Barra de descarga -->
         <div class="download-bar">
-            <span class="dl-label">
-                <i class="bi bi-file-earmark-excel-fill"></i> Exportar Excel
-            </span>
-            <button class="dl-btn dl-detalle" id="btnDescargaDetalle">
-                <i class="bi bi-table"></i> Detalle
+            <span class="dl-label"><i class="bi bi-file-earmark-excel-fill"></i> Exportar Excel</span>
+            <button class="btn-dl btn-dl--all" id="btnDescargaDetalle">
+                <i class="bi bi-table"></i> Todos
             </button>
-            <button class="dl-btn dl-filtro" id="btnDescargaFiltro">
-                <i class="bi bi-funnel-fill"></i> Con filtro
+            <button class="btn-dl btn-dl--filter" id="btnDescargaFiltro">
+                <i class="bi bi-funnel-fill"></i> Con filtro activo
             </button>
         </div>
 
     </section>
 
-    <!-- ══════════════════════════════════
-         SECCIÓN 2 — CORTE DE CAJA
-    ══════════════════════════════════ -->
-    <section class="glass-section reveal" style="animation-delay:.1s">
+    <!-- ── SECCIÓN 2: CORTE DE CAJA ───────────────────────── -->
+    <section class="panel-card reveal" style="animation-delay:.12s">
 
-        <div class="gs-header">
-            <div class="gs-title-group">
-                <div class="gs-icon gs-icon--green">
-                    <i class="bi bi-safe2-fill"></i>
-                </div>
+        <!-- Cabecera -->
+        <div class="section-head">
+            <div class="section-title-group">
+                <span class="section-icon section-icon--green"><i class="bi bi-safe2-fill"></i></span>
                 <div>
-                    <h2 class="gs-title">Corte de Caja</h2>
-                    <p class="gs-sub">Totales del periodo seleccionado</p>
+                    <h2 class="section-title">Corte de Caja</h2>
+                    <p class="section-sub">Totales consolidados del periodo</p>
                 </div>
             </div>
             <button class="btn-corte" id="btnGenerarCorte">
@@ -145,44 +140,39 @@
 
         <!-- Cards totales -->
         <div class="corte-grid">
-
             <div class="corte-card cc-total">
-                <div class="cc-icon"><i class="bi bi-currency-dollar"></i></div>
+                <span class="cc-icon"><i class="bi bi-currency-dollar"></i></span>
                 <div class="cc-body">
                     <span class="cc-label">Total general</span>
                     <span class="cc-value" id="totalGeneral">—</span>
                 </div>
             </div>
-
             <div class="corte-card cc-efectivo">
-                <div class="cc-icon"><i class="bi bi-cash-stack"></i></div>
+                <span class="cc-icon"><i class="bi bi-cash-stack"></i></span>
                 <div class="cc-body">
                     <span class="cc-label">Efectivo</span>
                     <span class="cc-value" id="totalEfectivo">—</span>
                 </div>
             </div>
-
             <div class="corte-card cc-tarjeta">
-                <div class="cc-icon"><i class="bi bi-credit-card-fill"></i></div>
+                <span class="cc-icon"><i class="bi bi-credit-card-fill"></i></span>
                 <div class="cc-body">
                     <span class="cc-label">Tarjeta</span>
                     <span class="cc-value" id="totalTarjeta">—</span>
                 </div>
             </div>
-
             <div class="corte-card cc-ordenes">
-                <div class="cc-icon"><i class="bi bi-clipboard2-check-fill"></i></div>
+                <span class="cc-icon"><i class="bi bi-clipboard2-check-fill"></i></span>
                 <div class="cc-body">
                     <span class="cc-label">Órdenes cerradas</span>
                     <span class="cc-value" id="totalOrdenes">—</span>
                 </div>
             </div>
-
         </div>
 
-        <!-- Tabla corte -->
-        <div class="table-responsive" id="wrapTablaCorte" style="display:none;">
-            <table class="rpt-table" id="tablaCorte">
+        <!-- Tabla corte (oculta hasta generar) -->
+        <div class="table-wrap" id="wrapTablaCorte" style="display:none;">
+            <table class="rpt-table" id="tablaCorte" aria-label="Resumen de corte">
                 <thead>
                     <tr>
                         <th>Método de pago</th>
@@ -196,9 +186,16 @@
 
     </section>
 
+    <!-- Regresar -->
+    <div class="d-flex justify-content-start">
+        <a th:href="@{/admin/inicio}" href="/admin/inicio" class="btn-back-main">
+            <i class="bi bi-arrow-left"></i> Regresar al inicio
+        </a>
+    </div>
+
 </main>
 
-<!-- FOOTER -->
+<!-- ══ FOOTER ════════════════════════════════════════════════ -->
 <footer class="rpt-footer">
     <span>&copy; 2025 · <span th:text="${nombreNegocio}">Negocio</span>. Todos los derechos reservados.</span>
     <span>Módulo de Reportes</span>

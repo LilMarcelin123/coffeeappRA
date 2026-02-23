@@ -1,296 +1,344 @@
 // ─────────────────────────────────────────────────────────────
-// Reportes.js
-// /js/Reportes/Reportes.js
+// Reportes.js  —  /js/Reportes/Reportes.js
+// Rincón Arboledas · módulo de reportes y corte de caja
 // ─────────────────────────────────────────────────────────────
 
-let filtroActivo = null;      // null = todos, 1 = efectivo, 2 = tarjeta
-let datosDetalle = [];        // cache de la última respuesta
+/* ── CONSTANTES ─────────────────────────────────────────────── */
+const API = {
+    detalle : "/admin/reportes/detalle",
+    corte   : "/admin/reportes/corte",
+    excel   : "/admin/reportes/excel",
+};
 
-// ── AL CARGAR ────────────────────────────────────────────────
-$(document).ready(function () {
+const SUFIJO_EXCEL = { 1: "_efectivo", 2: "_tarjeta" };
+
+const METODO = {
+    EFECTIVO      : "EFECTIVO",
+    TARJETA       : "TARJETA",
+    TOTAL_GENERAL : "TOTAL GENERAL",
+};
+
+/* ── ESTADO DEL MÓDULO ─────────────────────────────────────── */
+const estado = {
+    filtroActivo  : null,   // null = todos | 1 = efectivo | 2 = tarjeta
+    datosDetalle  : [],     // cache de la última respuesta de detalle
+};
+
+/* ── REFERENCIAS DOM ────────────────────────────────────────── */
+const dom = {
+    tbodyDetalle   : () => document.getElementById("tbodyDetalle"),
+    tbodyCorte     : () => document.getElementById("tbodyCorte"),
+    labelConteo    : () => document.getElementById("labelConteo"),
+    wrapTablaCorte : () => document.getElementById("wrapTablaCorte"),
+    btnCorte       : () => document.getElementById("btnGenerarCorte"),
+    totalGeneral   : () => document.getElementById("totalGeneral"),
+    totalEfectivo  : () => document.getElementById("totalEfectivo"),
+    totalTarjeta   : () => document.getElementById("totalTarjeta"),
+    totalOrdenes   : () => document.getElementById("totalOrdenes"),
+};
+
+/* ════════════════════════════════════════════════════════════
+   INICIALIZACIÓN
+   ════════════════════════════════════════════════════════════ */
+$(document).ready(() => {
 
     cargarDetalle(null);
 
+    /* Filtros de método de pago */
     $(".filter-pill").on("click", function () {
-        $(".filter-pill").removeClass("active");
-        $(this).addClass("active");
+        $(".filter-pill").removeClass("active").attr("aria-pressed", "false");
+        $(this).addClass("active").attr("aria-pressed", "true");
 
-        const filtro = $(this).data("filtro");
-        filtroActivo = filtro === "" ? null : parseInt(filtro);
-        cargarDetalle(filtroActivo);
+        const val = $(this).data("filtro");
+        estado.filtroActivo = val === "" ? null : parseInt(val, 10);
+        cargarDetalle(estado.filtroActivo);
     });
 
+    /* Búsqueda local */
     $("#inputBuscar").on("input", function () {
-        const q = $(this).val().toLowerCase().trim();
-        filtrarTablaLocal(q);
+        filtrarTablaLocal($(this).val().trim().toLowerCase());
     });
 
-    $("#btnGenerarCorte").on("click", function () {
-        cargarCorte();
-    });
+    /* Corte */
+    $("#btnGenerarCorte").on("click", cargarCorte);
 
+    /* Descargas Excel */
     $("#btnDescargaDetalle").on("click", function () {
         descargarExcel(null, this);
     });
 
     $("#btnDescargaFiltro").on("click", function () {
-        descargarExcel(filtroActivo, this);
+        descargarExcel(estado.filtroActivo, this);
     });
+
 });
 
-// ── DETALLE DE ÓRDENES ───────────────────────────────────────
+/* ════════════════════════════════════════════════════════════
+   DETALLE DE ÓRDENES
+   ════════════════════════════════════════════════════════════ */
 function cargarDetalle(idTipoPago) {
     const params = idTipoPago != null ? { idTipoPago } : {};
-
-    mostrarLoadingDetalle();
+    renderEstadoTabla(dom.tbodyDetalle(), "loading");
 
     $.ajax({
-        url: "/admin/reportes/detalle",
-        type: "GET",
-        data: params,
-        success: function (lista) {
-            datosDetalle = lista || [];
-            renderTablaDetalle(datosDetalle);
-            $("#labelConteo").text(`${datosDetalle.length} registro${datosDetalle.length !== 1 ? "s" : ""}`);
+        url     : API.detalle,
+        type    : "GET",
+        data    : params,
+        success(lista) {
+            estado.datosDetalle = lista ?? [];
+            renderTablaDetalle(estado.datosDetalle);
+            actualizarConteo(estado.datosDetalle.length);
         },
-        error: function (xhr) {
+        error(xhr) {
             console.error("Error detalle:", xhr.responseText);
-            mostrarErrorDetalle();
-        }
+            renderEstadoTabla(dom.tbodyDetalle(), "error");
+        },
     });
 }
 
 function renderTablaDetalle(lista) {
-    const tbody = document.getElementById("tbodyDetalle");
+    const tbody = dom.tbodyDetalle();
     tbody.innerHTML = "";
 
-    if (!lista || lista.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="6">
-                    <div class="empty-state">
-                        <i class="bi bi-inbox"></i>
-                        <span>Sin órdenes cerradas hoy</span>
-                    </div>
-                </td>
-            </tr>`;
+    if (!lista?.length) {
+        renderEstadoTabla(tbody, "empty");
         return;
     }
 
+    const fragment = document.createDocumentFragment();
+
     lista.forEach((row, idx) => {
-        const metodo     = (row.metodo_pago || "").toString().toUpperCase();
-        const badgeClass = metodo === "EFECTIVO" ? "badge-efectivo" : "badge-tarjeta";
-        const badgeIcon  = metodo === "EFECTIVO"
-            ? '<i class="bi bi-cash-coin"></i>'
-            : '<i class="bi bi-credit-card-fill"></i>';
+        const metodo     = String(row.metodo_pago ?? "").toUpperCase();
+        const esEfectivo = metodo === METODO.EFECTIVO;
+        const badgeClass = esEfectivo ? "badge-efectivo" : "badge-tarjeta";
+        const badgeIcon  = esEfectivo
+            ? '<i class="bi bi-cash-coin" aria-hidden="true"></i>'
+            : '<i class="bi bi-credit-card-fill" aria-hidden="true"></i>';
 
         const total = row.total != null
             ? `$${Number(row.total).toFixed(2)}`
             : "$0.00";
 
         const hora = row.hora_cierre
-            ? row.hora_cierre.toString().replace("T", " ").substring(0, 19)
+            ? String(row.hora_cierre).replace("T", " ").substring(0, 19)
             : "—";
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
-            <td style="color:var(--text-muted); font-size:.78rem;">${idx + 1}</td>
+            <td style="color:var(--text-muted);font-size:.78rem;">${idx + 1}</td>
             <td><strong>#${row.id_orden ?? "—"}</strong></td>
-            <td style="font-size:.82rem; color:var(--text-muted);">${hora}</td>
-            <td style="font-size:.82rem; max-width:260px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                ${row.resumen || "—"}
+            <td style="font-size:.82rem;color:var(--text-muted);">${hora}</td>
+            <td style="font-size:.82rem;max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                ${row.resumen ?? "—"}
             </td>
-            <td>
-                <span class="${badgeClass}">
-                    ${badgeIcon} ${metodo || "—"}
-                </span>
-            </td>
+            <td><span class="${badgeClass}">${badgeIcon} ${metodo || "—"}</span></td>
             <td class="td-total">${total}</td>
         `;
-        tbody.appendChild(tr);
+        fragment.appendChild(tr);
     });
+
+    tbody.appendChild(fragment);
 }
 
 function filtrarTablaLocal(q) {
     if (!q) {
-        renderTablaDetalle(datosDetalle);
+        renderTablaDetalle(estado.datosDetalle);
+        actualizarConteo(estado.datosDetalle.length);
         return;
     }
 
-    const filtrados = datosDetalle.filter(row => {
-        return (
-            String(row.id_orden    ?? "").includes(q) ||
-            String(row.resumen     ?? "").toLowerCase().includes(q) ||
-            String(row.metodo_pago ?? "").toLowerCase().includes(q)
-        );
-    });
+    const filtrados = estado.datosDetalle.filter(row =>
+        String(row.id_orden    ?? "").includes(q) ||
+        String(row.resumen     ?? "").toLowerCase().includes(q) ||
+        String(row.metodo_pago ?? "").toLowerCase().includes(q)
+    );
 
     renderTablaDetalle(filtrados);
-    $("#labelConteo").text(`${filtrados.length} de ${datosDetalle.length} registros`);
+    dom.labelConteo().textContent = `${filtrados.length} de ${estado.datosDetalle.length} registros`;
 }
 
-function mostrarLoadingDetalle() {
-    document.getElementById("tbodyDetalle").innerHTML = `
-        <tr>
-            <td colspan="6">
-                <div class="empty-state">
-                    <i class="bi bi-arrow-down-circle"></i>
-                    <span>Cargando datos…</span>
-                </div>
-            </td>
-        </tr>`;
-}
-
-function mostrarErrorDetalle() {
-    document.getElementById("tbodyDetalle").innerHTML = `
-        <tr>
-            <td colspan="6">
-                <div class="empty-state">
-                    <i class="bi bi-exclamation-circle"></i>
-                    <span>Error al cargar los datos</span>
-                </div>
-            </td>
-        </tr>`;
-}
-
-// ── CORTE DE CAJA ────────────────────────────────────────────
+/* ════════════════════════════════════════════════════════════
+   CORTE DE CAJA
+   ════════════════════════════════════════════════════════════ */
 function cargarCorte() {
-    const btn = document.getElementById("btnGenerarCorte");
-    btn.disabled = true;
-    btn.innerHTML = `<i class="bi bi-hourglass-split"></i> Calculando…`;
+    const btn = dom.btnCorte();
+    setBotonCargando(btn, true, "Calculando…");
 
     $.ajax({
-        url: "/admin/reportes/corte",
+        url: API.corte,
         type: "GET",
-        success: function (lista) {
-            btn.disabled = false;
-            btn.innerHTML = `<i class="bi bi-play-circle-fill"></i> Generar corte`;
+        success(lista) {
+            setBotonCargando(btn, false, '<i class="bi bi-play-circle-fill"></i> Generar corte');
 
-            if (!lista || lista.length === 0) {
+            if (!lista?.length) {
                 resetCardsCorte();
                 return;
             }
 
             renderCardsCorte(lista);
             renderTablaCorte(lista);
-            $("#wrapTablaCorte").show();
+            dom.wrapTablaCorte().style.display = "block";
         },
-        error: function (xhr) {
-            btn.disabled = false;
-            btn.innerHTML = `<i class="bi bi-play-circle-fill"></i> Generar corte`;
+        error(xhr) {
+            setBotonCargando(btn, false, '<i class="bi bi-play-circle-fill"></i> Generar corte');
             console.error("Error corte:", xhr.responseText);
             alert("No se pudo generar el corte.");
-        }
+        },
     });
 }
 
 function renderCardsCorte(lista) {
-    let totalGeneral  = 0;
-    let totalEfectivo = 0;
-    let totalTarjeta  = 0;
-    let totalOrdenes  = 0;
+    const totales = { general: 0, efectivo: 0, tarjeta: 0, ordenes: 0 };
 
     lista.forEach(row => {
-        const metodo  = (row.metodo_pago || "").toUpperCase();
-        const monto   = Number(row.total_monto   || 0);
-        const ordenes = Number(row.total_ordenes || 0);
+        const metodo  = String(row.metodo_pago ?? "").toUpperCase();
+        const monto   = Number(row.total_monto   ?? 0);
+        const ordenes = Number(row.total_ordenes  ?? 0);
 
-        if (metodo === "TOTAL GENERAL") {
-            totalGeneral = monto;
-            totalOrdenes = ordenes;
-        } else if (metodo === "EFECTIVO") {
-            totalEfectivo = monto;
-        } else if (metodo === "TARJETA") {
-            totalTarjeta = monto;
-        }
+        if      (metodo === METODO.TOTAL_GENERAL) { totales.general  = monto;   totales.ordenes = ordenes; }
+        else if (metodo === METODO.EFECTIVO)      { totales.efectivo = monto; }
+        else if (metodo === METODO.TARJETA)       { totales.tarjeta  = monto; }
     });
 
-    animarValor("totalGeneral",  `$${totalGeneral.toFixed(2)}`);
-    animarValor("totalEfectivo", `$${totalEfectivo.toFixed(2)}`);
-    animarValor("totalTarjeta",  `$${totalTarjeta.toFixed(2)}`);
-    animarValor("totalOrdenes",  totalOrdenes.toString());
+    animarValor(dom.totalGeneral(),  `$${totales.general.toFixed(2)}`);
+    animarValor(dom.totalEfectivo(), `$${totales.efectivo.toFixed(2)}`);
+    animarValor(dom.totalTarjeta(),  `$${totales.tarjeta.toFixed(2)}`);
+    animarValor(dom.totalOrdenes(),  String(totales.ordenes));
 }
 
 function renderTablaCorte(lista) {
-    const tbody = document.getElementById("tbodyCorte");
+    const tbody    = dom.tbodyCorte();
     tbody.innerHTML = "";
+    const fragment = document.createDocumentFragment();
 
     lista.forEach(row => {
-        const metodo  = row.metodo_pago || "—";
+        const metodo  = row.metodo_pago ?? "—";
         const ordenes = row.total_ordenes ?? 0;
-        const monto   = Number(row.total_monto || 0);
-        const esTotal = metodo.toUpperCase() === "TOTAL GENERAL";
+        const monto   = Number(row.total_monto ?? 0);
+        const esTotal = metodo.toUpperCase() === METODO.TOTAL_GENERAL;
 
         const tr = document.createElement("tr");
-        if (esTotal) tr.style.fontWeight = "600";
+        if (esTotal) tr.style.fontWeight = "700";
 
         tr.innerHTML = `
-            <td>${esTotal ? "<strong>" + metodo + "</strong>" : metodo}</td>
+            <td>${esTotal ? `<strong>${metodo}</strong>` : metodo}</td>
             <td>${ordenes}</td>
             <td class="td-total">$${monto.toFixed(2)}</td>
         `;
-        tbody.appendChild(tr);
+        fragment.appendChild(tr);
     });
+
+    tbody.appendChild(fragment);
 }
 
 function resetCardsCorte() {
-    ["totalGeneral", "totalEfectivo", "totalTarjeta", "totalOrdenes"].forEach(id => {
-        document.getElementById(id).textContent = "—";
-    });
+    [dom.totalGeneral(), dom.totalEfectivo(), dom.totalTarjeta(), dom.totalOrdenes()]
+        .forEach(el => { if (el) el.textContent = "—"; });
 }
 
-function animarValor(elementId, nuevoValor) {
-    const el = document.getElementById(elementId);
-    el.style.opacity = "0";
+/* ════════════════════════════════════════════════════════════
+   DESCARGA EXCEL
+   ════════════════════════════════════════════════════════════ */
+async function descargarExcel(idTipoPago, btnEl) {
+    const textoOriginal = btnEl.innerHTML;
+    setBotonCargando(btnEl, true, "Generando…");
+
+    const sufijo = SUFIJO_EXCEL[idTipoPago] ?? "_todos";
+    const query  = idTipoPago != null ? `?idTipoPago=${idTipoPago}` : "";
+    const url    = `${API.excel}${query}`;
+    const hoy    = new Date().toISOString().slice(0, 10);
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Error ${response.status}`);
+
+        const blob      = await response.blob();
+        const objectURL = URL.createObjectURL(blob);
+        const link      = document.createElement("a");
+
+        link.href     = objectURL;
+        link.download = `detalle_ordenes${sufijo}_${hoy}.xlsx`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(objectURL);
+
+    } catch (err) {
+        console.error("Error al descargar Excel:", err);
+        alert("No se pudo generar el Excel. Intenta de nuevo.");
+    } finally {
+        setBotonCargando(btnEl, false, textoOriginal);
+    }
+}
+
+/* ════════════════════════════════════════════════════════════
+   UTILIDADES
+   ════════════════════════════════════════════════════════════ */
+
+/**
+ * Renderiza un estado visual en un tbody (loading | empty | error).
+ * @param {HTMLElement} tbody
+ * @param {"loading"|"empty"|"error"} tipo
+ */
+function renderEstadoTabla(tbody, tipo) {
+    const estados = {
+        loading : { icon: "bi-arrow-down-circle", texto: "Cargando datos…"            },
+        empty   : { icon: "bi-inbox",             texto: "Sin órdenes cerradas hoy"   },
+        error   : { icon: "bi-exclamation-circle",texto: "Error al cargar los datos"  },
+    };
+
+    const { icon, texto } = estados[tipo] ?? estados.empty;
+    const cols = tbody.closest("table")?.querySelectorAll("thead th")?.length ?? 6;
+
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="${cols}">
+                <div class="empty-state">
+                    <i class="bi ${icon}" aria-hidden="true"></i>
+                    <span>${texto}</span>
+                </div>
+            </td>
+        </tr>`;
+}
+
+/**
+ * Habilita o deshabilita un botón y cambia su texto mientras está cargando.
+ * @param {HTMLElement} btn
+ * @param {boolean} cargando
+ * @param {string} textoCargando  — HTML del texto mientras carga
+ */
+function setBotonCargando(btn, cargando, textoCargando) {
+    btn.disabled = cargando;
+    if (cargando) {
+        btn.innerHTML = `<i class="bi bi-hourglass-split" aria-hidden="true"></i> ${textoCargando}`;
+    } else {
+        btn.innerHTML = textoCargando;   // texto original restaurado por el caller
+    }
+}
+
+/**
+ * Anima el cambio de valor de un elemento con fade + slide.
+ * @param {HTMLElement} el
+ * @param {string} nuevoValor
+ */
+function animarValor(el, nuevoValor) {
+    if (!el) return;
+    el.style.opacity   = "0";
     el.style.transform = "translateY(6px)";
+
     setTimeout(() => {
-        el.textContent = nuevoValor;
+        el.textContent     = nuevoValor;
         el.style.transition = "opacity .35s ease, transform .35s ease";
-        el.style.opacity = "1";
+        el.style.opacity   = "1";
         el.style.transform = "translateY(0)";
     }, 150);
 }
 
-// ── EXCEL ────────────────────────────────────────────────────
-function descargarExcel(idTipoPago, btnEl) {
-
-    // Feedback visual en el botón
-    const textoOriginal = btnEl.innerHTML;
-    btnEl.disabled = true;
-    btnEl.innerHTML = `<i class="bi bi-hourglass-split"></i> Generando…`;
-
-    const params = idTipoPago != null ? `?idTipoPago=${idTipoPago}` : "";
-    const url    = `/admin/reportes/excel${params}`;
-
-    // Usamos fetch para detectar errores del servidor
-    fetch(url)
-        .then(response => {
-            if (!response.ok) throw new Error(`Error ${response.status}`);
-            return response.blob();
-        })
-        .then(blob => {
-            // Crear enlace temporal y disparar descarga
-            const link     = document.createElement("a");
-            const objetoURL = URL.createObjectURL(blob);
-            const hoy      = new Date().toISOString().slice(0, 10);
-            const sufijo   = idTipoPago === 1 ? "_efectivo"
-                           : idTipoPago === 2 ? "_tarjeta"
-                           : "_todos";
-
-            link.href     = objetoURL;
-            link.download = `detalle_ordenes${sufijo}_${hoy}.xlsx`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(objetoURL);
-        })
-        .catch(err => {
-            console.error("Error al descargar Excel:", err);
-            alert("No se pudo generar el Excel. Intenta de nuevo.");
-        })
-        .finally(() => {
-            // Restaurar botón
-            btnEl.disabled  = false;
-            btnEl.innerHTML = textoOriginal;
-        });
+/**
+ * Actualiza el texto del contador de registros.
+ * @param {number} n
+ */
+function actualizarConteo(n) {
+    const el = dom.labelConteo();
+    if (el) el.textContent = `${n} registro${n !== 1 ? "s" : ""}`;
 }
