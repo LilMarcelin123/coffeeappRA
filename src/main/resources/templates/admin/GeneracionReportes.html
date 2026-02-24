@@ -186,6 +186,41 @@
 
     </section>
 
+    <!-- ── SECCIÓN 3: CIERRE DEL DÍA ─────────────────────── -->
+    <section class="panel-card reveal" style="animation-delay:.24s">
+
+        <div class="section-head">
+            <div class="section-title-group">
+                <span class="section-icon section-icon--red">
+                    <i class="bi bi-door-closed-fill"></i>
+                </span>
+                <div>
+                    <h2 class="section-title">Cierre del Día</h2>
+                    <p class="section-sub">Archiva el historial y reinicia las tablas operativas</p>
+                </div>
+            </div>
+
+            <button class="btn-cierre-dia" id="btnAbrirCierre">
+                <i class="bi bi-door-closed-fill"></i>
+                Ejecutar cierre del día
+            </button>
+        </div>
+
+        <!-- Advertencia -->
+        <div class="cierre-warning">
+            <i class="bi bi-exclamation-triangle-fill cierre-warning__icon"></i>
+            <div>
+                <strong>Acción irreversible.</strong>
+                Al ejecutar el cierre, todas las órdenes
+                cerradas de hoy se archivan en el historial y las tablas
+                operativas (<code>orden</code>, <code>orden_item</code>,
+                <code>orden_item_opcion</code>, <code>orden_preparacion</code>)
+                se reinician para comenzar un nuevo día.
+            </div>
+        </div>
+
+    </section>
+
     <!-- Regresar -->
     <div class="d-flex justify-content-start">
         <a th:href="@{/admin/inicio}" href="/admin/inicio" class="btn-back-main">
@@ -201,9 +236,76 @@
     <span>Módulo de Reportes</span>
 </footer>
 
+<!-- ══ MODAL CONFIRMACIÓN CIERRE ════════════════════════════ -->
+<div class="modal fade" id="modalConfirmCierre" tabindex="-1"
+     data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:460px;">
+        <div class="modal-content border-0 shadow-lg" style="border-radius:20px;overflow:hidden;">
+
+            <!-- Header rojo -->
+            <div class="modal-header border-0 px-4 pt-4 pb-2"
+                 style="background:linear-gradient(135deg,#b91c1c,#ef4444);">
+                <div class="d-flex align-items-center gap-3">
+                    <span style="font-size:32px;">🔴</span>
+                    <div>
+                        <h5 class="modal-title fw-bold text-white mb-0">
+                            Confirmar cierre del día
+                        </h5>
+                        <small class="text-white opacity-75">Esta acción no se puede deshacer</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body px-4 py-3">
+                <p class="text-muted small mb-3">
+                    Se archivarán las siguientes órdenes cerradas:
+                </p>
+                <div id="resumenPreCierre" class="mb-3">
+                    <div class="d-flex justify-content-center py-2">
+                        <div class="spinner-border spinner-border-sm text-danger"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-muted">
+                        Observaciones <span class="fw-normal">(opcional)</span>
+                    </label>
+                    <textarea id="inputObservaciones" class="form-control form-control-sm"
+                              rows="2"
+                              placeholder="Ej: Cierre normal, sin incidencias"
+                              style="border-radius:10px;"></textarea>
+                </div>
+                <div class="alert py-2 small mb-0"
+                     style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;color:#991b1b;">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Los datos quedarán guardados en el historial y podrás consultarlos después.
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer border-0 px-4 pb-4 pt-2">
+                <button class="btn btn-outline-secondary btn-sm rounded-pill px-4"
+                        data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+                <button id="btnConfirmarCierreFinal"
+                        class="btn btn-danger btn-sm rounded-pill px-4 fw-bold"
+                        onclick="ejecutarCierre()">
+                    <span id="spinnerCierre"
+                          class="spinner-border spinner-border-sm me-1"
+                          style="display:none;"></span>
+                    <i class="bi bi-door-closed-fill me-1"></i>
+                    Sí, ejecutar cierre
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script type="module" th:src="@{/js/Reportes/Reportes.js}"></script>
+<script th:src="@{/js/Reportes/Reportes.js}"></script>
 
 </body>
 </html>

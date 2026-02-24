@@ -21,6 +21,8 @@ import java.sql.ResultSetMetaData;
 import lombok.extern.slf4j.Slf4j;
 import com.icaro.coffeeapp.utils.ConexionJDBC;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 @Service
 @Slf4j
 public class ProcedimientosAlmacenados {
@@ -526,11 +528,334 @@ public Map<String, List<Map<String, Object>>> spOperadorOrdenes(Integer idRol) {
 
 
 
+//════════════════════════════════════════════════════════════════════════════
+//PEGAR ESTOS MÉTODOS DENTRO DE LA CLASE ProcedimientosAlmacenados
+//Agregar este import al inicio del archivo si no lo tienes:
+//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+//════════════════════════════════════════════════════════════════════════════
+
+
+// ── Encoder BCrypt (reutilizable, igual al que usa Spring Security) ────────
+private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+
+// ─────────────────────────────────────────────────────────────────────────
+// LISTAR TODOS LOS USUARIOS  (proceso 1)
+// Uso: GET /api/usuarios
+// ─────────────────────────────────────────────────────────────────────────
+public List<Map<String, Object>> spListarUsuarios() {
+    List<Map<String, Object>> lista = new ArrayList<>();
+    String sql = "{CALL sp_gestion_usuarios(?, NULL, NULL, NULL, NULL, NULL)}";
+
+    try (Connection conn = conexionJDBC.getConexion2();
+         CallableStatement cs = conn.prepareCall(sql)) {
+
+        cs.setInt(1, 1);
+
+        try (ResultSet rs = cs.executeQuery()) {
+            ResultSetMetaData meta = rs.getMetaData();
+            int cols = meta.getColumnCount();
+
+            while (rs.next()) {
+                Map<String, Object> fila = new LinkedHashMap<>();
+                for (int i = 1; i <= cols; i++) {
+                    fila.put(meta.getColumnLabel(i), rs.getObject(i));
+                }
+                lista.add(fila);
+            }
+        }
+
+    } catch (SQLException | ClassNotFoundException e) {
+        e.printStackTrace();
+    }
+    return lista;
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────
+// OBTENER USUARIO POR ID  (proceso 2)  — NO devuelve password
+// Uso: GET /api/usuarios/{id}
+// ─────────────────────────────────────────────────────────────────────────
+public Map<String, Object> spObtenerUsuarioPorId(Integer id) {
+    String sql = "{CALL sp_gestion_usuarios(?, NULL, NULL, NULL, NULL, ?)}";
+
+    try (Connection conn = conexionJDBC.getConexion2();
+         CallableStatement cs = conn.prepareCall(sql)) {
+
+        cs.setInt(1, 2);
+        cs.setInt(2, id);
+
+        try (ResultSet rs = cs.executeQuery()) {
+            if (rs.next()) {
+                Map<String, Object> fila = new LinkedHashMap<>();
+                ResultSetMetaData meta = rs.getMetaData();
+                for (int i = 1; i <= meta.getColumnCount(); i++) {
+                    fila.put(meta.getColumnLabel(i), rs.getObject(i));
+                }
+                return fila;
+            }
+        }
+
+    } catch (SQLException | ClassNotFoundException e) {
+        e.printStackTrace();
+    }
+    return null;
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────
+// CREAR USUARIO  (proceso 3)
+// Spring encripta el password con BCrypt AQUÍ, antes de pasar al SP
+// Devuelve: Map con "resultado"(0=OK,1=user dup,2=email dup), "mensaje", "nuevo_id"
+// ─────────────────────────────────────────────────────────────────────────
+public Map<String, Object> spCrearUsuario(String username, String passwordPlano,
+                                          String telefono, Integer idRol) {
+    // ── Encriptar contraseña ANTES de tocar la BD ──
+    String hashBcrypt = passwordEncoder.encode(passwordPlano);
+
+    String sql = "{CALL sp_gestion_usuarios(?, ?, ?, ?, ?, NULL)}";
+
+    try (Connection conn = conexionJDBC.getConexion2();
+         CallableStatement cs = conn.prepareCall(sql)) {
+
+        cs.setInt(1, 3);
+        cs.setString(2, username);
+        cs.setString(3, hashBcrypt);   // ← hash, nunca texto plano
+        cs.setString(4, telefono);
+        cs.setInt(5, idRol);
+
+        try (ResultSet rs = cs.executeQuery()) {
+            if (rs.next()) {
+                Map<String, Object> respuesta = new LinkedHashMap<>();
+                respuesta.put("resultado", rs.getInt("resultado"));
+                respuesta.put("mensaje",   rs.getString("mensaje"));
+                respuesta.put("nuevo_id",  rs.getObject("nuevo_id"));
+                return respuesta;
+            }
+        }
+
+    } catch (SQLException | ClassNotFoundException e) {
+        e.printStackTrace();
+    }
+
+    return Map.of("resultado", -1, "mensaje", "Error interno al crear usuario");
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────
+// EDITAR USUARIO  (proceso 4)
+// passwordPlano = null o vacío → el SP NO cambia el password
+// passwordPlano con valor     → Spring encripta y el SP lo actualiza
+// Devuelve: Map con "resultado"(0=OK,1=user dup,2=email dup), "mensaje"
+// ─────────────────────────────────────────────────────────────────────────
+public Map<String, Object> spEditarUsuario(Integer id, String username,
+                                           String passwordPlano, String telefono,
+                                           Integer idRol) {
+    // ── Encriptar solo si viene nuevo password ──
+    String hashBcrypt = (passwordPlano != null && !passwordPlano.isBlank())
+            ? passwordEncoder.encode(passwordPlano)
+            : null;
+
+    String sql = "{CALL sp_gestion_usuarios(?, ?, ?, ?, ?, ?)}";
+
+    try (Connection conn = conexionJDBC.getConexion2();
+         CallableStatement cs = conn.prepareCall(sql)) {
+
+        cs.setInt(1, 4);
+        cs.setString(2, username);
+
+        if (hashBcrypt != null) cs.setString(3, hashBcrypt);
+        else                    cs.setNull(3, Types.VARCHAR);  // SP detecta NULL → no cambia pass
+
+        cs.setString(4, telefono);
+        cs.setInt(5, idRol);
+        cs.setInt(6, id);
+
+        try (ResultSet rs = cs.executeQuery()) {
+            if (rs.next()) {
+                Map<String, Object> respuesta = new LinkedHashMap<>();
+                respuesta.put("resultado", rs.getInt("resultado"));
+                respuesta.put("mensaje",   rs.getString("mensaje"));
+                return respuesta;
+            }
+        }
+
+    } catch (SQLException | ClassNotFoundException e) {
+        e.printStackTrace();
+    }
+
+    return Map.of("resultado", -1, "mensaje", "Error interno al editar usuario");
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────
+// ELIMINAR USUARIO  (proceso 5)
+// Devuelve: Map con "resultado"(0=OK, 3=no encontrado, -1=error), "mensaje"
+// ─────────────────────────────────────────────────────────────────────────
+public Map<String, Object> spEliminarUsuario(Integer id) {
+    String sql = "{CALL sp_gestion_usuarios(?, NULL, NULL, NULL, NULL, ?)}";
+
+    try (Connection conn = conexionJDBC.getConexion2();
+         CallableStatement cs = conn.prepareCall(sql)) {
+
+        cs.setInt(1, 5);
+        cs.setInt(2, id);
+
+        try (ResultSet rs = cs.executeQuery()) {
+            if (rs.next()) {
+                Map<String, Object> respuesta = new LinkedHashMap<>();
+                respuesta.put("resultado", rs.getInt("resultado"));
+                respuesta.put("mensaje",   rs.getString("mensaje"));
+                return respuesta;
+            }
+        }
+
+    } catch (SQLException | ClassNotFoundException e) {
+        e.printStackTrace();
+    }
+
+    return Map.of("resultado", -1, "mensaje", "Error interno al eliminar usuario");
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────
+// BUSCAR POR USERNAME — Spring Security (proceso 6)
+// Lo llama UserDetailsService.loadUserByUsername()
+// Devuelve la fila completa incluyendo password hash para que BCrypt compare
+// ─────────────────────────────────────────────────────────────────────────
+public Map<String, Object> spBuscarUsuarioLogin(String username) {
+    String sql = "{CALL sp_gestion_usuarios(?, ?, NULL, NULL, NULL, NULL)}";
+
+    try (Connection conn = conexionJDBC.getConexion2();
+         CallableStatement cs = conn.prepareCall(sql)) {
+
+        cs.setInt(1, 6);
+        cs.setString(2, username);
+
+        try (ResultSet rs = cs.executeQuery()) {
+            if (rs.next()) {
+                Map<String, Object> fila = new LinkedHashMap<>();
+                ResultSetMetaData meta = rs.getMetaData();
+                for (int i = 1; i <= meta.getColumnCount(); i++) {
+                    fila.put(meta.getColumnLabel(i), rs.getObject(i));
+                }
+                return fila;
+            }
+        }
+
+    } catch (SQLException | ClassNotFoundException e) {
+        e.printStackTrace();
+    }
+    return null;
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────
+// VERIFICAR USERNAME DISPONIBLE  (proceso 7)
+// idExcluir = 0  → nuevo usuario
+// idExcluir = id → edición (excluye al propio usuario del chequeo)
+// Devuelve: true si está disponible, false si ya existe
+// ─────────────────────────────────────────────────────────────────────────
+public boolean spVerificarUsername(String username, Integer idExcluir) {
+    String sql = "{CALL sp_gestion_usuarios(?, ?, NULL, NULL, NULL, ?)}";
+
+    try (Connection conn = conexionJDBC.getConexion2();
+         CallableStatement cs = conn.prepareCall(sql)) {
+
+        cs.setInt(1, 7);
+        cs.setString(2, username);
+        cs.setInt(3, idExcluir != null ? idExcluir : 0);
+
+        try (ResultSet rs = cs.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("disponible") == 1;
+            }
+        }
+
+    } catch (SQLException | ClassNotFoundException e) {
+        e.printStackTrace();
+    }
+    return false;
+}
 
 
 
+//════════════════════════════════════════════════════════════════════════════
+//AGREGAR A ProcedimientosAlmacenados.java
+//════════════════════════════════════════════════════════════════════════════
 
+// ─────────────────────────────────────────────────────────────────────────
+// VALIDAR CONTRASEÑA MAESTRA DE MÓDULOS  (proceso 8)
+// El SP devuelve el hash BCrypt guardado en sys_config.
+// Spring compara el texto plano ingresado contra ese hash con BCrypt.
+// Devuelve: true = acceso permitido, false = contraseña incorrecta
+// ─────────────────────────────────────────────────────────────────────────
+public boolean spValidarAccesoModulo(String passwordIngresado) {
+    String sql = "{CALL sp_gestion_usuarios(8, NULL, NULL, NULL, NULL, NULL)}";
 
+    try (Connection conn = conexionJDBC.getConexion2();
+         CallableStatement cs = conn.prepareCall(sql)) {
+
+        cs.setInt(1, 8);
+
+        try (ResultSet rs = cs.executeQuery()) {
+            if (rs.next()) {
+                String hashGuardado = rs.getString("hash_config");
+                // BCrypt compara el texto plano contra el hash de BD
+                return passwordEncoder.matches(passwordIngresado, hashGuardado);
+            }
+        }
+
+    } catch (SQLException | ClassNotFoundException e) {
+        e.printStackTrace();
+    }
+    return false;
+}
+
+//════════════════════════════════════════════════════════════
+//AGREGAR A ProcedimientosAlmacenados.java
+//════════════════════════════════════════════════════════════
+
+// Ejecutar cierre del dia
+public Map<String, Object> spEjecutarCierreDia(String username, String observaciones) {
+    String sql = "{CALL sp_cierre_dia(1, ?, ?, NULL)}";
+    Map<String, Object> resultado = new LinkedHashMap<>();
+    try (Connection conn = conexionJDBC.getConexion2();
+         CallableStatement cs = conn.prepareCall(sql)) {
+        cs.setString(1, username);
+        cs.setString(2, observaciones != null ? observaciones : "");
+        try (ResultSet rs = cs.executeQuery()) {
+            if (rs.next()) {
+                resultado.put("resultado", rs.getInt("resultado"));
+                resultado.put("mensaje",   rs.getString("mensaje"));
+                resultado.put("id_cierre", rs.getObject("id_cierre"));
+            }
+        }
+    } catch (SQLException | ClassNotFoundException e) {
+        e.printStackTrace();
+        resultado.put("resultado", -1);
+        resultado.put("mensaje", "Error: " + e.getMessage());
+    }
+    return resultado;
+}
+
+// Listar historial de cierres
+public List<Map<String, Object>> spListarCierres() {
+    String sql = "{CALL sp_cierre_dia(2, NULL, NULL, NULL)}";
+    List<Map<String, Object>> lista = new ArrayList<>();
+    try (Connection conn = conexionJDBC.getConexion2();
+         CallableStatement cs = conn.prepareCall(sql);
+         ResultSet rs = cs.executeQuery()) {
+        ResultSetMetaData meta = rs.getMetaData();
+        int cols = meta.getColumnCount();
+        while (rs.next()) {
+            Map<String, Object> row = new LinkedHashMap<>();
+            for (int i = 1; i <= cols; i++) row.put(meta.getColumnLabel(i), rs.getObject(i));
+            lista.add(row);
+        }
+    } catch (SQLException | ClassNotFoundException e) { e.printStackTrace(); }
+    return lista;
+}
 
 
 	

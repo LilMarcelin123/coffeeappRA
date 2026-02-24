@@ -1,26 +1,61 @@
 import { mensajesAlert, mostrarConfirmacion2 } from '../FuncionesGenerales.js';
 
-let modalConfirmCerrar = null;
+let modalConfirmCerrar  = null;
 let modalConfirmReabrir = null;
 
+// ── Estado modal acceso ───────────────────────────────────────
+var _accesoModal     = null;
+var _moduloActual    = "";
+var _accesoBloqueado = false;
+
+var MODULOS_ACCESO = {
+    "usuarios": { label: "Gestion de Usuarios",    redirect: "/admin/GestionUsuarios"    },
+    "reportes": { label: "Generacion de Reportes", redirect: "/admin/GeneracionReportes"  }
+};
+
+function _elAcceso(id) {
+    return document.getElementById(id);
+}
+
+// ─────────────────────────────────────────────────────────────
 function abrirModalSeguro(modalId) {
     document.querySelectorAll(".modal-backdrop").forEach(b => b.remove());
     document.body.classList.remove("modal-open");
     document.body.style.removeProperty("overflow");
     document.body.style.removeProperty("padding-right");
 
-    const el = document.getElementById(modalId);
+    const el    = document.getElementById(modalId);
     const modal = bootstrap.Modal.getOrCreateInstance(el, { backdrop: true, keyboard: true });
     modal.show();
     return modal;
 }
 
+// ─────────────────────────────────────────────────────────────
 $(document).ready(function () {
 
-    // ---- Iniciar nueva orden ----
+    // ── Inicializar modal de acceso ───────────────────────────
+    var _modalEl = _elAcceso("modalAccesoModulo");
+    if (!_modalEl) {
+        console.warn("[AccesoModal] No se encontro #modalAccesoModulo en el DOM.");
+        console.warn("[AccesoModal] Verifica que th:replace este ANTES del script en inicio.html");
+    } else {
+        _accesoModal = bootstrap.Modal.getOrCreateInstance(_modalEl, {
+            backdrop: "static",
+            keyboard: false
+        });
+        _modalEl.addEventListener("hidden.bs.modal", function () {
+            _resetAccesoModal();
+            document.querySelectorAll(".modal-backdrop").forEach(function (b) { b.remove(); });
+            document.body.classList.remove("modal-open");
+            document.body.style.removeProperty("overflow");
+            document.body.style.removeProperty("padding-right");
+        });
+    }
+
+    // ── Toma de ordenes — SIN contrasena ─────────────────────
     $("#btnModalOrden").on("click", function () {
         mostrarConfirmacion2(
-            "¿Seguro que quieres iniciar una orden?",
+            "Seguro que quieres iniciar una orden?",
             () => {
                 $.ajax({
                     url: "/procesoInicialOrden",
@@ -34,48 +69,67 @@ $(document).ready(function () {
                     }
                 });
             },
-            () => { console.log("El usuario canceló la acción"); }
+            () => { console.log("cancelado"); }
         );
     });
 
-    // ---- Gestión catálogo ----
+    // ── Gestion catalogo — SIN contrasena ────────────────────
     $("#btnModalGestCat").on("click", function () {
         mostrarConfirmacion2(
-            "¿Seguro que quieres modificar el catalogo?",
+            "Seguro que quieres modificar el catalogo?",
             () => { window.location.href = "/admin/gestionCatalogo"; },
-            () => { console.log("El usuario canceló la acción"); }
+            () => { console.log("cancelado"); }
         );
     });
-	
-	
-	// ---- reportes boton ----
-	$("#btnModalReportes").on("click", function () {
-	    mostrarConfirmacion2(
-	        "¿Seguro que quieres ir a generar reportes?",
-	        () => { window.location.href = "/admin/GeneracionReportes"; },
-	        () => { console.log("El usuario canceló la acción"); }
-	    );
-	});
-	
-	
 
-    // ---- Modal confirmación cierre ----
+    // ── Reportes — CON contrasena maestra ────────────────────
+    $("#btnModalReportes").on("click", function () {
+        _abrirAcceso("reportes");
+    });
+
+    // ── Gestion usuarios — CON contrasena maestra ─────────────
+    $("#btnModalGestUser").on("click", function () {
+        _abrirAcceso("usuarios");
+    });
+
+    // ── Eventos modal acceso ──────────────────────────────────
+    $("#btnConfirmarAcceso").on("click", function () {
+        _validarAcceso();
+    });
+
+    $("#btnCancelarAcceso").on("click", function () {
+        if (_accesoModal) _accesoModal.hide();
+    });
+
+    $("#btnToggleAccesoPass").on("click", function () {
+        var input = _elAcceso("inputAccesoPassword");
+        var icono = _elAcceso("iconoOjoAcceso");
+        if (!input || !icono) return;
+        var esPass      = input.type === "password";
+        input.type      = esPass ? "text" : "password";
+        icono.className = esPass ? "bi bi-eye-slash" : "bi bi-eye";
+    });
+
+    $("#inputAccesoPassword").on("keydown", function (e) {
+        if (e.key === "Enter" && !_accesoBloqueado) _validarAcceso();
+    });
+
+    // ── Modal confirmacion cierre ─────────────────────────────
     const modalElCerrar = document.getElementById("modalConfirmCerrar");
-    modalConfirmCerrar = bootstrap.Modal.getOrCreateInstance(modalElCerrar);
+    modalConfirmCerrar  = bootstrap.Modal.getOrCreateInstance(modalElCerrar);
 
     modalElCerrar.addEventListener("hidden.bs.modal", function () {
         document.querySelectorAll(".modal-backdrop").forEach(b => b.remove());
         document.body.classList.remove("modal-open");
         document.body.style.removeProperty("overflow");
         document.body.style.removeProperty("padding-right");
-        // Resetear selector de pago
         $("#selectMetodoPago").val("");
         $("#btnConfirmarCerrar").prop("disabled", true);
     });
 
-    // ---- Modal confirmación reabrir ----
+    // ── Modal confirmacion reabrir ────────────────────────────
     const modalElReabrir = document.getElementById("modalConfirmReabrir");
-    modalConfirmReabrir = bootstrap.Modal.getOrCreateInstance(modalElReabrir);
+    modalConfirmReabrir  = bootstrap.Modal.getOrCreateInstance(modalElReabrir);
 
     modalElReabrir.addEventListener("hidden.bs.modal", function () {
         document.querySelectorAll(".modal-backdrop").forEach(b => b.remove());
@@ -84,16 +138,16 @@ $(document).ready(function () {
         document.body.style.removeProperty("padding-right");
     });
 
-    // ---- Cargar tabla pendientes ----
+    // ── Cargar tabla pendientes ───────────────────────────────
     cargarPendientes();
 
-    // ---- Select all ----
+    // ── Select all ───────────────────────────────────────────
     $("#chkAll").on("change", function () {
         $(".chkRow").prop("checked", $(this).is(":checked"));
         actualizarBotonesAccion();
     });
 
-    // ---- Abrir modal CERRAR ----
+    // ── Abrir modal CERRAR ────────────────────────────────────
     $("#btnCerrarSeleccionadas").on("click", function () {
         const ids = obtenerIdsSeleccionados();
         if (ids.length === 0) return;
@@ -101,49 +155,163 @@ $(document).ready(function () {
         modalConfirmCerrar = abrirModalSeguro("modalConfirmCerrar");
     });
 
-    // ---- Confirmar cierre ----
+    // ── Confirmar cierre ──────────────────────────────────────
     $("#btnConfirmarCerrar").on("click", function () {
         const ids = obtenerIdsSeleccionados();
-        if (ids.length === 0) {
-            $("#modalConfirmCerrar").modal("hide");
-            return;
-        }
+        if (ids.length === 0) { $("#modalConfirmCerrar").modal("hide"); return; }
         cerrarOrdenes(ids);
     });
 
-    // ---- Habilitar botón cerrar al seleccionar método de pago ----
     $("#selectMetodoPago").on("change", function () {
         $("#btnConfirmarCerrar").prop("disabled", !$(this).val());
     });
 
-    // ---- Abrir modal REABRIR — solo una orden a la vez ----
+    // ── Abrir modal REABRIR ───────────────────────────────────
     $("#btnReabrirSeleccionadas").on("click", function () {
         const ids = obtenerIdsSeleccionados();
         if (ids.length === 0) return;
-
-        if (ids.length > 1) {
-            alert("Solo puedes reabrir una orden a la vez.");
-            return;
-        }
-
+        if (ids.length > 1) { alert("Solo puedes reabrir una orden a la vez."); return; }
         renderListaReabrir(ids);
         modalConfirmReabrir = abrirModalSeguro("modalConfirmReabrir");
     });
 
-    // ---- Confirmar reabrir ----
+    // ── Confirmar reabrir ─────────────────────────────────────
     $("#btnConfirmarReabrir").on("click", function () {
         const ids = obtenerIdsSeleccionados();
-        if (ids.length === 0) {
-            modalConfirmReabrir.hide();
-            return;
-        }
+        if (ids.length === 0) { modalConfirmReabrir.hide(); return; }
         modalConfirmReabrir.hide();
         reabrirOrdenes(ids);
     });
 
 });
 
-// ---------------- Funciones tabla ----------------
+// ════════════════════════════════════════════════════════════
+// MODAL ACCESO — funciones
+// ════════════════════════════════════════════════════════════
+
+function _abrirAcceso(modulo) {
+    if (_accesoBloqueado) return;
+    if (!_accesoModal) {
+        console.error("[AccesoModal] No inicializado. El fragmento debe estar antes del script.");
+        return;
+    }
+    _moduloActual = modulo;
+    var info  = MODULOS_ACCESO[modulo];
+    var label = _elAcceso("labelNombreModulo");
+    if (label) label.textContent = info ? info.label : modulo;
+    _resetAccesoModal();
+    _accesoModal.show();
+    setTimeout(function () {
+        var inp = _elAcceso("inputAccesoPassword");
+        if (inp) inp.focus();
+    }, 400);
+}
+
+function _validarAcceso() {
+    var inp  = _elAcceso("inputAccesoPassword");
+    var pass = inp ? inp.value.trim() : "";
+    if (!pass) { _mostrarErrorAcceso("Ingresa la contrasena.", "warning"); return; }
+
+    _setLoadingAcceso(true);
+
+    var params = new URLSearchParams();
+    params.append("password", pass);
+    params.append("modulo",   _moduloActual);
+
+    fetch("/api/acceso-modulo", { method: "POST", body: params })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+            if (data.acceso) {
+                var btn = _elAcceso("btnConfirmarAcceso");
+                if (btn) {
+                    btn.style.background = "#198754";
+                    btn.innerHTML = "<i class=\'bi bi-check-lg\'></i> Acceso concedido";
+                }
+                setTimeout(function () {
+                    if (_accesoModal) _accesoModal.hide();
+                    window.location.href = data.redirect;
+                }, 700);
+
+            } else if (data.bloqueado) {
+                _accesoBloqueado = true;
+                _mostrarErrorAcceso(data.mensaje, "danger");
+                if (_elAcceso("inputAccesoPassword")) _elAcceso("inputAccesoPassword").disabled = true;
+                if (_elAcceso("btnConfirmarAcceso"))  _elAcceso("btnConfirmarAcceso").disabled  = true;
+                if (_elAcceso("dotsIntentos"))        _elAcceso("dotsIntentos").style.display   = "none";
+                var segundos = parseInt((data.mensaje.match(/[0-9]+/) || ["300"])[0]);
+                setTimeout(function () { _accesoBloqueado = false; _resetAccesoModal(); }, segundos * 1000);
+
+            } else {
+                _mostrarErrorAcceso(data.mensaje, "danger");
+                _actualizarDotsAcceso(data.intentos || 0);
+                if (_elAcceso("inputAccesoPassword")) {
+                    _elAcceso("inputAccesoPassword").value = "";
+                    _elAcceso("inputAccesoPassword").focus();
+                }
+                _sacudirInputAcceso();
+            }
+        })
+        .catch(function () { _mostrarErrorAcceso("Error de conexion. Intenta de nuevo.", "warning"); })
+        .finally(function () { _setLoadingAcceso(false); });
+}
+
+function _mostrarErrorAcceso(msg, tipo) {
+    var el = _elAcceso("mensajeAccesoError");
+    if (!el) return;
+    el.textContent   = msg;
+    el.className     = "alert alert-" + tipo + " py-2 small mb-0";
+    el.style.display = "block";
+}
+
+function _actualizarDotsAcceso(intentosFallidos) {
+    var wrap = _elAcceso("dotsIntentos");
+    if (!wrap) return;
+    wrap.style.display = "flex";
+    var restantes = 3 - intentosFallidos;
+    ["dot1", "dot2", "dot3"].forEach(function (id, i) {
+        var dot = _elAcceso(id);
+        if (dot) dot.style.color = i < restantes ? "#48392D" : "#dee2e6";
+    });
+}
+
+function _setLoadingAcceso(on) {
+    var spinner = _elAcceso("spinnerAcceso");
+    if (spinner) spinner.style.display = on ? "inline-block" : "none";
+    ["btnConfirmarAcceso", "btnCancelarAcceso", "inputAccesoPassword"].forEach(function (id) {
+        var el = _elAcceso(id);
+        if (el) el.disabled = on;
+    });
+}
+
+function _sacudirInputAcceso() {
+    var input = _elAcceso("inputAccesoPassword");
+    if (!input) return;
+    input.classList.add("is-invalid");
+    input.style.animation = "shake 0.4s ease";
+    setTimeout(function () {
+        input.style.animation = "";
+        input.classList.remove("is-invalid");
+    }, 400);
+}
+
+function _resetAccesoModal() {
+    var input = _elAcceso("inputAccesoPassword");
+    var btn   = _elAcceso("btnConfirmarAcceso");
+    if (input) { input.value = ""; input.type = "password"; input.disabled = false; }
+    if (btn)   { btn.disabled = false; btn.style.background = "#48392D"; btn.innerHTML = "Ingresar"; }
+    if (_elAcceso("iconoOjoAcceso"))     _elAcceso("iconoOjoAcceso").className         = "bi bi-eye";
+    if (_elAcceso("mensajeAccesoError")) _elAcceso("mensajeAccesoError").style.display = "none";
+    if (_elAcceso("dotsIntentos"))       _elAcceso("dotsIntentos").style.display       = "none";
+    if (_elAcceso("spinnerAcceso"))      _elAcceso("spinnerAcceso").style.display      = "none";
+    ["dot1", "dot2", "dot3"].forEach(function (id) {
+        var dot = _elAcceso(id);
+        if (dot) dot.style.color = "#48392D";
+    });
+}
+
+// ════════════════════════════════════════════════════════════
+// TABLA ORDENES PENDIENTES
+// ════════════════════════════════════════════════════════════
 
 function cargarPendientes() {
     $.ajax({
@@ -157,7 +325,6 @@ function cargarPendientes() {
 function renderPendientes(lista) {
     const tbody = document.getElementById("tbodyPendientes");
     const tpl   = document.getElementById("tplPendienteRow");
-
     tbody.innerHTML = "";
 
     (lista || []).forEach(o => {
@@ -166,17 +333,15 @@ function renderPendientes(lista) {
         const tr      = node.querySelector("tr");
 
         tr.dataset.idOrden = idOrden;
-
         node.querySelector(".col-id").textContent     = idOrden ?? "";
         node.querySelector(".col-hora").textContent   = o.t_hora_creacion ?? "";
-        node.querySelector(".col-total").textContent  =
-            (o.p_total != null) ? `$${Number(o.p_total).toFixed(2)}` : "$0.00";
+        node.querySelector(".col-total").textContent  = (o.p_total != null) ? `$${Number(o.p_total).toFixed(2)}` : "$0.00";
         node.querySelector(".col-resumen").textContent = o.resumen ?? "";
 
         const chk = node.querySelector(".chkRow");
 
         chk.addEventListener("change", function () {
-            const total   = $("#tbodyPendientes .chkRow").length;
+            const total    = $("#tbodyPendientes .chkRow").length;
             const marcados = $("#tbodyPendientes .chkRow:checked").length;
             $("#chkAll").prop("checked", total > 0 && marcados === total);
             actualizarBotonesAccion();
@@ -185,10 +350,8 @@ function renderPendientes(lista) {
         tr.addEventListener("click", function (e) {
             const tag = e.target.tagName.toLowerCase();
             if (tag === "input" || tag === "button" || tag === "a") return;
-
             chk.checked = !chk.checked;
-
-            const total   = $("#tbodyPendientes .chkRow").length;
+            const total    = $("#tbodyPendientes .chkRow").length;
             const marcados = $("#tbodyPendientes .chkRow:checked").length;
             $("#chkAll").prop("checked", total > 0 && marcados === total);
             actualizarBotonesAccion();
@@ -219,38 +382,26 @@ function actualizarBotonesAccion() {
 function renderListaConfirmacion(ids) {
     const ul = document.getElementById("listaOrdenesSeleccionadas");
     ul.innerHTML = "";
-    ids.forEach(id => {
-        const li = document.createElement("li");
-        li.textContent = `Orden #${id}`;
-        ul.appendChild(li);
-    });
+    ids.forEach(id => { const li = document.createElement("li"); li.textContent = `Orden #${id}`; ul.appendChild(li); });
 }
 
 function renderListaReabrir(ids) {
     const ul = document.getElementById("listaOrdenesReabrir");
     ul.innerHTML = "";
-    ids.forEach(id => {
-        const li = document.createElement("li");
-        li.textContent = `Orden #${id}`;
-        ul.appendChild(li);
-    });
+    ids.forEach(id => { const li = document.createElement("li"); li.textContent = `Orden #${id}`; ul.appendChild(li); });
 }
 
-// ---------------- Acciones ----------------
+// ════════════════════════════════════════════════════════════
+// ACCIONES
+// ════════════════════════════════════════════════════════════
 
 function cerrarOrdenes(ids) {
     $("#btnConfirmarCerrar").prop("disabled", true);
-
     const metodoPago = $("#selectMetodoPago").val();
-
-    const requests = ids.map(idOrden =>
-        $.ajax({
-            url: "/admin/orden/gestionar",
-            type: "POST",
-            data: { idOrden: idOrden, tipoProceso: 1, idRol: 1, pTipoPago: metodoPago }
-        })
+    const requests   = ids.map(idOrden =>
+        $.ajax({ url: "/admin/orden/gestionar", type: "POST",
+                 data: { idOrden: idOrden, tipoProceso: 1, idRol: 1, pTipoPago: metodoPago } })
     );
-
     $.when.apply($, requests)
         .done(function () {
             $("#btnConfirmarCerrar").prop("disabled", false);
@@ -260,23 +411,18 @@ function cerrarOrdenes(ids) {
         .fail(function (xhr) {
             $("#btnConfirmarCerrar").prop("disabled", false);
             console.log("Error cerrando:", xhr.responseText);
-            alert("No se pudieron cerrar una o más órdenes.");
+            alert("No se pudieron cerrar una o mas ordenes.");
         });
 }
 
 function reabrirOrdenes(ids) {
     $("#btnConfirmarReabrir").prop("disabled", true);
-
-    const idOrden = ids[0]; // siempre una sola
-
+    const idOrden = ids[0];
     $.ajax({
         url: "/admin/orden/gestionar",
         type: "POST",
         data: { idOrden: idOrden, tipoProceso: 6, idRol: null, pTipoPago: null },
-        success: function () {
-            // Redirigir a toma de orden con items ya cargados
-            window.location.href = "/admin/tomaOrden?idOrden=" + idOrden;
-        },
+        success: function () { window.location.href = "/admin/tomaOrden?idOrden=" + idOrden; },
         error: function (xhr) {
             $("#btnConfirmarReabrir").prop("disabled", false);
             console.error("Error reabriendo:", xhr.responseText);

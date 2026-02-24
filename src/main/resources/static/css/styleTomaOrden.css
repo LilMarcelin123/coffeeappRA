@@ -428,3 +428,24 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* ============================================================
+   PEGAR EN style.css  (o en el <head> de inicio.html)
+   Requerido por el modal de contraseña maestra
+   ============================================================ */
+
+/* Animación sacudida cuando la contraseña es incorrecta */
+@keyframes shake {
+    0%, 100% { transform: translateX(0);   }
+    20%       { transform: translateX(-8px); }
+    40%       { transform: translateX(8px);  }
+    60%       { transform: translateX(-5px); }
+    80%       { transform: translateX(5px);  }
+}
+
+/* Puntos de intentos restantes en el modal */
+.dot-intento {
+    font-size: 18px;
+    color: #48392D;
+    transition: color 0.3s;
+    line-height: 1;
+}

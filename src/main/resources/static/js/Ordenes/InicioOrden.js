@@ -30,7 +30,7 @@ const ENDPOINTS = {
     agregarItem:               '/admin/orden/agregarItem',
     eliminarItem:              '/admin/orden/eliminarItem',
     confirmarOrden:            '/admin/orden/gestionar',
-    redireccionInicio:         '/admin',
+    redireccionInicio:         '/admin/inicio',
 };
 
 const TEXTO_RESUMEN_VACIO = `

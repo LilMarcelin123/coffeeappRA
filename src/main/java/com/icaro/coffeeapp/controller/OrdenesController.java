@@ -67,6 +67,14 @@ public class OrdenesController {
 
     
     
+    @GetMapping("/admin/GestionUsuarios")
+    public String mostrarGestionUsuarios(Model model) {
+
+        return "admin/GestionUsuarios"; 
+    }
+    
+    
+    
     @GetMapping("/api/productosPorCategoria/{idCategoria}")
     @ResponseBody
     public List<Map<String, Object>> productosPorCategoria(@PathVariable Integer idCategoria) {

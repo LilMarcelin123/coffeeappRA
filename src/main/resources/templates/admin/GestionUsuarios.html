@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gestión de Usuarios — Rincón Arboledas</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" th:href="@{/css/styleGestUser.css}">
+</head>
+<body>
+
+<!-- ══ FRANJA IMAGEN ════════════════════════════════════════ -->
+<header class="gu-strip">
+  <img class="gu-strip__img" src="/img/granoscafe.jpg" alt="" aria-hidden="true">
+  <div class="gu-strip__overlay"></div>
+  <div class="gu-strip__content">
+    <span class="hero-badge">
+      <i class="fa-solid fa-users-gear"></i> Usuarios
+    </span>
+    <a th:href="@{/admin/inicio}" href="/admin/inicio" class="btn-back-strip">
+      <i class="fa-solid fa-chevron-left"></i> Inicio
+    </a>
+  </div>
+</header>
+
+<!-- ══ TÍTULO GRANDE ════════════════════════════════════════ -->
+<div class="header-block">
+  <div>
+    <p class="header-eyebrow">Administración del sistema</p>
+    <h1 class="header-main-title">Usuarios <em>&amp; Roles</em></h1>
+    <div class="header-divider"></div>
+  </div>
+  <div class="header-meta">
+    <span class="header-negocio" th:text="${nombreNegocio}">Rincón Arboledas</span>
+    <div class="header-logo">
+      <img th:src="@{/img/arboledasLogo.jpg}" src="/img/arboledasLogo.jpg" alt="Logo">
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN ═════════════════════════════════════════════════ -->
+<main class="gu-main">
+
+  <!-- ── PANEL PRINCIPAL ─────────────────────────────────── -->
+  <section class="panel-card reveal">
+
+    <!-- Cabecera -->
+    <div class="section-head">
+      <div class="section-title-group">
+        <span class="section-icon"><i class="fa-solid fa-users-gear"></i></span>
+        <div>
+          <h2 class="section-title">Gestión de Usuarios</h2>
+          <p class="section-sub">Administración de accesos y roles del sistema</p>
+        </div>
+      </div>
+      <div class="gu-head-right">
+        <span class="gu-badge-total" id="badgeTotal">— usuarios</span>
+        <button class="btn-nuevo" id="btnNuevo">
+          <i class="fa-solid fa-user-plus"></i> Nuevo Usuario
+        </button>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="table-toolbar">
+      <div class="search-wrap">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <input type="text" id="searchInput" placeholder="Buscar por usuario, teléfono o rol…" autocomplete="off">
+        <button class="clear-btn" id="clearSearch" title="Limpiar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="toolbar-filters">
+        <select id="filterRol" class="gu-select">
+          <option value="">Todos los roles</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="table-wrap">
+      <table class="rpt-table" id="tablaUsuarios" aria-label="Usuarios del sistema">
+        <thead>
+          <tr>
+            <th class="th-id">#</th>
+            <th>Usuario</th>
+            <th>Teléfono / WhatsApp</th>
+            <th>Rol</th>
+            <th class="th-actions">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyUsuarios">
+          <tr class="gu-loading-row">
+            <td colspan="5">
+              <div class="empty-state">
+                <i class="fa-solid fa-circle-notch fa-spin"></i>
+                <span>Cargando usuarios…</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="gu-empty" id="emptyState" style="display:none;">
+        <i class="fa-solid fa-user-slash"></i>
+        <p>No se encontraron usuarios</p>
+      </div>
+    </div>
+
+    <!-- Paginación -->
+    <div class="gu-pagination" id="paginacion"></div>
+
+  </section>
+
+  <!-- Regresar -->
+  <div class="d-flex justify-content-start">
+    <a th:href="@{/admin/inicio}" href="/admin/inicio" class="btn-back-main">
+      <i class="fa-solid fa-arrow-left"></i> Regresar al inicio
+    </a>
+  </div>
+
+</main>
+
+<!-- ══ FOOTER ════════════════════════════════════════════════ -->
+<footer class="gu-footer">
+  <span>&copy; 2025 · <span th:text="${nombreNegocio}">Negocio</span>. Todos los derechos reservados.</span>
+  <span>Módulo de Usuarios</span>
+</footer>
+
+<!-- ══════════════════════════════════════════════════════════
+     MODAL CREAR / EDITAR
+     ══════════════════════════════════════════════════════════ -->
+<div class="gu-overlay" id="modalOverlay">
+  <div class="gu-modal" id="modalForm">
+
+    <div class="gu-modal-header">
+      <div class="gu-modal-title-wrap">
+        <span class="gu-modal-icon" id="modalIcon">
+          <i class="fa-solid fa-user-plus"></i>
+        </span>
+        <h2 class="gu-modal-title" id="modalTitle">Nuevo Usuario</h2>
+      </div>
+      <button class="gu-modal-close" id="btnCloseModal">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <form id="formUsuario" autocomplete="off" novalidate>
+      <input type="hidden" id="userId"/>
+
+      <div class="gu-form-grid">
+
+        <!-- Username -->
+        <div class="gu-field">
+          <label for="inputUsername">
+            <i class="fa-solid fa-user"></i> Usuario
+          </label>
+          <input type="text" id="inputUsername" class="gu-input" placeholder="Ej. jgarcia" required maxlength="100"/>
+          <span class="gu-field-error" id="errUsername"></span>
+        </div>
+
+        <!-- Teléfono / WhatsApp -->
+        <div class="gu-field">
+          <label for="inputEmail">
+            <i class="fa-brands fa-whatsapp"></i> Teléfono / WhatsApp
+          </label>
+          <input type="tel" id="inputEmail" class="gu-input" placeholder="Ej. 5512345678" maxlength="20"/>
+          <span class="gu-field-error" id="errEmail"></span>
+        </div>
+
+        <!-- Password -->
+        <div class="gu-field gu-field-full">
+          <label for="inputPassword">
+            <i class="fa-solid fa-lock"></i> Contraseña
+            <span class="gu-label-hint" id="passHint">(dejar vacío para no cambiar)</span>
+          </label>
+          <div class="gu-input-icon-wrap">
+            <input type="password" id="inputPassword" class="gu-input" placeholder="••••••••" maxlength="255"/>
+            <button type="button" class="gu-toggle-pass" id="togglePass" tabindex="-1">
+              <i class="fa-solid fa-eye" id="eyeIcon"></i>
+            </button>
+          </div>
+          <span class="gu-field-error" id="errPassword"></span>
+        </div>
+
+        <!-- Rol -->
+        <div class="gu-field gu-field-full">
+          <label for="inputRol">
+            <i class="fa-solid fa-shield-halved"></i> Rol del Sistema
+          </label>
+          <select id="inputRol" class="gu-input gu-select-modal" required>
+            <option value="">-- Selecciona un rol --</option>
+          </select>
+          <span class="gu-field-error" id="errRol"></span>
+        </div>
+
+      </div>
+
+      <!-- Preview Rol -->
+      <div class="gu-rol-preview" id="rolPreview" style="display:none;">
+        <i class="fa-solid fa-circle-info"></i>
+        <span id="rolPreviewDesc"></span>
+      </div>
+
+      <div class="gu-modal-footer">
+        <button type="button" class="btn-back-main" id="btnCancelModal">Cancelar</button>
+        <button type="submit" class="btn-nuevo" id="btnSubmitModal">
+          <i class="fa-solid fa-floppy-disk"></i> Guardar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     MODAL CONFIRMAR ELIMINAR
+     ══════════════════════════════════════════════════════════ -->
+<div class="gu-overlay" id="modalDeleteOverlay">
+  <div class="gu-modal gu-modal-sm" id="modalDelete">
+
+    <div class="gu-modal-header gu-modal-header-danger">
+      <div class="gu-modal-title-wrap">
+        <span class="gu-modal-icon gu-modal-icon--danger">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </span>
+        <h2 class="gu-modal-title">Eliminar Usuario</h2>
+      </div>
+      <button class="gu-modal-close" id="btnCloseDelete">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="gu-modal-body">
+      <p>¿Seguro que deseas eliminar al usuario <strong id="deleteUserName"></strong>?</p>
+      <p class="gu-warn-text">
+        <i class="fa-solid fa-circle-exclamation"></i> Esta acción no se puede deshacer.
+      </p>
+    </div>
+
+    <div class="gu-modal-footer">
+      <button class="btn-back-main" id="btnCancelDelete">Cancelar</button>
+      <button class="btn-danger" id="btnConfirmDelete">
+        <i class="fa-solid fa-trash"></i> Eliminar
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ TOAST ═════════════════════════════════════════════════ -->
+<div class="gu-toast" id="toast">
+  <i class="gu-toast-icon" id="toastIcon"></i>
+  <span id="toastMsg"></span>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module" th:src="@{/js/Usuarios/GestUser.js}"></script>
+
+</body>
+</html>

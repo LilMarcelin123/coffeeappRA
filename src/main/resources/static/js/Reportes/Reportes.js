@@ -20,8 +20,8 @@ const METODO = {
 
 /* ── ESTADO DEL MÓDULO ─────────────────────────────────────── */
 const estado = {
-    filtroActivo  : null,   // null = todos | 1 = efectivo | 2 = tarjeta
-    datosDetalle  : [],     // cache de la última respuesta de detalle
+    filtroActivo  : null,
+    datosDetalle  : [],
 };
 
 /* ── REFERENCIAS DOM ────────────────────────────────────────── */
@@ -48,7 +48,6 @@ $(document).ready(() => {
     $(".filter-pill").on("click", function () {
         $(".filter-pill").removeClass("active").attr("aria-pressed", "false");
         $(this).addClass("active").attr("aria-pressed", "true");
-
         const val = $(this).data("filtro");
         estado.filtroActivo = val === "" ? null : parseInt(val, 10);
         cargarDetalle(estado.filtroActivo);
@@ -66,10 +65,12 @@ $(document).ready(() => {
     $("#btnDescargaDetalle").on("click", function () {
         descargarExcel(null, this);
     });
-
     $("#btnDescargaFiltro").on("click", function () {
         descargarExcel(estado.filtroActivo, this);
     });
+
+    /* Cierre del día ← única línea que se agregó */
+    initModalCierre();
 
 });
 
@@ -146,13 +147,11 @@ function filtrarTablaLocal(q) {
         actualizarConteo(estado.datosDetalle.length);
         return;
     }
-
     const filtrados = estado.datosDetalle.filter(row =>
         String(row.id_orden    ?? "").includes(q) ||
         String(row.resumen     ?? "").toLowerCase().includes(q) ||
         String(row.metodo_pago ?? "").toLowerCase().includes(q)
     );
-
     renderTablaDetalle(filtrados);
     dom.labelConteo().textContent = `${filtrados.length} de ${estado.datosDetalle.length} registros`;
 }
@@ -169,12 +168,7 @@ function cargarCorte() {
         type: "GET",
         success(lista) {
             setBotonCargando(btn, false, '<i class="bi bi-play-circle-fill"></i> Generar corte');
-
-            if (!lista?.length) {
-                resetCardsCorte();
-                return;
-            }
-
+            if (!lista?.length) { resetCardsCorte(); return; }
             renderCardsCorte(lista);
             renderTablaCorte(lista);
             dom.wrapTablaCorte().style.display = "block";
@@ -189,17 +183,14 @@ function cargarCorte() {
 
 function renderCardsCorte(lista) {
     const totales = { general: 0, efectivo: 0, tarjeta: 0, ordenes: 0 };
-
     lista.forEach(row => {
         const metodo  = String(row.metodo_pago ?? "").toUpperCase();
         const monto   = Number(row.total_monto   ?? 0);
         const ordenes = Number(row.total_ordenes  ?? 0);
-
-        if      (metodo === METODO.TOTAL_GENERAL) { totales.general  = monto;   totales.ordenes = ordenes; }
+        if      (metodo === METODO.TOTAL_GENERAL) { totales.general  = monto; totales.ordenes = ordenes; }
         else if (metodo === METODO.EFECTIVO)      { totales.efectivo = monto; }
         else if (metodo === METODO.TARJETA)       { totales.tarjeta  = monto; }
     });
-
     animarValor(dom.totalGeneral(),  `$${totales.general.toFixed(2)}`);
     animarValor(dom.totalEfectivo(), `$${totales.efectivo.toFixed(2)}`);
     animarValor(dom.totalTarjeta(),  `$${totales.tarjeta.toFixed(2)}`);
@@ -207,19 +198,16 @@ function renderCardsCorte(lista) {
 }
 
 function renderTablaCorte(lista) {
-    const tbody    = dom.tbodyCorte();
+    const tbody = dom.tbodyCorte();
     tbody.innerHTML = "";
     const fragment = document.createDocumentFragment();
-
     lista.forEach(row => {
         const metodo  = row.metodo_pago ?? "—";
         const ordenes = row.total_ordenes ?? 0;
         const monto   = Number(row.total_monto ?? 0);
         const esTotal = metodo.toUpperCase() === METODO.TOTAL_GENERAL;
-
         const tr = document.createElement("tr");
         if (esTotal) tr.style.fontWeight = "700";
-
         tr.innerHTML = `
             <td>${esTotal ? `<strong>${metodo}</strong>` : metodo}</td>
             <td>${ordenes}</td>
@@ -227,7 +215,6 @@ function renderTablaCorte(lista) {
         `;
         fragment.appendChild(tr);
     });
-
     tbody.appendChild(fragment);
 }
 
@@ -242,27 +229,22 @@ function resetCardsCorte() {
 async function descargarExcel(idTipoPago, btnEl) {
     const textoOriginal = btnEl.innerHTML;
     setBotonCargando(btnEl, true, "Generando…");
-
     const sufijo = SUFIJO_EXCEL[idTipoPago] ?? "_todos";
     const query  = idTipoPago != null ? `?idTipoPago=${idTipoPago}` : "";
     const url    = `${API.excel}${query}`;
     const hoy    = new Date().toISOString().slice(0, 10);
-
     try {
         const response = await fetch(url);
         if (!response.ok) throw new Error(`Error ${response.status}`);
-
         const blob      = await response.blob();
         const objectURL = URL.createObjectURL(blob);
         const link      = document.createElement("a");
-
         link.href     = objectURL;
         link.download = `detalle_ordenes${sufijo}_${hoy}.xlsx`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(objectURL);
-
     } catch (err) {
         console.error("Error al descargar Excel:", err);
         alert("No se pudo generar el Excel. Intenta de nuevo.");
@@ -272,24 +254,111 @@ async function descargarExcel(idTipoPago, btnEl) {
 }
 
 /* ════════════════════════════════════════════════════════════
+   CIERRE DEL DÍA
+   ════════════════════════════════════════════════════════════ */
+var _modalCierre = null;
+
+function initModalCierre() {
+    var el = document.getElementById("modalConfirmCierre");
+    if (!el) return;
+    _modalCierre = bootstrap.Modal.getOrCreateInstance(el, {
+        backdrop: "static", keyboard: false
+    });
+    $("#btnAbrirCierre").on("click", abrirModalCierre);
+}
+
+function abrirModalCierre() {
+    document.getElementById("resumenPreCierre").innerHTML =
+        '<div class="d-flex justify-content-center py-2">' +
+        '<div class="spinner-border spinner-border-sm text-danger"></div></div>';
+    document.getElementById("inputObservaciones").value = "";
+    if (_modalCierre) _modalCierre.show();
+
+    $.ajax({
+        url: API.corte,
+        type: "GET",
+        success: function(lista) {
+            if (!lista || !lista.length) {
+                document.getElementById("resumenPreCierre").innerHTML =
+                    '<p class="text-muted small mb-0 text-center">No hay ordenes cerradas para archivar.</p>';
+                document.getElementById("btnConfirmarCierreFinal").disabled = true;
+                return;
+            }
+            document.getElementById("btnConfirmarCierreFinal").disabled = false;
+            var html = '<ul class="list-unstyled mb-0">';
+            lista.forEach(function(row) {
+                var metodo  = (row.metodo_pago || "").toUpperCase();
+                var esTotal = metodo === "TOTAL GENERAL";
+                var colorClass = esTotal
+                    ? "bg-danger text-white"
+                    : metodo.includes("EFECTIVO") ? "bg-success text-white"
+                    : "bg-primary text-white";
+                html += '<li class="d-flex justify-content-between align-items-center mb-2">' +
+                    '<span class="badge ' + colorClass + ' rounded-pill" style="font-size:.72rem;">' +
+                    (row.metodo_pago || "—") + '</span>' +
+                    '<span class="small"><strong>' + (row.total_ordenes || 0) + '</strong> ordenes &nbsp;' +
+                    '<strong>$' + Number(row.total_monto || 0).toFixed(2) + '</strong></span>' +
+                    '</li>';
+            });
+            html += '</ul>';
+            document.getElementById("resumenPreCierre").innerHTML = html;
+        },
+        error: function() {
+            document.getElementById("resumenPreCierre").innerHTML =
+                '<p class="text-danger small mb-0">No se pudo cargar el resumen.</p>';
+        }
+    });
+}
+
+function ejecutarCierre() {
+    var btn     = document.getElementById("btnConfirmarCierreFinal");
+    var spinner = document.getElementById("spinnerCierre");
+    var obs     = document.getElementById("inputObservaciones").value.trim();
+
+    btn.disabled = true;
+    spinner.style.display = "inline-block";
+
+    var params = new URLSearchParams();
+    if (obs) params.append("observaciones", obs);
+
+    fetch("/api/cierres/ejecutar", { method: "POST", body: params })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (_modalCierre) _modalCierre.hide();
+            if (data.resultado === 1) {
+                var btnPrincipal = document.getElementById("btnAbrirCierre");
+                btnPrincipal.disabled = true;
+                btnPrincipal.classList.add("ejecutado");
+                btnPrincipal.innerHTML =
+                    '<i class="bi bi-check-circle-fill"></i> Cierre ejecutado correctamente';
+                cargarDetalle(null);
+                resetCardsCorte();
+                document.getElementById("wrapTablaCorte").style.display = "none";
+                alert("Cierre exitoso: " + data.mensaje);
+            } else {
+                alert("Aviso: " + data.mensaje);
+            }
+        })
+        .catch(function() {
+            alert("Error de conexion al ejecutar el cierre.");
+        })
+        .finally(function() {
+            btn.disabled = false;
+            spinner.style.display = "none";
+        });
+}
+
+/* ════════════════════════════════════════════════════════════
    UTILIDADES
    ════════════════════════════════════════════════════════════ */
-
-/**
- * Renderiza un estado visual en un tbody (loading | empty | error).
- * @param {HTMLElement} tbody
- * @param {"loading"|"empty"|"error"} tipo
- */
 function renderEstadoTabla(tbody, tipo) {
     const estados = {
-        loading : { icon: "bi-arrow-down-circle", texto: "Cargando datos…"            },
-        empty   : { icon: "bi-inbox",             texto: "Sin órdenes cerradas hoy"   },
-        error   : { icon: "bi-exclamation-circle",texto: "Error al cargar los datos"  },
+        loading : { icon: "bi-arrow-down-circle",  texto: "Cargando datos…"           },
+        empty   : { icon: "bi-inbox",              texto: "Sin ordenes cerradas hoy"  },
+        error   : { icon: "bi-exclamation-circle", texto: "Error al cargar los datos" },
     };
-
     const { icon, texto } = estados[tipo] ?? estados.empty;
     const cols = tbody.closest("table")?.querySelectorAll("thead th")?.length ?? 6;
-
     tbody.innerHTML = `
         <tr>
             <td colspan="${cols}">
@@ -301,43 +370,27 @@ function renderEstadoTabla(tbody, tipo) {
         </tr>`;
 }
 
-/**
- * Habilita o deshabilita un botón y cambia su texto mientras está cargando.
- * @param {HTMLElement} btn
- * @param {boolean} cargando
- * @param {string} textoCargando  — HTML del texto mientras carga
- */
 function setBotonCargando(btn, cargando, textoCargando) {
     btn.disabled = cargando;
     if (cargando) {
         btn.innerHTML = `<i class="bi bi-hourglass-split" aria-hidden="true"></i> ${textoCargando}`;
     } else {
-        btn.innerHTML = textoCargando;   // texto original restaurado por el caller
+        btn.innerHTML = textoCargando;
     }
 }
 
-/**
- * Anima el cambio de valor de un elemento con fade + slide.
- * @param {HTMLElement} el
- * @param {string} nuevoValor
- */
 function animarValor(el, nuevoValor) {
     if (!el) return;
     el.style.opacity   = "0";
     el.style.transform = "translateY(6px)";
-
     setTimeout(() => {
-        el.textContent     = nuevoValor;
+        el.textContent      = nuevoValor;
         el.style.transition = "opacity .35s ease, transform .35s ease";
-        el.style.opacity   = "1";
-        el.style.transform = "translateY(0)";
+        el.style.opacity    = "1";
+        el.style.transform  = "translateY(0)";
     }, 150);
 }
 
-/**
- * Actualiza el texto del contador de registros.
- * @param {number} n
- */
 function actualizarConteo(n) {
     const el = dom.labelConteo();
     if (el) el.textContent = `${n} registro${n !== 1 ? "s" : ""}`;

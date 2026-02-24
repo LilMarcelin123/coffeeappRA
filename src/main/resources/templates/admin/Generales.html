@@ -91,3 +91,104 @@
   </div>
 </div>
 
+
+
+
+
+
+
+
+
+
+
+<!-- PEGAR EN Generales.html junto a tus otros fragmentos -->
+
+<div th:fragment="modalAccesoModulo">
+
+    <!-- MODAL: Contraseña maestra de acceso a módulos -->
+    <div class="modal fade" id="modalAccesoModulo" tabindex="-1" aria-hidden="true"
+         data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered" style="max-width:420px;">
+            <div class="modal-content border-0 shadow-lg">
+
+                <!-- Header -->
+                <div class="modal-header border-0 pb-0" style="background:#f8f4f0;">
+                    <div class="d-flex align-items-center gap-2">
+                        <span style="font-size:28px;">🔐</span>
+                        <div>
+                            <h5 class="modal-title mb-0 fw-bold" style="color:#48392D;">
+                                Acceso restringido
+                            </h5>
+                            <small class="text-muted" id="labelNombreModulo">Módulo protegido</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Body -->
+                <div class="modal-body" style="background:#f8f4f0;">
+                    <p class="text-muted small mb-3">
+                        Ingresa la contraseña maestra para continuar.
+                    </p>
+
+                    <!-- Campo contraseña -->
+                    <div class="input-group mb-2">
+                        <input type="password"
+                               id="inputAccesoPassword"
+                               class="form-control"
+                               placeholder="Contraseña maestra"
+                               maxlength="50"
+                               autocomplete="off"/>
+                        <button class="btn btn-outline-secondary" type="button" id="btnToggleAccesoPass">
+                            <i class="bi bi-eye" id="iconoOjoAcceso"></i>
+                        </button>
+                    </div>
+
+                    <!-- Mensaje de error / bloqueo -->
+                    <div id="mensajeAccesoError" class="alert py-2 small mb-0" style="display:none;"></div>
+
+                    <!-- Indicador de intentos -->
+                    <div id="dotsIntentos" class="d-flex gap-1 mt-2" style="display:none !important;">
+                        <span class="dot-intento" id="dot1">●</span>
+                        <span class="dot-intento" id="dot2">●</span>
+                        <span class="dot-intento" id="dot3">●</span>
+                        <small class="text-muted ms-1">intentos restantes</small>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="modal-footer border-0 pt-0" style="background:#f8f4f0;">
+                    <button type="button" class="btn btn-outline-secondary btn-sm"
+                            id="btnCancelarAcceso">
+                        Cancelar
+                    </button>
+                    <button type="button" class="btn btn-sm fw-bold text-white"
+                            id="btnConfirmarAcceso"
+                            style="background:#48392D; min-width:100px;">
+                        <span id="spinnerAcceso" class="spinner-border spinner-border-sm me-1"
+                              style="display:none;"></span>
+                        Ingresar
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- CSS del modal (se inyecta junto al fragmento) -->
+    <style>
+        @keyframes shake {
+            0%, 100% { transform: translateX(0);    }
+            20%       { transform: translateX(-8px); }
+            40%       { transform: translateX(8px);  }
+            60%       { transform: translateX(-5px); }
+            80%       { transform: translateX(5px);  }
+        }
+        .dot-intento {
+            font-size: 18px;
+            color: #48392D;
+            transition: color 0.3s;
+            line-height: 1;
+        }
+    </style>
+
+</div>

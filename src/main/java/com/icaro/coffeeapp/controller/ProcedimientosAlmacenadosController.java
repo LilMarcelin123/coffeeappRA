@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +27,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @Slf4j
@@ -263,4 +266,278 @@ public class ProcedimientosAlmacenadosController {
 	    
 	    
 	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	 // ════════════════════════════════════════════════════════════════════════════
+	//  PEGAR ESTOS MÉTODOS DENTRO DE LA CLASE ProcedimientosAlmacenadosController
+	//  Agregar estos imports al inicio del archivo si no los tienes:
+//	    import org.springframework.web.bind.annotation.*;
+//	    import org.springframework.http.HttpStatus;
+	// ════════════════════════════════════════════════════════════════════════════
+
+
+	    // ═════════════════════════════════════════════════════════════════════════
+	    //  GESTIÓN DE USUARIOS
+	    // ═════════════════════════════════════════════════════════════════════════
+
+	    // ── Vista HTML ────────────────────────────────────────────────────────────
+	    @GetMapping("/admin/usuarios")
+	    public String vistaGestionUsuarios(Model model, HttpSession session) {
+	        if (session.getAttribute("nombreUsuario") == null) return "redirect:/login";
+	        model.addAttribute("nombreUsuario", session.getAttribute("nombreUsuario"));
+	        model.addAttribute("nombreNegocio", session.getAttribute("nombreNegocio"));
+	        return "admin/GestionUsuarios";   // → templates/admin/GestionUsuarios.html
+	    }
+
+
+	    // ── GET /api/usuarios  →  lista todos ─────────────────────────────────────
+	    @GetMapping("/api/usuarios")
+	    @ResponseBody
+	    public ResponseEntity<List<Map<String, Object>>> listarUsuarios() {
+	        List<Map<String, Object>> lista = procedimientosAlmacenados.spListarUsuarios();
+	        return ResponseEntity.ok(lista);
+	    }
+
+
+	    // ── GET /api/usuarios/{id}  →  obtener uno (sin password) ────────────────
+	    @GetMapping("/api/usuarios/{id}")
+	    @ResponseBody
+	    public ResponseEntity<Map<String, Object>> obtenerUsuario(
+	            @PathVariable("id") Integer id) {
+
+	        Map<String, Object> usuario = procedimientosAlmacenados.spObtenerUsuarioPorId(id);
+
+	        if (usuario == null) {
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+	                    .body(Map.of("mensaje", "Usuario no encontrado"));
+	        }
+	        return ResponseEntity.ok(usuario);
+	    }
+
+
+	    // ── POST /api/usuarios  →  crear ──────────────────────────────────────────
+	    @PostMapping("/api/usuarios")
+	    @ResponseBody
+	    public ResponseEntity<Map<String, Object>> crearUsuario(
+	            @RequestParam("username")  String  username,
+	            @RequestParam("password")  String  password,
+	            @RequestParam("telefono")  String  telefono,
+	            @RequestParam("id_rol")    Integer idRol) {
+
+	        Map<String, Object> respuesta = procedimientosAlmacenados
+	                .spCrearUsuario(username, password, telefono, idRol);
+
+	        int resultado = (int) respuesta.get("resultado");
+
+	        if (resultado == 0) {
+	            return ResponseEntity.status(HttpStatus.CREATED).body(respuesta);
+	        } else if (resultado == 1 || resultado == 2) {
+	            // username o email duplicado → 409 Conflict
+	            return ResponseEntity.status(HttpStatus.CONFLICT).body(respuesta);
+	        } else {
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(respuesta);
+	        }
+	    }
+
+
+	    // ── PUT /api/usuarios/{id}  →  editar ────────────────────────────────────
+	    @PutMapping("/api/usuarios/{id}")
+	    @ResponseBody
+	    public ResponseEntity<Map<String, Object>> editarUsuario(
+	            @PathVariable("id")                          Integer id,
+	            @RequestParam("username")                    String  username,
+	            @RequestParam(value = "password", required = false) String  password,
+	            @RequestParam("telefono")                    String  telefono,
+	            @RequestParam("id_rol")                      Integer idRol) {
+
+	        Map<String, Object> respuesta = procedimientosAlmacenados
+	                .spEditarUsuario(id, username, password, telefono, idRol);
+
+	        int resultado = (int) respuesta.get("resultado");
+
+	        if (resultado == 0) {
+	            return ResponseEntity.ok(respuesta);
+	        } else if (resultado == 1 || resultado == 2) {
+	            return ResponseEntity.status(HttpStatus.CONFLICT).body(respuesta);
+	        } else {
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(respuesta);
+	        }
+	    }
+
+
+	    // ── DELETE /api/usuarios/{id}  →  eliminar ────────────────────────────────
+	    @DeleteMapping("/api/usuarios/{id}")
+	    @ResponseBody
+	    public ResponseEntity<Map<String, Object>> eliminarUsuario(
+	            @PathVariable("id") Integer id) {
+
+	        Map<String, Object> respuesta = procedimientosAlmacenados.spEliminarUsuario(id);
+	        int resultado = (int) respuesta.get("resultado");
+
+	        if (resultado == 0) {
+	            return ResponseEntity.ok(respuesta);
+	        } else if (resultado == 3) {
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
+	        } else {
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(respuesta);
+	        }
+	    }
+
+
+	    // ── GET /api/roles  →  catálogo de roles ─────────────────────────────────
+	    //  (el JS del frontend lo llama para poblar el <select>)
+	    @GetMapping("/api/roles")
+	    @ResponseBody
+	    public ResponseEntity<List<Map<String, Object>>> listarRoles() {
+	        List<Map<String, Object>> roles = procedimientosAlmacenados.obtenerRoles();
+	        return ResponseEntity.ok(roles);
+	    }
+
+
+	    // ── GET /api/usuarios/verificar-username  →  disponibilidad ──────────────
+	    //  Uso desde JS: /api/usuarios/verificar-username?username=jgarcia&idExcluir=0
+	    @GetMapping("/api/usuarios/verificar-username")
+	    @ResponseBody
+	    public ResponseEntity<Map<String, Object>> verificarUsername(
+	            @RequestParam("username")              String  username,
+	            @RequestParam(value = "idExcluir", defaultValue = "0") Integer idExcluir) {
+
+	        boolean disponible = procedimientosAlmacenados.spVerificarUsername(username, idExcluir);
+	        return ResponseEntity.ok(Map.of("disponible", disponible));
+	    }
+	    
+	    
+	    
+	 // ════════════════════════════════════════════════════════════════════════════
+	//  AGREGAR A ProcedimientosAlmacenadosController.java
+	// ════════════════════════════════════════════════════════════════════════════
+
+	    // ─────────────────────────────────────────────────────────────────────────
+	    // POST /api/acceso-modulo
+	    // Valida la contraseña maestra antes de entrar a un módulo protegido.
+	    // El frontend envía: password + modulo (nombre del módulo para el log)
+	    // Spring responde:   { acceso: true/false, redirect: "/ruta" }
+	    //
+	    // Bloqueo por intentos: se guarda en HttpSession para no necesitar BD.
+	    //   - Máximo 3 intentos fallidos → bloqueo 5 minutos
+	    // ─────────────────────────────────────────────────────────────────────────
+	    @PostMapping("/api/acceso-modulo")
+	    @ResponseBody
+	    public ResponseEntity<Map<String, Object>> validarAccesoModulo(
+	            @RequestParam("password") String password,
+	            @RequestParam("modulo")   String modulo,
+	            HttpSession session) {
+
+	        // ── Verificar bloqueo por intentos fallidos ──────────────────────────
+	        Integer intentosFallidos = (Integer) session.getAttribute("accesoIntentos");
+	        Long    bloqueadoHasta   = (Long)    session.getAttribute("accesoBloqueadoHasta");
+
+	        if (bloqueadoHasta != null && System.currentTimeMillis() < bloqueadoHasta) {
+	            long segundosRestantes = (bloqueadoHasta - System.currentTimeMillis()) / 1000;
+	            return ResponseEntity.status(429).body(Map.of(
+	                "acceso",  false,
+	                "mensaje", "Demasiados intentos. Espera " + segundosRestantes + " segundos.",
+	                "bloqueado", true
+	            ));
+	        }
+
+	        // ── Validar contraseña contra BD ─────────────────────────────────────
+	        boolean accesoCorrecto = procedimientosAlmacenados.spValidarAccesoModulo(password);
+
+	        if (accesoCorrecto) {
+	            // Limpiar contadores de intentos
+	            session.removeAttribute("accesoIntentos");
+	            session.removeAttribute("accesoBloqueadoHasta");
+
+	            // Determinar ruta de redirección según módulo
+	            String redirect = switch (modulo.toLowerCase()) {
+	                case "usuarios"  -> "/admin/GestionUsuarios";
+	                case "reportes"  -> "/admin/GeneracionReportes";
+	                default          -> "/admin/inicio";
+	            };
+
+	            System.out.println(">>> Acceso a modulo [" + modulo + "] por usuario: " + session.getAttribute("nombreUsuario"));
+
+	            return ResponseEntity.ok(Map.of(
+	                "acceso",   true,
+	                "redirect", redirect,
+	                "mensaje",  "Acceso concedido"
+	            ));
+
+	        } else {
+	            // Incrementar contador de intentos fallidos
+	            int intentos = (intentosFallidos == null ? 0 : intentosFallidos) + 1;
+	            session.setAttribute("accesoIntentos", intentos);
+
+	            if (intentos >= 3) {
+	                // Bloquear 5 minutos
+	                long bloqueo = System.currentTimeMillis() + (5 * 60 * 1000L);
+	                session.setAttribute("accesoBloqueadoHasta", bloqueo);
+	                session.removeAttribute("accesoIntentos");
+
+	                System.out.println(">>> BLOQUEO acceso modulos. Usuario: " + session.getAttribute("nombreUsuario") + " - 3 intentos fallidos");
+
+	                return ResponseEntity.status(429).body(Map.of(
+	                    "acceso",    false,
+	                    "mensaje",   "Demasiados intentos. Bloqueado por 5 minutos.",
+	                    "bloqueado", true
+	                ));
+	            }
+
+	            int restantes = 3 - intentos;
+	            return ResponseEntity.status(401).body(Map.of(
+	                "acceso",    false,
+	                "mensaje",   "Contraseña incorrecta. Te quedan " + restantes + " intento(s).",
+	                "bloqueado", false,
+	                "intentos",  intentos
+	            ));
+	        }
+	    }
+	    
+	    @GetMapping("/util/generarHash")
+	    @ResponseBody
+	    public String generarHash(@RequestParam String pass) {
+	        return new BCryptPasswordEncoder().encode(pass);
+	    }
+	    
+	    
+	    
+	    
+	    
+	 // ════════════════════════════════════════════════════════════
+	//  AGREGAR A ProcedimientosAlmacenadosController.java
+	// ════════════════════════════════════════════════════════════
+
+
+	    // Listar historial de cierres
+	    @GetMapping("/api/cierres")
+	    @ResponseBody
+	    public ResponseEntity<List<Map<String, Object>>> listarCierres() {
+	        return ResponseEntity.ok(procedimientosAlmacenados.spListarCierres());
+	    }
+
+	    // Ejecutar cierre del dia
+	    @PostMapping("/api/cierres/ejecutar")
+	    @ResponseBody
+	    public ResponseEntity<Map<String, Object>> ejecutarCierre(
+	            @RequestParam(value = "observaciones", required = false) String observaciones,
+	            HttpSession session) {
+
+	        String username = (String) session.getAttribute("nombreUsuario");
+	        if (username == null) username = "sistema";
+
+	        Map<String, Object> res = procedimientosAlmacenados.spEjecutarCierreDia(username, observaciones);
+	        int resultado = (int) res.getOrDefault("resultado", -1);
+
+	        if (resultado == 1)  return ResponseEntity.ok(res);
+	        if (resultado == 0)  return ResponseEntity.status(400).body(res);
+	        return ResponseEntity.status(500).body(res);
+	    }
 }
