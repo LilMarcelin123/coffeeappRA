@@ -1,9 +1,4 @@
-// ─────────────────────────────────────────────────────────────
-// Reportes.js  —  /js/Reportes/Reportes.js
-// Rincón Arboledas · módulo de reportes y corte de caja
-// ─────────────────────────────────────────────────────────────
 
-/* ── CONSTANTES ─────────────────────────────────────────────── */
 const API = {
     detalle : "/admin/reportes/detalle",
     corte   : "/admin/reportes/corte",
@@ -310,6 +305,7 @@ function abrirModalCierre() {
     });
 }
 
+
 function ejecutarCierre() {
     var btn     = document.getElementById("btnConfirmarCierreFinal");
     var spinner = document.getElementById("spinnerCierre");
@@ -334,13 +330,13 @@ function ejecutarCierre() {
                 cargarDetalle(null);
                 resetCardsCorte();
                 document.getElementById("wrapTablaCorte").style.display = "none";
-                alert("Cierre exitoso: " + data.mensaje);
+                mostrarConfirmacion2("✅ " + data.mensaje, function(){}, function(){}, "exito");
             } else {
-                alert("Aviso: " + data.mensaje);
+                mostrarConfirmacion2("⚠️ " + data.mensaje, function(){}, function(){}, "advertencia");
             }
         })
         .catch(function() {
-            alert("Error de conexion al ejecutar el cierre.");
+            mostrarConfirmacion2("❌ Error de conexión.", function(){}, function(){}, "error");
         })
         .finally(function() {
             btn.disabled = false;
@@ -395,3 +391,47 @@ function actualizarConteo(n) {
     const el = dom.labelConteo();
     if (el) el.textContent = `${n} registro${n !== 1 ? "s" : ""}`;
 }
+function mostrarConfirmacion2(mensaje, onContinuar, onRegresar, tipo) {
+    const modalEl = document.getElementById("modalConfirmacion");
+    if (!modalEl) { console.error("No existe #modalConfirmacion"); return; }
+
+    const msgEl       = modalEl.querySelector("#mensajeConfirmacion");
+    const btnContinuar = modalEl.querySelector("#btnContinuar");
+    const btnRegresar  = modalEl.querySelector("#btnRegresar");
+    const header       = modalEl.querySelector(".modal-header");
+    const titulo       = modalEl.querySelector(".modal-title");
+
+    if (!msgEl) return;
+    msgEl.textContent = mensaje;
+
+    // ── Reset ─────────────────────────────────────────────
+    btnContinuar.className = "btn px-4 rounded-pill";
+    header.style.background = "";
+    titulo.textContent = "Confirmación";
+
+    // ── Estilos por tipo ──────────────────────────────────
+    if (tipo === "exito") {
+        header.style.background = "#d1fae5";
+        titulo.innerHTML = '<i class="bi bi-check-circle-fill text-success me-2"></i>Éxito';
+        btnContinuar.classList.add("btn-success");
+        btnContinuar.innerHTML = '<i class="bi bi-check-circle me-2"></i>Aceptar';
+    } else if (tipo === "advertencia") {
+        header.style.background = "#fef9c3";
+        titulo.innerHTML = '<i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>Advertencia';
+        btnContinuar.classList.add("btn-warning");
+        btnContinuar.innerHTML = '<i class="bi bi-exclamation-circle me-2"></i>Entendido';
+    } else if (tipo === "error") {
+        header.style.background = "#fee2e2";
+        titulo.innerHTML = '<i class="bi bi-x-circle-fill text-danger me-2"></i>Error';
+        btnContinuar.classList.add("btn-danger");
+        btnContinuar.innerHTML = '<i class="bi bi-x-circle me-2"></i>Cerrar';
+    } else {
+        btnContinuar.classList.add("btn-primary");
+        btnContinuar.innerHTML = '<i class="bi bi-check-circle me-2"></i>Continuar';
+    }
+
+    btnContinuar.onclick = () => { if (onContinuar) onContinuar(); $('#modalConfirmacion').modal('hide'); };
+    btnRegresar.onclick  = () => { if (onRegresar)  onRegresar();  $('#modalConfirmacion').modal('hide'); };
+    $('#modalConfirmacion').modal('show');
+}
+window.ejecutarCierre = ejecutarCierre;

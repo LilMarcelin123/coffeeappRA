@@ -171,17 +171,11 @@
 
 <!-- FOOTER -->
 <footer class="footer-custom">
-    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
-        <span>
-            &copy; 2025 ·
-            <span th:text="${nombreNegocio}">Nombre del negocio</span>.
-            Todos los derechos reservados.
-        </span>
-        <span class="footer-right">
-            Desarrollado por <a th:href="@{/}" target="_blank">Tu marca</a>
-        </span>
-        <div class="logo-circle">
-            <img th:src="@{/img/icarous_logo.jpg}" alt="Logo desarrollador">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <span>&copy; 2025 · <span th:text="${nombreNegocio}">Negocio</span>. Todos los derechos reservados.</span>
+        <span>Soporte: <a href="mailto:contactcheatcoder@gmail.com">Escríbenos</a></span>
+        <div class="footer-logo">
+            <img th:src="@{/img/arboledasLogo.jpg}" alt="Logo">
         </div>
     </div>
 </footer>

@@ -1,21 +1,3 @@
-/**
- * TomaOrden.js
- * Módulo principal para la toma de órdenes en Rincón Arboledas.
- *
- * Estructura:
- *   1. Imports
- *   2. Constantes y configuración
- *   3. Selectores del DOM
- *   4. Funciones de utilidad
- *   5. Funciones de UI / render
- *   6. Funciones de red (AJAX)
- *   7. Manejadores de eventos
- *   8. Inicialización
- */
-
-// ─────────────────────────────────────────────────────────────
-// 1. IMPORTS
-// ─────────────────────────────────────────────────────────────
 import { mensajesAlert, mostrarConfirmacion } from '../FuncionesGenerales.js';
 
 
