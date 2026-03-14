@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.icaro.coffeeapp.model.Categoria;
@@ -38,14 +39,41 @@ public class OrdenesController {
     private ProductoRepository productoRepository;
 
     @GetMapping({"/admin/tomaOrden", "/tomaOrden"})
-    public String mostrarTomaOrden(Model model) {
-
+    public String mostrarTomaOrden(
+            @RequestParam(name = "idOrden", required = false) Integer idOrden,
+            Model model) {
         List<Categoria> categorias = categoriaRepository.findAll();
         System.out.println("CATEGORIAS ENCONTRADAS: " + categorias.size());
         model.addAttribute("categorias", categorias);
 
+        model.addAttribute("idOrden", idOrden);
+
         return "admin/tomaOrden";
     }
+
+
+    @GetMapping("/admin/gestionCatalogo")
+    public String mostrarGestionCatalogo(Model model) {
+
+        return "admin/gestionCatalogo"; 
+    }
+
+    
+    @GetMapping("/admin/GeneracionReportes")
+    public String mostrarGeneracionReportes(Model model) {
+
+        return "admin/GeneracionReportes"; 
+    }
+
+    
+    
+    @GetMapping("/admin/GestionUsuarios")
+    public String mostrarGestionUsuarios(Model model) {
+
+        return "admin/GestionUsuarios"; 
+    }
+    
+    
     
     @GetMapping("/api/productosPorCategoria/{idCategoria}")
     @ResponseBody

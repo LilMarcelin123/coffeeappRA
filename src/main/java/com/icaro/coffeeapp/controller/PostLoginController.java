@@ -1,9 +1,13 @@
 package com.icaro.coffeeapp.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import com.icaro.coffeeapp.model.SecurityUser;
 
 import java.util.Collection;
 
@@ -11,32 +15,31 @@ import java.util.Collection;
 public class PostLoginController {
 
     @GetMapping("/postLogin")
-    public String redirigirSegunRol(Authentication authentication) {
+    public String redirigirSegunRol(Authentication authentication, HttpServletRequest request) {
 
+        if (authentication == null) return "redirect:/login?error";
+
+        HttpSession session = request.getSession();
+        SecurityUser securityUser = (SecurityUser) authentication.getPrincipal();
+
+        session.setAttribute("nombreUsuario", authentication.getName());
+        session.setAttribute("idRol",         securityUser.getIdRol());
+        session.setAttribute("nombreNegocio", "Rincón Arboledas");
+
+        System.out.println(">>> Usuario:     " + authentication.getName());
+        System.out.println(">>> Authorities: " + authentication.getAuthorities());
+        System.out.println(">>> idRol:       " + securityUser.getIdRol());
+
+    
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 
-        boolean isAdmin           = hasRole(authorities, "ROLE_ADMINISTRADOR");
-        boolean isSalados         = hasRole(authorities, "ROLE_OPERADOR_SALADOS");
-        boolean isCrepasWaffles   = hasRole(authorities, "ROLE_OPERADOR_CREPAS_WAFFLES");
-        boolean isBebCalientes    = hasRole(authorities, "ROLE_OPERADOR_BEBIDAS_CALIENTES");
-        boolean isBebFrias        = hasRole(authorities, "ROLE_OPERADOR_BEBIDAS_FRIAS");
-        boolean isFitness         = hasRole(authorities, "ROLE_OPERADOR_FITNESS");
+        if (hasRole(authorities, "ROLE_ADMINISTRADOR"))              return "redirect:/admin/inicio";
+        if (hasRole(authorities, "ROLE_OPERADOR_SALADOS"))           return "redirect:/salados/iniciosa";
+        if (hasRole(authorities, "ROLE_OPERADOR_CREPAS_WAFFLES"))    return "redirect:/crepas/iniciocr";
+        if (hasRole(authorities, "ROLE_OPERADOR_BEBIDAS_CALIENTES")) return "redirect:/bebcalientes/iniciobc";
+        if (hasRole(authorities, "ROLE_OPERADOR_BEBIDAS_FRIAS"))     return "redirect:/bebfrias/iniciobf";
+        if (hasRole(authorities, "ROLE_OPERADOR_FITNESS"))           return "redirect:/fitness/iniciofit";
 
-        if (isAdmin) {
-            return "redirect:/admin/inicio";
-        } else if (isSalados) {
-            return "redirect:/salados/iniciosa";
-        } else if (isCrepasWaffles) {
-            return "redirect:/crepas/iniciocr";
-        } else if (isBebCalientes) {
-            return "redirect:/bebcalientes/iniciobc";
-        } else if (isBebFrias) {
-            return "redirect:/bebfrias/iniciobf";
-        } else if (isFitness) {
-            return "redirect:/fitness/iniciofit";
-        }
-
-        // fallback
         return "redirect:/login?error";
     }
 

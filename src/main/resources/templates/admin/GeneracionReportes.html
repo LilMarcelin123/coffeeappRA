@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes — Rincón Arboledas</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/styleGeneracionReportes.css}">
+</head>
+
+<body>
+
+<!-- ══ FRANJA IMAGEN ════════════════════════════════════════ -->
+<header class="rpt-strip">
+    <img class="rpt-strip__img" src="/img/granoscafe.jpg" alt="" aria-hidden="true">
+    <div class="rpt-strip__overlay"></div>
+    <div class="rpt-strip__content">
+        <span class="hero-badge">
+            <i class="bi bi-bar-chart-fill"></i> Reportes
+        </span>
+        <a th:href="@{/admin/inicio}" class="btn-back-strip">
+            <i class="bi bi-chevron-left"></i> Inicio
+        </a>
+    </div>
+</header>
+
+<!-- ══ TÍTULO GRANDE ════════════════════════════════════════ -->
+<div class="header-block">
+    <div>
+        <p class="header-eyebrow">Análisis del día</p>
+        <h1 class="header-main-title">Reportes <em>&amp; Corte</em></h1>
+        <div class="header-divider"></div>
+    </div>
+    <div class="header-meta">
+        <span class="header-negocio" th:text="${nombreNegocio}">Rincón Arboledas</span>
+        <div class="header-logo">
+            <img th:src="@{/img/arboledasLogo.jpg}" alt="Logo">
+        </div>
+    </div>
+</div>
+
+<!-- ══ MAIN ═════════════════════════════════════════════════ -->
+<main class="rpt-main">
+
+    <!-- ── SECCIÓN 1: DETALLE DE ÓRDENES ─────────────────── -->
+    <section class="panel-card reveal">
+
+        <!-- Cabecera -->
+        <div class="section-head">
+            <div class="section-title-group">
+                <span class="section-icon"><i class="bi bi-receipt-cutoff"></i></span>
+                <div>
+                    <h2 class="section-title">Detalle de Órdenes</h2>
+                    <p class="section-sub">Historial de transacciones cerradas hoy</p>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="filter-group" role="group" aria-label="Filtro por método de pago">
+                <button class="filter-pill active" data-filtro="" aria-pressed="true">
+                    <i class="bi bi-list-ul"></i> Todos
+                </button>
+                <button class="filter-pill" data-filtro="1" aria-pressed="false">
+                    <i class="bi bi-cash-coin"></i> Efectivo
+                </button>
+                <button class="filter-pill" data-filtro="2" aria-pressed="false">
+                    <i class="bi bi-credit-card-fill"></i> Tarjeta
+                </button>
+            </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="table-toolbar">
+            <span class="tbl-count" id="labelConteo">— registros</span>
+            <label class="search-wrap">
+                <i class="bi bi-search" aria-hidden="true"></i>
+                <input type="text" id="inputBuscar" placeholder="Buscar orden…" autocomplete="off">
+            </label>
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-wrap">
+            <table class="rpt-table" id="tablaDetalle" aria-label="Detalle de órdenes">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>ID Orden</th>
+                        <th>Hora cierre</th>
+                        <th>Resumen</th>
+                        <th>Pago</th>
+                        <th class="text-end">Total</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyDetalle">
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <i class="bi bi-arrow-down-circle"></i>
+                                <span>Cargando datos…</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Barra de descarga -->
+        <div class="download-bar">
+            <span class="dl-label"><i class="bi bi-file-earmark-excel-fill"></i> Exportar Excel</span>
+            <button class="btn-dl btn-dl--all" id="btnDescargaDetalle">
+                <i class="bi bi-table"></i> Todos
+            </button>
+            <button class="btn-dl btn-dl--filter" id="btnDescargaFiltro">
+                <i class="bi bi-funnel-fill"></i> Con filtro activo
+            </button>
+        </div>
+
+    </section>
+
+    <!-- ── SECCIÓN 2: CORTE DE CAJA ───────────────────────── -->
+    <section class="panel-card reveal" style="animation-delay:.12s">
+
+        <!-- Cabecera -->
+        <div class="section-head">
+            <div class="section-title-group">
+                <span class="section-icon section-icon--green"><i class="bi bi-safe2-fill"></i></span>
+                <div>
+                    <h2 class="section-title">Corte de Caja</h2>
+                    <p class="section-sub">Totales consolidados del periodo</p>
+                </div>
+            </div>
+            <button class="btn-corte" id="btnGenerarCorte">
+                <i class="bi bi-play-circle-fill"></i> Generar corte
+            </button>
+        </div>
+
+        <!-- Cards totales -->
+        <div class="corte-grid">
+            <div class="corte-card cc-total">
+                <span class="cc-icon"><i class="bi bi-currency-dollar"></i></span>
+                <div class="cc-body">
+                    <span class="cc-label">Total general</span>
+                    <span class="cc-value" id="totalGeneral">—</span>
+                </div>
+            </div>
+            <div class="corte-card cc-efectivo">
+                <span class="cc-icon"><i class="bi bi-cash-stack"></i></span>
+                <div class="cc-body">
+                    <span class="cc-label">Efectivo</span>
+                    <span class="cc-value" id="totalEfectivo">—</span>
+                </div>
+            </div>
+            <div class="corte-card cc-tarjeta">
+                <span class="cc-icon"><i class="bi bi-credit-card-fill"></i></span>
+                <div class="cc-body">
+                    <span class="cc-label">Tarjeta</span>
+                    <span class="cc-value" id="totalTarjeta">—</span>
+                </div>
+            </div>
+            <div class="corte-card cc-ordenes">
+                <span class="cc-icon"><i class="bi bi-clipboard2-check-fill"></i></span>
+                <div class="cc-body">
+                    <span class="cc-label">Órdenes cerradas</span>
+                    <span class="cc-value" id="totalOrdenes">—</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla corte (oculta hasta generar) -->
+        <div class="table-wrap" id="wrapTablaCorte" style="display:none;">
+            <table class="rpt-table" id="tablaCorte" aria-label="Resumen de corte">
+                <thead>
+                    <tr>
+                        <th>Método de pago</th>
+                        <th>Órdenes</th>
+                        <th class="text-end">Total</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyCorte"></tbody>
+            </table>
+        </div>
+
+    </section>
+
+    <!-- ── SECCIÓN 3: CIERRE DEL DÍA ─────────────────────── -->
+    <section class="panel-card reveal" style="animation-delay:.24s">
+
+        <div class="section-head">
+            <div class="section-title-group">
+                <span class="section-icon section-icon--red">
+                    <i class="bi bi-door-closed-fill"></i>
+                </span>
+                <div>
+                    <h2 class="section-title">Cierre del Día</h2>
+                    <p class="section-sub">Archiva el historial y reinicia las tablas operativas</p>
+                </div>
+            </div>
+
+            <button class="btn-cierre-dia" id="btnAbrirCierre">
+                <i class="bi bi-door-closed-fill"></i>
+                Ejecutar cierre del día
+            </button>
+        </div>
+
+        <!-- Advertencia -->
+        <div class="cierre-warning">
+            <i class="bi bi-exclamation-triangle-fill cierre-warning__icon"></i>
+            <div>
+                <strong>Acción irreversible.</strong>
+                Al ejecutar el cierre, todas las órdenes
+                cerradas de hoy se archivan en el historial y las tablas
+                operativas (<code>orden</code>, <code>orden_item</code>,
+                <code>orden_item_opcion</code>, <code>orden_preparacion</code>)
+                se reinician para comenzar un nuevo día.
+            </div>
+        </div>
+
+    </section>
+
+    <!-- Regresar -->
+    <div class="d-flex justify-content-start">
+        <a th:href="@{/admin/inicio}" href="/admin/inicio" class="btn-back-main">
+            <i class="bi bi-arrow-left"></i> Regresar al inicio
+        </a>
+    </div>
+
+</main>
+
+<!-- ══ FOOTER ════════════════════════════════════════════════ -->
+<footer class="rpt-footer">
+    <span>&copy; 2025 · <span th:text="${nombreNegocio}">Negocio</span>. Todos los derechos reservados.</span>
+    <span>Módulo de Reportes</span>
+</footer>
+
+<!-- ══ MODAL CONFIRMACIÓN CIERRE ════════════════════════════ -->
+<div class="modal fade" id="modalConfirmCierre" tabindex="-1"
+     data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:460px;">
+        <div class="modal-content border-0 shadow-lg" style="border-radius:20px;overflow:hidden;">
+
+            <!-- Header rojo -->
+            <div class="modal-header border-0 px-4 pt-4 pb-2"
+                 style="background:linear-gradient(135deg,#b91c1c,#ef4444);">
+                <div class="d-flex align-items-center gap-3">
+                    <span style="font-size:32px;">🔴</span>
+                    <div>
+                        <h5 class="modal-title fw-bold text-white mb-0">
+                            Confirmar cierre del día
+                        </h5>
+                        <small class="text-white opacity-75">Esta acción no se puede deshacer</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body px-4 py-3">
+                <p class="text-muted small mb-3">
+                    Se archivarán las siguientes órdenes cerradas:
+                </p>
+                <div id="resumenPreCierre" class="mb-3">
+                    <div class="d-flex justify-content-center py-2">
+                        <div class="spinner-border spinner-border-sm text-danger"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-muted">
+                        Observaciones <span class="fw-normal">(opcional)</span>
+                    </label>
+                    <textarea id="inputObservaciones" class="form-control form-control-sm"
+                              rows="2"
+                              placeholder="Ej: Cierre normal, sin incidencias"
+                              style="border-radius:10px;"></textarea>
+                </div>
+                <div class="alert py-2 small mb-0"
+                     style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;color:#991b1b;">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Los datos quedarán guardados en el historial y podrás consultarlos después.
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer border-0 px-4 pb-4 pt-2">
+                <button class="btn btn-outline-secondary btn-sm rounded-pill px-4"
+                        data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+                <button id="btnConfirmarCierreFinal"
+                        class="btn btn-danger btn-sm rounded-pill px-4 fw-bold"
+                        onclick="ejecutarCierre()">
+                    <span id="spinnerCierre"
+                          class="spinner-border spinner-border-sm me-1"
+                          style="display:none;"></span>
+                    <i class="bi bi-door-closed-fill me-1"></i>
+                    Sí, ejecutar cierre
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div th:replace="~{admin/Generales :: modalConfirmacion}"></div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module" th:src="@{/js/Reportes/Reportes.js}"></script>
+
+</body>
+</html>

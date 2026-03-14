@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+
+<div th:fragment="modalEditar">
+	<div class="modal fade" id="modalEditar" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">✏ Editar registro</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row g-3">
+
+          <div class="col-md-6">
+            <label class="form-label">Nombre</label>
+            <input id="nombre" class="form-control">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Precio</label>
+			<input id="precio" type="number" step="0.01" class="form-control" required>
+          </div>
+
+          <div class="col-md-12">
+            <label class="form-label">Descripción</label>
+            <input id="descripcion" class="form-control">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Rol</label>
+            <select id="rol" class="form-select">
+              <option value="">Seleccione</option>
+              <option value="1">Admin</option>
+              <option value="2">Usuario</option>
+            </select>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button id="btnGuardarCambios" class="btn btn-success">
+           Guardar
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>  
+</div>
+
+
+<div th:fragment="modalInsertar">
+  <div class="modal fade" id="modalInsertar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h5 class="modal-title"> Insertar registro</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="row g-3">
+
+            <!-- Nombre -->
+            <div class="col-md-12" id="nombreContainer">
+              <label class="form-label">Nombre</label>
+              <input id="insertNombre" class="form-control">
+            </div>
+
+            <!-- Precio -->
+            <div class="col-md-6" id="precioContainer">
+              <label class="form-label">Precio</label>
+              <input id="insertPrecio" type="number" step="0.01" class="form-control">
+            </div>
+
+            <!-- Descripción -->
+            <div class="col-md-12" id="descripcionContainer">
+              <label class="form-label">Descripción</label>
+              <input id="insertDescripcion" class="form-control">
+            </div>
+
+            <!-- Rol dinámico -->
+            <div class="col-md-6" id="rolContainer">
+              <label class="form-label">Rol de preparación</label>
+              <select id="insertRol" class="form-select"></select>
+            </div>
+
+            <!-- Categoría padre -->
+            <div class="col-md-6" id="categoriaSelectContainer">
+              <label class="form-label">Categoría</label>
+              <select id="insertCategoria" class="form-select"></select>
+            </div>
+
+            <!-- Subcategoría padre -->
+            <div class="col-md-6" id="subcategoriaSelectContainer">
+              <label class="form-label">Subcategoría</label>
+              <select id="insertSubcategoria" class="form-select"></select>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button id="btnGuardarInsertar" class="btn btn-success"> Guardar</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</body>
+</html>

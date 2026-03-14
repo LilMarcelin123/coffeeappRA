@@ -4,171 +4,279 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Administrador</title>
+    <title>Toma de Orden — Rincón Arboledas</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/styleTomaOrdenes.css}">
+
+    <!-- Preview styles (remove when using Thymeleaf) -->
+    <style>
+        :root {
+            --crema:#FDFAF6;--crema-2:#F5EFE6;--cafe-light:#D4B896;
+            --cafe-mid:#B8936A;--cafe-dark:#8B5E3C;--cafe-deep:#5C3317;
+            --cafe-ink:#3B1F0A;--text-primary:#1A0F08;--text-muted:#8A7060;
+            --radius-xl:24px;--radius-lg:16px;--radius-md:12px;
+            --shadow-card:0 4px 24px rgba(92,51,23,.08);--blur:blur(20px);
+        }
+        *,*::before,*::after{box-sizing:border-box;}
+        body{font-family:'Poppins',sans-serif;background:var(--crema);color:var(--text-primary);min-height:100vh;margin:0;}
+
+        /* FRANJA IMAGEN */
+        .hero-section{position:relative;width:100%;height:110px;background-size:cover;background-position:center 38%;background-repeat:no-repeat;overflow:hidden;}
+        .hero-overlay{position:absolute;inset:0;background:linear-gradient(to right,rgba(59,31,10,.72) 0%,rgba(92,51,23,.45) 50%,rgba(59,31,10,.68) 100%);}
+        .hero-section::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--cafe-mid),var(--cafe-light),var(--cafe-mid));}
+        .hero-content{position:relative;z-index:1;height:100%;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(24px,5vw,64px);}
+        .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.30);border-radius:30px;padding:5px 18px;font-size:.70rem;font-weight:700;color:rgba(255,255,255,.92);letter-spacing:.12em;text-transform:uppercase;backdrop-filter:blur(12px);}
+        .hero-logo{width:52px;height:52px;border-radius:14px;overflow:hidden;border:2px solid rgba(255,255,255,.30);box-shadow:0 4px 16px rgba(0,0,0,.25);flex-shrink:0;}
+        .hero-logo img{width:100%;height:100%;object-fit:cover;}
+
+        /* HEADER BLOCK */
+        .header-block{max-width:1100px;margin:36px auto 0;padding:0 24px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;animation:slideDown .5s ease both;}
+        .header-eyebrow{font-size:.70rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--cafe-mid);margin-bottom:6px;}
+        .header-main-title{font-family:'Playfair Display',serif;font-size:clamp(2.4rem,5vw,4rem);font-weight:700;color:var(--cafe-ink);line-height:1.05;margin:0 0 6px;letter-spacing:-.02em;}
+        .header-main-title em{font-style:italic;color:var(--cafe-dark);}
+        .header-divider{width:64px;height:3px;border-radius:4px;background:linear-gradient(90deg,var(--cafe-mid),var(--cafe-light));margin-top:12px;}
+        .header-right{text-align:right;flex-shrink:0;}
+        .header-negocio{font-size:1rem;font-weight:600;color:var(--cafe-dark);}
+        .header-fecha{font-size:.78rem;color:var(--text-muted);margin-top:2px;}
+
+        /* GRID */
+        .main-grid{display:grid;grid-template-columns:1fr 400px;gap:24px;max-width:1100px;margin:28px auto;padding:0 24px 60px;animation:fadeUp .5s ease .1s both;}
+        @media(max-width:900px){.main-grid{grid-template-columns:1fr;}.header-block{flex-direction:column;align-items:flex-start;}.header-right{text-align:left;}}
+
+        /* CARDS */
+        .panel-card{background:rgba(255,255,255,.94);backdrop-filter:var(--blur);border:1.5px solid rgba(212,184,150,.28);border-radius:var(--radius-xl);box-shadow:var(--shadow-card);padding:32px;}
+        .panel-card-title{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;color:var(--cafe-deep);margin-bottom:24px;display:flex;align-items:center;gap:12px;}
+        .panel-card-title i{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--cafe-light),var(--cafe-dark));display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.1rem;flex-shrink:0;box-shadow:0 4px 12px rgba(139,94,60,.3);}
+
+        /* ORDEN BADGE */
+        .orden-badge{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--cafe-deep),var(--cafe-dark));color:#fff;border-radius:var(--radius-lg);padding:14px 22px;font-weight:700;font-size:1.05rem;margin-bottom:22px;box-shadow:0 4px 18px rgba(92,51,23,.28);}
+        .orden-badge i{font-size:1.2rem;opacity:.75;}
+
+        /* FORM */
+        .form-label-custom{font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.10em;margin-bottom:7px;display:block;}
+        .form-select,.form-control{border:1.5px solid rgba(212,184,150,.5);border-radius:var(--radius-md);padding:12px 16px;font-family:'Poppins',sans-serif;font-size:.92rem;color:var(--text-primary);background:rgba(255,255,255,.9);transition:border-color .2s,box-shadow .2s;}
+        .form-select:focus,.form-control:focus{border-color:var(--cafe-mid);box-shadow:0 0 0 3px rgba(184,147,106,.18);outline:none;}
+
+        /* COMENTARIO */
+        .comentario-wrap{background:#FFFBF5;border:1.5px dashed rgba(212,184,150,.6);border-radius:var(--radius-lg);padding:16px 18px;margin-top:16px;}
+        .comentario-label{font-size:.72rem;font-weight:700;color:var(--cafe-mid);text-transform:uppercase;letter-spacing:.09em;display:flex;align-items:center;gap:6px;margin-bottom:9px;}
+        #comentarioProducto{border:none;background:transparent;font-size:.9rem;color:var(--text-primary);width:100%;resize:none;outline:none;font-family:'Poppins',sans-serif;}
+        #comentarioProducto::placeholder{color:var(--cafe-light);}
+
+        /* BOTONES */
+        .btn-cafe{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:15px 22px;border:none;border-radius:var(--radius-md);font-family:'Poppins',sans-serif;font-weight:700;font-size:.96rem;cursor:pointer;transition:transform .2s,box-shadow .2s,opacity .2s;}
+        .btn-cafe:active{transform:scale(.97);}
+        .btn-primary-cafe{background:linear-gradient(135deg,var(--cafe-dark),var(--cafe-deep));color:#fff;box-shadow:0 4px 18px rgba(92,51,23,.28);}
+        .btn-primary-cafe:hover{box-shadow:0 8px 28px rgba(92,51,23,.38);transform:translateY(-2px);}
+        .btn-success-cafe{background:linear-gradient(135deg,#2E7D32,#1B5E20);color:#fff;box-shadow:0 4px 18px rgba(27,94,32,.28);}
+        .btn-success-cafe:hover{box-shadow:0 8px 28px rgba(27,94,32,.38);transform:translateY(-2px);}
+        .btn-success-cafe:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none;}
+        .btn-outline-cafe{background:transparent;color:var(--cafe-dark);border:2px solid rgba(139,94,60,.35);text-decoration:none;}
+        .btn-outline-cafe:hover{background:var(--crema-2);border-color:var(--cafe-mid);}
+
+        /* RESUMEN */
+        .resumen-empty{text-align:center;color:var(--text-muted);padding:32px 0;font-size:.9rem;}
+        .resumen-empty i{font-size:2.4rem;display:block;margin-bottom:10px;opacity:.35;}
+        .resumen-item{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px dashed rgba(212,184,150,.35);animation:fadeUp .3s ease both;}
+        .resumen-item:last-child{border-bottom:none;}
+        .resumen-item .cantidad{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--cafe-light),var(--cafe-mid));color:#fff;font-size:.78rem;font-weight:800;flex-shrink:0;margin-top:1px;}
+        .resumen-item .producto{font-weight:600;color:var(--cafe-deep);font-size:.92rem;flex:1;}
+        .resumen-item .extras{font-size:.78rem;color:var(--text-muted);margin-top:3px;font-style:italic;}
+        .resumen-item .total-item{font-weight:700;color:var(--cafe-dark);font-size:.92rem;white-space:nowrap;}
+        .btn-eliminar-item{width:30px;height:30px;border-radius:9px;border:1.5px solid rgba(220,53,69,.22);background:rgba(220,53,69,.05);color:#c62828;display:flex;align-items:center;justify-content:center;font-size:.8rem;cursor:pointer;transition:background .2s,transform .2s;flex-shrink:0;}
+        .btn-eliminar-item:hover{background:rgba(220,53,69,.15);transform:scale(1.12);}
+
+        /* TOTAL */
+        .total-row{display:flex;justify-content:space-between;align-items:center;padding:16px 0 0;margin-top:10px;border-top:2px solid rgba(212,184,150,.3);}
+        .total-label{font-weight:700;color:var(--text-muted);font-size:.82rem;text-transform:uppercase;letter-spacing:.08em;}
+        #totalOrdenVista{font-size:1.6rem;font-weight:800;color:var(--cafe-deep);font-family:'Playfair Display',serif;}
+
+        /* FOOTER */
+        .footer-custom{background:rgba(255,255,255,.82);backdrop-filter:var(--blur);border-top:1.5px solid rgba(212,184,150,.22);padding:18px 32px;font-size:.82rem;color:var(--text-muted);}
+        .footer-custom a{color:var(--cafe-mid);text-decoration:none;}
+        .footer-custom a:hover{color:var(--cafe-dark);}
+        .footer-logo{width:36px;height:36px;border-radius:10px;overflow:hidden;border:1.5px solid rgba(212,184,150,.4);}
+        .footer-logo img{width:100%;height:100%;object-fit:cover;}
+
+        /* ANIMS */
+        @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+    </style>
 </head>
 
 <body>
 
-<!--  SUPERIOR CON FONDO E LOGOS -->
-<header class="container-fluid px-0">
+<!-- ── FRANJA DE IMAGEN (delgada, tipo margen) ───────────────── -->
+<header>
     <div class="hero-section" style="background-image: url('/img/granoscafe.jpg');">
-        <div class="hero-overlay">
-            <div class="container">
-                <div class="row align-items-center">
-                    <!-- Texto principal -->
-                    <div class="col-md-7">
-                        <div class="mb-2">
-                            <span class="badge-rol">
-                                Panel Toma de Orden
-                            </span>
-                        </div>
-                        <h1 class="hero-title mb-2">
-                            Selección de Productos
-                            
-                        </h1>
-                    
-                    </div>
-
-                    <!-- Logos -->
-                    <div class="col-md-5 mt-3 mt-md-0">
-                        <div class="logo-stack">
-                            <!-- Logo del negocio -->
-                            <div class="logo-circle">
-                                <img th:src="@{/img/arboledasLogo.jpg}" alt="Logo negocio">
-                            </div>
-
-                           
-                        </div>
-                        <p class="text-end small mt-2 opacity-75 d-none d-md-block">
-                            <span th:text="${nombreNegocio}">Nombre del negocio</span>
-                        </p>
-                    </div>
-                </div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="bi bi-receipt-cutoff"></i> Toma de Orden
+            </div>
+            <div class="hero-logo">
+                <img th:src="@{/img/arboledasLogo.jpg}" alt="Logo">
             </div>
         </div>
     </div>
 </header>
 
-<!-- CUERPO PRINCIPAL -->
-<main class="container card-main">
-    <div class="glass-card p-4 p-md-4 mb-4">
-        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-            <div>
-                <h2 class="h4 mb-0">
-                    <span th:text="${nombreUsuario}">Usuario</span>
-                </h2>
-                <p class="text-muted mb-0 subtitle-small">
-                    Selecciona en la parte debajo los productos y subproductos
-					y al final confirma para guardar el producto en la orden.
-                </p>
-            </div>
-            <div>
-                <a class="btn btn-outline-danger btn-sm" th:href="@{/admin/inicio}">
-                    REGRESAR
-                </a>
-            </div>
+<!-- ── TÍTULO GRANDE DEBAJO DE LA FRANJA ───────────────────── -->
+<div class="header-block">
+    <div>
+        <div class="header-eyebrow">Selección de productos</div>
+        <h1 class="header-main-title">
+            Toma de <em>Orden</em>
+        </h1>
+        <div class="header-divider"></div>
+    </div>
+    <div class="header-right">
+        <div class="header-negocio" th:text="${nombreNegocio}">Rincón Arboledas</div>
+        <div class="header-fecha">Selecciona, confirma y envía a cocina</div>
+    </div>
+</div>
+
+
+<!-- ── GRID PRINCIPAL ───────────────────────────────────────── -->
+<main class="main-grid">
+
+    <!-- COLUMNA IZQUIERDA: FORMULARIO -->
+    <div class="panel-card">
+        <div class="panel-card-title">
+            <i class="bi bi-bag-plus-fill"></i>
+            Agregar Productos
         </div>
 
-        <hr>
+        <!-- Badge de orden activa -->
+        <div class="orden-badge">
+            <i class="bi bi-receipt-cutoff"></i>
+            Orden #<span th:text="${idOrden}">—</span>
+            <input type="hidden" id="idOrden" th:value="${idOrden}">
+        </div>
 
-        <!-- MENÚ PRINCIPAL -->
-        <div class="row g-3">
+        <!-- Bienvenida -->
+        <p class="text-muted mb-20" style="font-size:.88rem; margin-bottom:20px;">
+            <i class="bi bi-person-fill me-1"></i>
+            <span th:text="${nombreUsuario}">Operador</span> —
+            Selecciona categoría, producto, cantidad y confirma.
+        </p>
 
-            <!-- Opción: Toma de órdenes -->
-            <div class="col-md-4">
-         
+        <!-- Categoría -->
+        <div class="mb-3">
+            <label class="form-label-custom"><i class="bi bi-grid me-1"></i> Categoría</label>
+            <select id="selectCategoria" class="form-select">
+                <option value="">Seleccione una categoría</option>
+                <option th:each="cat : ${categorias}"
+                        th:value="${cat.idcategoria}"
+                        th:text="${cat.nnombrecategoria}">
+                </option>
+            </select>
+        </div>
+
+        <!-- Productos (dinámico) -->
+        <div id="contenedorProductos" class="mb-3"></div>
+
+        <!-- Cantidad -->
+        <div class="mb-3" id="wrapCantidad" style="display:none;">
+            <label class="form-label-custom"><i class="bi bi-hash me-1"></i> Cantidad</label>
+            <input type="number"
+                   class="form-control"
+                   id="cantidadProducto"
+                   min="1"
+                   placeholder="Ej: 2">
+        </div>
+
+        <!-- Comentario -->
+        <div class="comentario-wrap" id="wrapComentario" style="display:none;">
+            <div class="comentario-label">
+                <i class="bi bi-chat-left-text"></i> Nota / Comentario (opcional)
             </div>
+            <textarea id="comentarioProducto"
+                      rows="2"
+                      maxlength="300"
+                      placeholder="Ej: Sin cebolla, bien cocido, sin azúcar…"></textarea>
+        </div>
 
-            <!-- Opción: Gestión de catálogos -->
-			<div class="col-md-4">
+        <!-- Subcategoría (dinámico) -->
+        <div id="contenedorSubcategoria" class="mt-3"></div>
 
-			    <!-- Tarjeta -->
-			    <div class="panel-card h-100 d-flex flex-column justify-content-between p-3">
+        <!-- Extras (dinámico) -->
+        <div id="contenedorOpcionesExtras" class="mt-2"></div>
 
-			        <!-- Select de categorías -->
-			        <div>
-			            <select id='selectCategoria' name="idCategoria" class="form-select" required>
-			                <option value="">Seleccione una categoría</option>
-			                <option th:each="cat : ${categorias}"
-			                        th:value="${cat.idcategoria}"
-			                        th:text="${cat.nnombrecategoria}">
-			                </option>
-			            </select>
-			        </div>
-
-			        <!-- SELECT de productos dinámico (DEBE estar fuera del <a>) -->
-						
-						<!-- SELECT de productos dinámico -->
-						<div id="contenedorProductos" class="mt-3 text-center"></div>
-
-						<!-- Cantidad del producto (abajo y centrado) -->
-						<div class="mt-3 d-flex justify-content-center">
-						    <div style="width: 150px;">
-						  
-						        <input type="number"
-						               class="form-control text-center"
-						               name="cantidadProducto"
-						               id="cantidadProducto"
-						               min="1"
-						               max="10"
-						               value="1">
-						    </div>
-						</div>
-
-						<div id="contenedorSubcategoria" class="mt-2 text-center"></div>
-						
-						<div id="contenedorOpcionesExtras" class="mt-3"></div>
-			        <!-- Botón -->
-			    
-
-			    </div>
-
-			</div>
-
-            <!-- Opción: Gestión de usuarios -->
-            <div class="col-md-4">
-       
-            </div>
-
+        <!-- Botones -->
+        <div class="d-flex flex-column gap-2 mt-4">
+            <button id="btnAñadeItem" class="btn-cafe btn-primary-cafe" style="display:none;">
+                <i class="bi bi-plus-circle-fill"></i> Añadir a la orden
+            </button>
+            <button id="btnConfirmaOrden" class="btn-cafe btn-success-cafe" style="display:none;" disabled>
+                <i class="bi bi-check2-circle"></i> Confirmar y enviar a cocina
+            </button>
+            <a href="/admin/inicio" class="btn-cafe btn-outline-cafe text-decoration-none">
+                <i class="bi bi-x-circle"></i> Salir sin confirmar
+            </a>
         </div>
     </div>
-	
 
-	
+    <!-- ── COLUMNA DERECHA: RESUMEN ──────────────────────────── -->
+    <div class="panel-card" style="align-self: start; position: sticky; top: 20px;">
+        <div class="panel-card-title">
+            <i class="bi bi-receipt"></i>
+            Resumen de Orden
+        </div>
+
+        <div id="contenedorResumenOrden">
+            <div class="resumen-empty">
+                <i class="bi bi-bag"></i>
+                Sin productos aún
+            </div>
+        </div>
+
+        <div class="total-row">
+            <span class="total-label">Total</span>
+            <span id="totalOrdenVista">$0.00</span>
+        </div>
+    </div>
+
 </main>
 
-<!-- FOOTER -->
+
+<!-- ── FOOTER ─────────────────────────────────────────────────── -->
 <footer class="footer-custom">
-    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
-        <span>
-            &copy; 2025 ·
-            <span th:text="${nombreNegocio}">Nombre del negocio</span>.
-            Todos los derechos reservados.
-        </span>
-        <span class="footer-right">
-            Desarrollado por
-			
-            <a th:href="@{/}" target="_blank">Tu marca</a>
-		
-        </span>
-		<!-- Tu logo / marca desarrollador -->
-				<div class="logo-circle">
-		           <img th:src="@{/img/icarous_logo.jpg}" alt="Logo desarrollador">
-		       </div>
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <span>&copy; 2025 · <span th:text="${nombreNegocio}">Negocio</span>. Todos los derechos reservados.</span>
+        <span>Soporte: <a href="mailto:contactcheatcoder@gmail.com">Escríbenos</a></span>
+        <div class="footer-logo">
+            <img th:src="@{/img/arboledasLogo.jpg}" alt="Logo">
+        </div>
     </div>
 </footer>
 
+
+<!-- ── TEMPLATE RESUMEN ITEM ─────────────────────────────────── -->
+<template id="tplResumenItem">
+    <div class="resumen-item">
+        <span class="cantidad"></span>
+        <div style="flex:1; min-width:0;">
+            <div class="producto"></div>
+            <div class="extras" style="display:none;"></div>
+        </div>
+        <span class="total-item"></span>
+        <button class="btn-eliminar-item" title="Quitar">
+            <i class="bi bi-trash3"></i>
+        </button>
+    </div>
+</template>
+
+<div th:replace="~{admin/Generales :: modalAlertas}"></div>
+<div th:replace="~{admin/Generales :: modalConfirmacion}"></div>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<div th:replace="admin/DetalleOrdenes :: modalConfirmación"></div>
-
-<script th:src="@{/js/Ordenes/InicioOrden.js}"></script>
-<script th:src="@{/js/Ordenes/TomaOrden.js}"></script>
+<script type="module" th:src="@{/js/Ordenes/TomaOrden.js}"></script>
+<script type="module" th:src="@{/js/Ordenes/InicioOrden.js}"></script>
 
 </body>
 </html>

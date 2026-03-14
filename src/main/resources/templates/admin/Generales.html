@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/styleTomaOrden.css}">
+</head>
+<body>
+  <!-- Fragmento del modal -->
+  <div th:fragment="modalAlertas">
+    <div class="modal fade" id="modalAlertas" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content shadow-lg border-0 rounded-4">
+          <div id="modalColor" class="modal-header bg-gradient text-white d-flex align-items-center">
+            <i class="bi bi-exclamation-triangle-fill fs-2 me-2"></i>
+            <h5 class="modal-title fw-bold mb-0">Alerta</h5>
+            <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body text-center py-4">
+            <p id="mensajeGenerico" class="fs-5 text-secondary">...</p>
+          </div>
+          <div class="modal-footer justify-content-center border-0 pb-4">
+            <button id="modalGeneralOK" type="button" class="btn btn-outline-dark px-4 rounded-pill" data-bs-dismiss="modal">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
+
+<div th:fragment="modalConfirmacion"> <div class="modal fade" id="modalConfirmacion" tabindex="-1" aria-hidden="true"> <div class="modal-dialog modal-dialog-centered modal-lg"> <div class="modal-content confirm-modal">
+        <!-- Encabezado -->
+        <div class="modal-header d-flex align-items-center justify-content-center border-0">
+          <h5 class="modal-title fw-bold mb-0">Confirmación</h5>
+          <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        
+        <!-- Cuerpo dinámico -->
+        <div class="modal-body text-center py-4">
+          <p id="mensajeConfirmacion" class="fs-5 text-dark">¿Está seguro que desea continuar?</p>
+        </div>
+        
+        <!-- Footer con dos botones -->
+        <div class="modal-footer justify-content-center border-0 pb-4">
+          <button id="btnRegresar" type="button" class="btn btn-outline-secondary px-4 rounded-pill" data-bs-dismiss="modal">
+            <i class="bi bi-arrow-left-circle me-2"></i>Regresar
+          </button>
+          <button id="btnContinuar" type="button" class="btn btn-primary px-4 rounded-pill">
+            <i class="bi bi-check-circle me-2"></i>Continuar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div th:fragment="modalEliminar">
+  <div class="modal fade" id="modalEliminar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content shadow-lg border-0 rounded-4">
+
+        <!-- Encabezado -->
+        <div class="modal-header bg-danger text-white d-flex align-items-center">
+          <i class="bi bi-trash-fill fs-2 me-2"></i>
+          <h5 class="modal-title fw-bold mb-0">Confirmar eliminación</h5>
+          <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+
+        <!-- Cuerpo dinámico -->
+        <div class="modal-body text-center py-4">
+          <p id="mensajeEliminar" class="fs-5 text-dark">
+            ¿Está seguro que desea eliminar este registro?
+          </p>
+        </div>
+
+        <!-- Footer con dos botones -->
+        <div class="modal-footer justify-content-center border-0 pb-4">
+          <button id="btnCancelarEliminar" type="button" class="btn btn-outline-secondary px-4 rounded-pill" data-bs-dismiss="modal">
+            <i class="bi bi-arrow-left-circle me-2"></i>Cancelar
+          </button>
+          <button id="btnConfirmarEliminar" type="button" class="btn btn-danger px-4 rounded-pill">
+            <i class="bi bi-check-circle me-2"></i>Eliminar
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<!-- PEGAR EN Generales.html junto a tus otros fragmentos -->
+
+<div th:fragment="modalAccesoModulo">
+
+    <!-- MODAL: Contraseña maestra de acceso a módulos -->
+    <div class="modal fade" id="modalAccesoModulo" tabindex="-1" aria-hidden="true"
+         data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered" style="max-width:420px;">
+            <div class="modal-content border-0 shadow-lg">
+
+                <!-- Header -->
+                <div class="modal-header border-0 pb-0" style="background:#f8f4f0;">
+                    <div class="d-flex align-items-center gap-2">
+                        <span style="font-size:28px;">🔐</span>
+                        <div>
+                            <h5 class="modal-title mb-0 fw-bold" style="color:#48392D;">
+                                Acceso restringido
+                            </h5>
+                            <small class="text-muted" id="labelNombreModulo">Módulo protegido</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Body -->
+                <div class="modal-body" style="background:#f8f4f0;">
+                    <p class="text-muted small mb-3">
+                        Ingresa la contraseña maestra para continuar.
+                    </p>
+
+                    <!-- Campo contraseña -->
+                    <div class="input-group mb-2">
+                        <input type="password"
+                               id="inputAccesoPassword"
+                               class="form-control"
+                               placeholder="Contraseña maestra"
+                               maxlength="50"
+                               autocomplete="off"/>
+                        <button class="btn btn-outline-secondary" type="button" id="btnToggleAccesoPass">
+                            <i class="bi bi-eye" id="iconoOjoAcceso"></i>
+                        </button>
+                    </div>
+
+                    <!-- Mensaje de error / bloqueo -->
+                    <div id="mensajeAccesoError" class="alert py-2 small mb-0" style="display:none;"></div>
+
+                    <!-- Indicador de intentos -->
+                    <div id="dotsIntentos" class="d-flex gap-1 mt-2" style="display:none !important;">
+                        <span class="dot-intento" id="dot1">●</span>
+                        <span class="dot-intento" id="dot2">●</span>
+                        <span class="dot-intento" id="dot3">●</span>
+                        <small class="text-muted ms-1">intentos restantes</small>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="modal-footer border-0 pt-0" style="background:#f8f4f0;">
+                    <button type="button" class="btn btn-outline-secondary btn-sm"
+                            id="btnCancelarAcceso">
+                        Cancelar
+                    </button>
+                    <button type="button" class="btn btn-sm fw-bold text-white"
+                            id="btnConfirmarAcceso"
+                            style="background:#48392D; min-width:100px;">
+                        <span id="spinnerAcceso" class="spinner-border spinner-border-sm me-1"
+                              style="display:none;"></span>
+                        Ingresar
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- CSS del modal (se inyecta junto al fragmento) -->
+    <style>
+        @keyframes shake {
+            0%, 100% { transform: translateX(0);    }
+            20%       { transform: translateX(-8px); }
+            40%       { transform: translateX(8px);  }
+            60%       { transform: translateX(-5px); }
+            80%       { transform: translateX(5px);  }
+        }
+        .dot-intento {
+            font-size: 18px;
+            color: #48392D;
+            transition: color 0.3s;
+            line-height: 1;
+        }
+    </style>
+
+</div>

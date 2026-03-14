@@ -1,0 +1,192 @@
+/* Fuente y fondo general */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa;
+    color: #343a40;
+}
+
+/* HERO IMAGE */
+.hero-section {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;   /* mantiene proporción sin acercar */
+    height: 25vh;             /* altura fija */
+}
+.hero-overlay {
+    background: rgba(0,0,0,0.55);
+    height: 100%;
+    color: #fff;
+    text-align: center;
+}
+.hero-title {
+    font-weight: 700;
+    font-size: 2.5rem;
+}
+
+/* GLASS CARDS */
+.glass-card {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.glass-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 25px rgba(0,0,0,0.1);
+}
+
+/* TITULOS DE SECCION */
+h5 {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    text-align: center;
+    color: #343a40;
+}
+
+/* TABLA */
+.table {
+    border-radius: 8px;
+    overflow: hidden;
+}
+.table thead {
+    background-color: #343a40;
+    color: #fff;
+}
+.table-hover tbody tr:hover {
+    background-color: rgba(0,0,0,0.05);
+}
+
+/* BOTONES DE ACCIONES */
+.btn.rounded-circle {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.btn.rounded-circle i {
+    font-size: 1.4rem;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+.btn.rounded-circle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+.btn.rounded-circle:hover i {
+    transform: scale(1.2);
+    color: #fff;
+}
+
+/* FOOTER */
+.footer-custom {
+    background: #212529;
+    color: #adb5bd;
+    padding: 1rem 0;
+    margin-top: 2rem;
+    text-align: center;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ===== MODALES ESTILO APPLE ===== */
+.modal-content {
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px) saturate(180%);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    animation: iosModalFade 0.4s ease;
+}
+
+/* Animación suave estilo iOS */
+@keyframes iosModalFade {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* HEADER minimalista */
+.modal-header {
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    background: transparent;
+    color: #111;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+.modal-title {
+    flex: 1;
+    text-align: center;
+    font-weight: 600;
+    color: #111;
+}
+.btn-close {
+    filter: invert(0.5);
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+.btn-close:hover {
+    opacity: 1;
+}
+
+/* BODY con inputs estilo iOS */
+.modal-body {
+    padding: 1.5rem;
+}
+.form-label {
+    font-weight: 500;
+    color: #333;
+}
+.form-control, .form-select {
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.1);
+    background: rgba(255,255,255,0.7);
+    transition: all 0.2s ease;
+}
+.form-control:focus, .form-select:focus {
+    border-color: #007aff; /* azul iOS */
+    box-shadow: 0 0 0 0.2rem rgba(0,122,255,0.25);
+}
+
+/* FOOTER estilo iOS */
+.modal-footer {
+    border-top: 1px solid rgba(0,0,0,0.1);
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+}
+.modal-footer .btn {
+    border-radius: 12px;
+    font-weight: 500;
+    padding: 0.6rem 1.2rem;
+    transition: all 0.2s ease;
+}
+
+/* Botón Guardar estilo Apple (azul) */
+.btn-success {
+    background: #007aff;
+    border: none;
+    color: #fff;
+}
+.btn-success:hover {
+    background: #005ecb;
+}
+
+/* Botón Cancelar estilo Apple (gris claro) */
+.btn-secondary {
+    background: #e5e5ea;
+    border: none;
+    color: #111;
+}
+.btn-secondary:hover {
+    background: #d1d1d6;
+}

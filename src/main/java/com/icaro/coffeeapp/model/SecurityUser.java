@@ -66,4 +66,8 @@ public class SecurityUser implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+    
+    public int getIdRol() {
+        return user.getId_rol();
+    }
 }
