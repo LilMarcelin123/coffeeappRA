@@ -80,12 +80,11 @@ public class OrdenesController {
     public List<Map<String, Object>> productosPorCategoria(@PathVariable Integer idCategoria) {
 
         List<Producto> productos = productoRepository.findByCategoria_Idcategoria(idCategoria);
-
         return productos.stream().map(p -> {
             Map<String, Object> item = new HashMap<>();
-            item.put("id", p.getIdproducto());
-            item.put("nombre", p.getNnombreproducto());
-            item.put("precio", p.getPreciobase());
+            item.put("id",          p.getIdproducto());
+            item.put("nombre",      p.getNnombreproducto());
+            item.put("precio",      p.getPreciobase());
             item.put("descripcion", p.getDescripcion());
             return item;
         }).collect(Collectors.toList());
