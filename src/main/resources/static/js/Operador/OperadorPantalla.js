@@ -1,186 +1,197 @@
-<!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+// ─────────────────────────────────────────────────────────────
+// OperadorPantalla.js
+// /js/Operador/OperadorPantalla.js
+// Polling cada 10 segundos — proceso 7 (ordenes + items por rol)
+// ─────────────────────────────────────────────────────────────
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <title>Panel Operador</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <link rel="stylesheet" th:href="@{/css/styleOperador.css}">
-</head>
+let countdownSeg = 10;
+let primeraVez   = true;
 
-<body>
+// ── Mapa de áreas por id_rol_preparacion ─────────────────────
+const AREA_MAP = {
+    2: { clase: "area-salados",    icono: "bi bi-egg-fried",    label: "Salados"          },
+    3: { clase: "area-crepas",     icono: "bi bi-layers-fill",  label: "Crepas & Waffles" },
+    4: { clase: "area-bcalientes", icono: "bi bi-cup-hot-fill", label: "Beb. Calientes"   },
+    5: { clase: "area-bfrias",     icono: "bi bi-cup-straw",    label: "Beb. Frías"       },
+    6: { clase: "area-fitness",    icono: "bi bi-apple",        label: "Fitness"          },
+};
+const AREA_DEFAULT = { clase: "area-bcalientes", icono: "bi bi-cup-hot-fill", label: "Sin área" };
 
-<!-- BLOBS FONDO -->
-<div class="blob blob-1" aria-hidden="true"></div>
-<div class="blob blob-2" aria-hidden="true"></div>
-<div class="blob blob-3" aria-hidden="true"></div>
+// ── INICIO ───────────────────────────────────────────────────
+$(document).ready(function () {
+    actualizarHora();
+    setInterval(actualizarHora, 1000);
 
-<!-- HEADER -->
-<header class="op-header">
-    <div class="op-header-inner">
+    cargarOrdenes();
+    iniciarPolling();
+});
 
-        <div class="op-brand">
-            <div class="op-logo-wrap">
-                <img th:src="@{/img/arboledasLogo.jpg}" alt="Logo" class="op-logo-img">
-            </div>
-            <div class="op-brand-text">
-                <span class="op-negocio" th:text="${nombreNegocio}">Rincón Arboledas</span>
-                <span class="op-live-badge">
-                    <i class="bi bi-circle-fill"></i> En vivo
-                </span>
-            </div>
-        </div>
+// ── POLLING ───────────────────────────────────────────────────
+function iniciarPolling() {
+    setInterval(() => {
+        countdownSeg--;
+        $("#countdownDisplay").text(countdownSeg + "s");
 
-        <!-- Pill de refresh — visible en tablet/desktop -->
-        <div class="op-header-center">
-            <div class="op-refresh-pill">
-                <i class="bi bi-arrow-clockwise" id="iconRefresh"></i>
-                <span>Refresh en <strong id="countdownDisplay">10s</strong></span>
-            </div>
-        </div>
+        if (countdownSeg <= 0) {
+            countdownSeg = 10;
+            cargarOrdenes();
 
-        <div class="op-header-right">
-            <div class="op-user-chip">
-                <div class="op-avatar">
-                    <i class="bi bi-person-fill"></i>
-                </div>
-                <div class="op-user-info">
-                    <span class="op-user-name" th:text="${nombreUsuario}">Operador</span>
-                    <span class="op-user-rol" th:text="${rolNombre}">Área</span>
-                </div>
-            </div>
-            <a th:href="@{/logout}" class="btn-logout" title="Cerrar sesión">
-                <i class="bi bi-box-arrow-right"></i>
-            </a>
-        </div>
+            const icon = document.getElementById("iconRefresh");
+            icon.classList.add("spinning");
+            setTimeout(() => icon.classList.remove("spinning"), 650);
+        }
+    }, 1000);
+}
 
-    </div>
-</header>
+// ── FETCH ÓRDENES (proceso 7) ─────────────────────────────────
+function cargarOrdenes() {
+    $.ajax({
+        url: "/operador/ordenes",
+        type: "GET",
+        success: function (data) {
+            const ordenes = data.ordenes || [];
+            const items   = data.items   || [];
 
-<!-- Countdown visible solo en móvil (el pill se oculta en pantallas pequeñas) -->
-<div class="op-mobile-refresh">
-    <i class="bi bi-arrow-clockwise"></i> Refresh en <strong id="countdownMobile">10s</strong>
-</div>
+            // Agrupar ítems por id_orden para acceso rápido
+            const itemsPorOrden = {};
+            items.forEach(item => {
+                const id = String(item.id_orden);
+                if (!itemsPorOrden[id]) itemsPorOrden[id] = [];
+                itemsPorOrden[id].push(item);
+            });
 
-<!-- HERO -->
-<section class="op-hero">
-    <div class="op-hero-inner">
-        <div class="op-hero-text">
-            <p class="op-eyebrow">
-                <i class="bi bi-layout-wtf"></i> Panel de Órdenes
-            </p>
-            <h1 class="op-hero-title">
-                Hola, <span th:text="${nombreUsuario}">Operador</span>
-            </h1>
-            <p class="op-hero-sub">
-                Órdenes activas en tiempo real. Color e ícono por área.
-            </p>
-        </div>
-
-        <div class="op-stats-row">
-            <div class="op-stat-chip">
-                <div class="op-stat-icon"><i class="bi bi-receipt"></i></div>
-                <div class="op-stat-body">
-                    <span class="op-stat-num" id="numOrdenes">—</span>
-                    <span class="op-stat-label">Órdenes</span>
-                </div>
-            </div>
-            <div class="op-stat-chip">
-                <div class="op-stat-icon"><i class="bi bi-list-check"></i></div>
-                <div class="op-stat-body">
-                    <span class="op-stat-num" id="numItems">—</span>
-                    <span class="op-stat-label">Ítems</span>
-                </div>
-            </div>
-            <div class="op-stat-chip">
-                <div class="op-stat-icon"><i class="bi bi-clock"></i></div>
-                <div class="op-stat-body">
-                    <span class="op-stat-num" id="horaActual">—</span>
-                    <span class="op-stat-label">Hora</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- MAIN -->
-<main class="op-main">
-
-    <!-- Leyenda scroll horizontal en móvil -->
-    <div class="op-leyenda">
-        <span class="leyenda-title"><i class="bi bi-grid-fill"></i> Áreas:</span>
-        <span class="leyenda-chip area-salados"><i class="bi bi-egg-fried"></i> Salados</span>
-        <span class="leyenda-chip area-crepas"><i class="bi bi-layers-fill"></i> Crepas &amp; Waffles</span>
-        <span class="leyenda-chip area-bcalientes"><i class="bi bi-cup-hot-fill"></i> Beb. Calientes</span>
-        <span class="leyenda-chip area-bfrias"><i class="bi bi-cup-straw"></i> Beb. Frías</span>
-        <span class="leyenda-chip area-fitness"><i class="bi bi-apple"></i> Fitness</span>
-    </div>
-
-    <!-- Grid de órdenes -->
-    <div class="op-grid" id="ordenesGrid">
-        <div class="op-empty-state" id="estadoInicial">
-            <div class="op-empty-icon"><i class="bi bi-arrow-repeat"></i></div>
-            <p>Cargando órdenes…</p>
-        </div>
-    </div>
-
-</main>
-
-<!-- FOOTER -->
-<footer class="op-footer">
-    <span>&copy; 2025 · <span th:text="${nombreNegocio}">Negocio</span>. Todos los derechos reservados.</span>
-    <span>Panel Operador</span>
-</footer>
-
-<!-- TEMPLATES -->
-<template id="tplOrdenCard">
-    <div class="orden-card">
-        <div class="orden-card-header">
-            <div class="orden-num">
-                <i class="bi bi-receipt"></i>
-                <span class="orden-id-val"></span>
-            </div>
-            <span class="orden-hora-val"><i class="bi bi-clock"></i> </span>
-        </div>
-        <div class="orden-items-list"></div>
-        <div class="orden-card-footer">
-            <span class="orden-items-count"></span>
-        </div>
-    </div>
-</template>
-
-<template id="tplItem">
-    <div class="orden-item">
-        <div class="item-area-dot"></div>
-        <div class="item-body">
-            <div class="item-top">
-                <span class="item-icono"></span>
-                <span class="item-nombre"></span>
-                <span class="item-badge-cantidad"></span>
-            </div>
-            <span class="item-extras"></span>
-        </div>
-    </div>
-</template>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script th:src="@{/js/Operador/OperadorPantalla.js}"></script>
-
-<!-- Sincronizar countdown móvil con el principal -->
-<script>
-    const origActualizar = window.actualizarCountdown;
-    const observer = new MutationObserver(() => {
-        const val = document.getElementById('countdownDisplay')?.textContent;
-        const mob = document.getElementById('countdownMobile');
-        if (val && mob) mob.textContent = val;
+            renderOrdenes(ordenes, itemsPorOrden);
+        },
+        error: function (xhr) {
+            console.error("Error al cargar órdenes:", xhr.responseText);
+            if (primeraVez) mostrarError();
+        }
     });
-    const cd = document.getElementById('countdownDisplay');
-    if (cd) observer.observe(cd, { childList: true, characterData: true, subtree: true });
-</script>
+}
 
-</body>
-</html>
+// ── RENDER PRINCIPAL ──────────────────────────────────────────
+function renderOrdenes(ordenes, itemsPorOrden) {
+    primeraVez = false;
+    const grid = document.getElementById("ordenesGrid");
+
+    // Actualizar stats
+    const totalItems = Object.values(itemsPorOrden)
+        .reduce((acc, arr) => acc + arr.length, 0);
+    animarNum("numOrdenes", ordenes.length);
+    animarNum("numItems",   totalItems);
+
+    // Sin órdenes
+    if (ordenes.length === 0) {
+        grid.innerHTML = `
+            <div class="op-empty-state">
+                <div class="op-empty-icon">
+                    <i class="bi bi-check2-circle"></i>
+                </div>
+                <p>Sin órdenes pendientes. Todo al día.</p>
+            </div>`;
+        return;
+    }
+
+    const tplCard = document.getElementById("tplOrdenCard");
+    const tplItem = document.getElementById("tplItem");
+
+    const idsNuevos = new Set(ordenes.map(o => String(o.id_orden)));
+
+    // Eliminar cards que ya no están
+    grid.querySelectorAll(".orden-card").forEach(el => {
+        if (!idsNuevos.has(el.dataset.id)) el.remove();
+    });
+
+    // Limpiar empty state si existía
+    grid.querySelectorAll(".op-empty-state").forEach(el => el.remove());
+
+    // Crear o actualizar cada card
+    ordenes.forEach((orden, idx) => {
+        const idStr = String(orden.id_orden);
+        let card = grid.querySelector(`.orden-card[data-id="${idStr}"]`);
+
+        if (!card) {
+            const clone = tplCard.content.cloneNode(true);
+            card = clone.querySelector(".orden-card");
+            card.dataset.id = idStr;
+            card.style.animationDelay = `${idx * 0.06}s`;
+            grid.appendChild(card);
+        }
+
+        // ── Cabecera ──────────────────────────────────────────
+        card.querySelector(".orden-id-val").textContent = `Orden #${orden.id_orden}`;
+
+        const hora = orden.t_hora_creacion
+            ? orden.t_hora_creacion.toString().replace("T", " ").substring(11, 16)
+            : "—";
+        card.querySelector(".orden-hora-val").innerHTML =
+            `<i class="bi bi-clock"></i> ${hora}`;
+
+        // ── Ítems ─────────────────────────────────────────────
+        const itemsEl = card.querySelector(".orden-items-list");
+        itemsEl.innerHTML = "";
+
+        const misItems = itemsPorOrden[idStr] || [];
+
+        misItems.forEach(item => {
+            const cloneItem = tplItem.content.cloneNode(true);
+            const itemEl    = cloneItem.querySelector(".orden-item");
+
+            const area = AREA_MAP[item.id_rol_preparacion] || AREA_DEFAULT;
+            itemEl.classList.add(area.clase);
+
+            itemEl.querySelector(".item-icono").innerHTML =
+                `<i class="${area.icono}"></i>`;
+
+            itemEl.querySelector(".item-nombre").textContent =
+                item.n_nombre_producto || "—";
+
+            itemEl.querySelector(".item-badge-cantidad").textContent =
+                `×${item.p_cantidad}`;
+
+            const extrasEl = itemEl.querySelector(".item-extras");
+            if (item.n_extras_descripcion) {
+                extrasEl.textContent = item.n_extras_descripcion;
+            } else {
+                extrasEl.style.display = "none";
+            }
+
+            itemsEl.appendChild(cloneItem);
+        });
+
+        // ── Footer: conteo de ítems ───────────────────────────
+        card.querySelector(".orden-items-count").textContent =
+            `${misItems.length} ítem${misItems.length !== 1 ? "s" : ""}`;
+    });
+}
+
+// ── HELPERS ───────────────────────────────────────────────────
+function actualizarHora() {
+    const ahora = new Date();
+    const h = String(ahora.getHours()).padStart(2, "0");
+    const m = String(ahora.getMinutes()).padStart(2, "0");
+    $("#horaActual").text(`${h}:${m}`);
+}
+
+function animarNum(id, valor) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.opacity   = "0";
+    el.style.transform = "translateY(4px)";
+    setTimeout(() => {
+        el.textContent      = valor;
+        el.style.transition = "opacity .3s ease, transform .3s ease";
+        el.style.opacity    = "1";
+        el.style.transform  = "translateY(0)";
+    }, 120);
+}
+
+function mostrarError() {
+    document.getElementById("ordenesGrid").innerHTML = `
+        <div class="op-empty-state">
+            <div class="op-empty-icon">
+                <i class="bi bi-exclamation-triangle"></i>
+            </div>
+            <p>Error al cargar las órdenes. Reintentando…</p>
+        </div>`;
+}
