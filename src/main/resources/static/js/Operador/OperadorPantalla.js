@@ -136,22 +136,7 @@ function sonarAlertar() {
     }
 }
 
-function reproducirTono(ctx, frecuencia, inicioSeg, duracionSeg, volumen = 0.4) {
-    const osc  = ctx.createOscillator();
-    const gain = ctx.createGain();
 
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    osc.type            = "sine";
-    osc.frequency.value = frecuencia;
-
-    gain.gain.setValueAtTime(volumen, ctx.currentTime + inicioSeg);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + inicioSeg + duracionSeg);
-
-    osc.start(ctx.currentTime + inicioSeg);
-    osc.stop(ctx.currentTime  + inicioSeg + duracionSeg);
-}
 
 // ── FILTRO POR ÁREA ───────────────────────────────────────────
 
