@@ -25,6 +25,7 @@ let primeraVez        = true;
 let filtroActivo      = null;   // null = todos, número = id_rol_preparacion
 let idsConocidos      = new Set();
 let countdownSeg      = POLLING_INTERVAL_MS / 1000;
+let audioCtx          = null;
 
 // Cache para re-renderizar al cambiar filtro sin esperar el polling
 let ultimosOrdenes       = [];
@@ -35,6 +36,10 @@ let ultimosItemsPorOrden = {};
 $(document).ready(() => {
     actualizarHora();
     setInterval(actualizarHora, 1000);
+
+    // Inicializar AudioContext en el primer click del usuario
+    // (los navegadores requieren interacción antes de permitir audio)
+    document.addEventListener("click", () => obtenerAudioCtx(), { once: true });
 
     iniciarBotonesFiltro();
     cargarOrdenes();
@@ -123,20 +128,59 @@ function detectarYAlertarOrdenesNuevas(ordenes) {
 
 // ── ALERTA SONORA ─────────────────────────────────────────────
 
+function obtenerAudioCtx() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    // El navegador suspende el contexto si no hubo interacción — lo reanudamos
+    if (audioCtx.state === "suspended") {
+        audioCtx.resume();
+    }
+    return audioCtx;
+}
+
 function sonarAlertar() {
     try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const ctx = obtenerAudioCtx();
 
-        reproducirTono(ctx, 880,  0.00, 0.18);
-        reproducirTono(ctx, 1100, 0.22, 0.18);
-        reproducirTono(ctx, 1320, 0.44, 0.30);
+        // Primera campanada — tono principal + armónicos (timbre metálico)
+        reproducirCampana(ctx, 880,  0.00, 1.8, 0.5);
+        reproducirCampana(ctx, 1760, 0.00, 1.2, 0.2);
+        reproducirCampana(ctx, 2640, 0.00, 0.8, 0.1);
+
+        // Segunda campanada
+        reproducirCampana(ctx, 880,  0.55, 1.8, 0.5);
+        reproducirCampana(ctx, 1760, 0.55, 1.2, 0.2);
+        reproducirCampana(ctx, 2640, 0.55, 0.8, 0.1);
+
+        // Tercera campanada (más suave, efecto eco)
+        reproducirCampana(ctx, 880,  1.10, 1.8, 0.3);
+        reproducirCampana(ctx, 1760, 1.10, 1.2, 0.12);
+        reproducirCampana(ctx, 2640, 1.10, 0.8, 0.06);
 
     } catch (e) {
         console.warn("Audio no disponible:", e);
     }
 }
 
+function reproducirCampana(ctx, frecuencia, inicioSeg, duracionSeg, volumen = 0.4) {
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
 
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.type            = "sine";
+    osc.frequency.value = frecuencia;
+
+    // Ataque instantáneo (5 ms) + decaimiento exponencial largo → timbre de campana
+    gain.gain.setValueAtTime(0, ctx.currentTime + inicioSeg);
+    gain.gain.linearRampToValueAtTime(volumen, ctx.currentTime + inicioSeg + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + inicioSeg + duracionSeg);
+
+    osc.start(ctx.currentTime + inicioSeg);
+    osc.stop(ctx.currentTime  + inicioSeg + duracionSeg + 0.05);
+}
 
 // ── FILTRO POR ÁREA ───────────────────────────────────────────
 
@@ -150,11 +194,7 @@ function iniciarBotonesFiltro() {
 function onClickFiltro() {
     const rol = parseInt(this.dataset.rol);
 
-    if (filtroActivo === rol) {
-        filtroActivo = null;
-    } else {
-        filtroActivo = rol;
-    }
+    filtroActivo = filtroActivo === rol ? null : rol;
 
     document.querySelectorAll(".leyenda-chip[data-rol]").forEach(c => {
         c.classList.toggle("filtro-activo", parseInt(c.dataset.rol) === filtroActivo);
@@ -250,8 +290,8 @@ function obtenerOCrearCard(grid, idStr, idx) {
         const tpl   = document.getElementById("tplOrdenCard");
         const clone = tpl.content.cloneNode(true);
         card = clone.querySelector(".orden-card");
-        card.dataset.id            = idStr;
-        card.style.animationDelay  = `${idx * 0.06}s`;
+        card.dataset.id           = idStr;
+        card.style.animationDelay = `${idx * 0.06}s`;
         grid.appendChild(card);
     }
 
@@ -269,8 +309,8 @@ function actualizarCabeceraCard(card, orden) {
 }
 
 function actualizarItemsCard(card, items) {
-    const tpl      = document.getElementById("tplItem");
-    const itemsEl  = card.querySelector(".orden-items-list");
+    const tpl     = document.getElementById("tplItem");
+    const itemsEl = card.querySelector(".orden-items-list");
     itemsEl.innerHTML = "";
 
     items.forEach(item => {
@@ -279,8 +319,8 @@ function actualizarItemsCard(card, items) {
         const area      = AREA_MAP[item.id_rol_preparacion] || AREA_DEFAULT;
 
         itemEl.classList.add(area.clase);
-        itemEl.querySelector(".item-icono").innerHTML          = `<i class="${area.icono}"></i>`;
-        itemEl.querySelector(".item-nombre").textContent       = item.n_nombre_producto || "—";
+        itemEl.querySelector(".item-icono").innerHTML            = `<i class="${area.icono}"></i>`;
+        itemEl.querySelector(".item-nombre").textContent         = item.n_nombre_producto || "—";
         itemEl.querySelector(".item-badge-cantidad").textContent = `×${item.p_cantidad}`;
 
         const extrasEl = itemEl.querySelector(".item-extras");
