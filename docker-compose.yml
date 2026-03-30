@@ -1,3 +1,4 @@
+version: '3.8'
 services:
   mysql:
     image: mariadb:10.6.4-focal
@@ -11,18 +12,79 @@ services:
       MYSQL_PASSWORD: coffee_pass
     volumes:
       - mysql_data:/var/lib/mysql
-
   app:
     build: .
     container_name: coffee_app
     ports:
-      - "8080:8080"
+      - "8082:8080"
     depends_on:
       - mysql
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/coffee_db
+      SPRING_DATASOURCE_URL: jdbc:mariadb://mysql:3306/coffee_db?allowPublicKeyRetrieval=true&useSSL=false
       SPRING_DATASOURCE_USERNAME: coffee_user
       SPRING_DATASOURCE_PASSWORD: coffee_pass
-
+  # ── Evolution API — gateway de WhatsApp ──────────────────────
+  evolution-api:
+    image: atendai/evolution-api:latest
+    container_name: evolution-api
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      SERVER_TYPE: http
+      SERVER_PORT: 8080
+      AUTHENTICATION_TYPE: apikey
+      AUTHENTICATION_API_KEY: cafeteria_key_2024
+      DATABASE_ENABLED: "false"
+      DATABASE_PROVIDER: sqlite
+      DATABASE_CONNECTION_URI: "file:./data/evolution.db"
+      CACHE_REDIS_ENABLED: "false"
+      CACHE_REDIS_URI: redis://redis:6379
+      CACHE_REDIS_PREFIX_KEY: evolution
+      CACHE_LOCAL_ENABLED: "true"
+      # Webhook apunta a n8n dentro de la misma red Docker
+      WEBHOOK_GLOBAL_URL: "http://n8n:5678/webhook/whatsapp"
+      WEBHOOK_GLOBAL_ENABLED: "false"
+      LOG_LEVEL: ERROR
+      DEL_INSTANCE: "false"
+    volumes:
+      - evolution_data:/evolution/data
+      - evolution_instances:/evolution/instances
+    depends_on:
+      - redis
+  # ── Redis — sesiones de WhatsApp ─────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: evolution-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+  # ── n8n — orquestador del chatbot ────────────────────────────
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    restart: always
+    ports:
+      - "5678:5678"
+    environment:
+      # URL pública donde n8n se expone (para webhooks de Evolution API)
+      WEBHOOK_URL: http://localhost:5678
+      # Timezone México
+      GENERIC_TIMEZONE: America/Mexico_City
+      TZ: America/Mexico_City
+      # Guardar credenciales encriptadas
+      N8N_ENCRYPTION_KEY: cambia_esta_clave_secreta
+      # Básico sin auth para desarrollo local (pon en true para producción)
+      N8N_BASIC_AUTH_ACTIVE: "false"
+    volumes:
+      - n8n_data:/home/node/.n8n
+    depends_on:
+      - evolution-api
 volumes:
   mysql_data:
+  evolution_data:
+  evolution_instances:
+  redis_data:
+  n8n_data:

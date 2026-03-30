@@ -327,8 +327,17 @@ body {
     flex:1; line-height:1.3; min-width:0; overflow-wrap:break-word;
 }
 .item-badge-cantidad {
-    font-size:.6rem; font-weight:800; padding:2px 7px;
-    border-radius:11px; color:#fff; white-space:nowrap; flex-shrink:0;
+    font-size: 1.5rem;
+    font-weight: 900;
+    padding: 6px 14px;
+    border-radius: 16px;
+    color: #fff;
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-width: 3rem;
+    text-align: center;
+    letter-spacing: -.01em;
+
 }
 .area-salados    .item-badge-cantidad { background:var(--salados-accent); }
 .area-crepas     .item-badge-cantidad { background:var(--crepas-accent); }
