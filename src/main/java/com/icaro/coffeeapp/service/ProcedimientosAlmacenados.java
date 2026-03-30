@@ -201,7 +201,9 @@ return idItem;
 	                    val = val.toString();
 	                }
 	                if (val instanceof java.sql.Timestamp) {
-	                    val = ((java.sql.Timestamp) val).toLocalDateTime().toString();
+	                    val = ((java.sql.Timestamp) val).toInstant()
+	                        .atZone(java.time.ZoneId.of("America/Mexico_City"))
+	                        .toLocalDateTime().toString();
 	                }
 	                if (val instanceof java.sql.Date) {
 	                    val = val.toString();
@@ -420,7 +422,9 @@ public List<Map<String, Object>> spReportes(Integer tipoProceso, Integer idTipoP
                     val = val.toString();
                 }
                 if (val instanceof java.sql.Timestamp) {
-                    val = ((java.sql.Timestamp) val).toLocalDateTime().toString();
+                    val = ((java.sql.Timestamp) val).toInstant()
+                        .atZone(java.time.ZoneId.of("America/Mexico_City"))
+                        .toLocalDateTime().toString();
                 }
                 if (val instanceof java.sql.Date) {
                     val = val.toString();
@@ -456,7 +460,9 @@ private List<Map<String, Object>> leerResultSet(ResultSet rs) throws Exception {
         for (int i = 1; i <= cols; i++) {
             Object val = rs.getObject(i);
             if (val instanceof java.sql.Timestamp)
-                val = ((java.sql.Timestamp) val).toLocalDateTime().toString();
+                val = ((java.sql.Timestamp) val).toInstant()
+                    .atZone(java.time.ZoneId.of("America/Mexico_City"))
+                    .toLocalDateTime().toString();
             if (val instanceof java.sql.Date)
                 val = val.toString();
             row.put(meta.getColumnLabel(i), val);

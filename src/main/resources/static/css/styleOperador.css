@@ -358,3 +358,22 @@ body {
     to   { opacity:1; transform:translateY(0); }
 }
 .wave { display:none; }
+
+/* Filtro activo — resalta el chip seleccionado */
+.leyenda-chip[data-rol] {
+    transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+}
+.leyenda-chip[data-rol]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,.12);
+}
+.leyenda-chip.filtro-activo {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(0,0,0,.18);
+    border-width: 3px;
+    opacity: 1 !important;
+}
+/* Atenuar los chips no activos cuando hay filtro */
+.op-leyenda:has(.filtro-activo) .leyenda-chip[data-rol]:not(.filtro-activo) {
+    opacity: 0.45;
+}

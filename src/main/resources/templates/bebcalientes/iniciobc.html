@@ -109,15 +109,15 @@
 <!-- MAIN -->
 <main class="op-main">
 
-    <!-- Leyenda scroll horizontal en móvil -->
-    <div class="op-leyenda">
-        <span class="leyenda-title"><i class="bi bi-grid-fill"></i> Áreas:</span>
-        <span class="leyenda-chip area-salados"><i class="bi bi-egg-fried"></i> Salados</span>
-        <span class="leyenda-chip area-crepas"><i class="bi bi-layers-fill"></i> Crepas &amp; Waffles</span>
-        <span class="leyenda-chip area-bcalientes"><i class="bi bi-cup-hot-fill"></i> Beb. Calientes</span>
-        <span class="leyenda-chip area-bfrias"><i class="bi bi-cup-straw"></i> Beb. Frías</span>
-        <span class="leyenda-chip area-fitness"><i class="bi bi-apple"></i> Fitness</span>
-    </div>
+	<!-- Solo cambia la sección de leyenda, agrega data-rol a cada chip -->
+	<div class="op-leyenda">
+	    <span class="leyenda-title"><i class="bi bi-grid-fill"></i> Áreas:</span>
+	    <span class="leyenda-chip area-salados"    data-rol="2"><i class="bi bi-egg-fried"></i> Salados</span>
+	    <span class="leyenda-chip area-crepas"     data-rol="3"><i class="bi bi-layers-fill"></i> Crepas &amp; Waffles</span>
+	    <span class="leyenda-chip area-bcalientes" data-rol="4"><i class="bi bi-cup-hot-fill"></i> Beb. Calientes</span>
+	    <span class="leyenda-chip area-bfrias"     data-rol="5"><i class="bi bi-cup-straw"></i> Beb. Frías</span>
+	    <span class="leyenda-chip area-fitness"    data-rol="6"><i class="bi bi-apple"></i> Fitness</span>
+	</div>
 
     <!-- Grid de órdenes -->
     <div class="op-grid" id="ordenesGrid">

@@ -1,13 +1,12 @@
 // ─────────────────────────────────────────────────────────────
 // OperadorPantalla.js
-// /js/Operador/OperadorPantalla.js
-// Polling cada 10 segundos — proceso 7 (ordenes + items por rol)
+// Polling cada 10 segundos + filtro por área
 // ─────────────────────────────────────────────────────────────
 
-let countdownSeg = 10;
-let primeraVez   = true;
+let countdownSeg  = 10;
+let primeraVez    = true;
+let filtroActivo  = null; // null = todos, número = id_rol_preparacion
 
-// ── Mapa de áreas por id_rol_preparacion ─────────────────────
 const AREA_MAP = {
     2: { clase: "area-salados",    icono: "bi bi-egg-fried",    label: "Salados"          },
     3: { clase: "area-crepas",     icono: "bi bi-layers-fill",  label: "Crepas & Waffles" },
@@ -17,14 +16,47 @@ const AREA_MAP = {
 };
 const AREA_DEFAULT = { clase: "area-bcalientes", icono: "bi bi-cup-hot-fill", label: "Sin área" };
 
+// Cache de los últimos datos para re-renderizar al cambiar filtro sin esperar el polling
+let ultimosOrdenes     = [];
+let ultimosItemsPorOrden = {};
+
 // ── INICIO ───────────────────────────────────────────────────
 $(document).ready(function () {
     actualizarHora();
     setInterval(actualizarHora, 1000);
 
+    iniciarBotonesFiltro();
     cargarOrdenes();
     iniciarPolling();
 });
+
+// ── BOTONES DE FILTRO ─────────────────────────────────────────
+function iniciarBotonesFiltro() {
+    // Agrega data-rol a cada chip de la leyenda para identificarlos
+    // Estructura esperada en el HTML:
+    // <span class="leyenda-chip area-salados"    data-rol="2">...
+    // <span class="leyenda-chip area-crepas"     data-rol="3">...
+    // etc.
+    document.querySelectorAll(".leyenda-chip[data-rol]").forEach(chip => {
+        chip.style.cursor = "pointer";
+        chip.addEventListener("click", function () {
+            const rol = parseInt(this.dataset.rol);
+
+            if (filtroActivo === rol) {
+                // Click en el mismo → quitar filtro
+                filtroActivo = null;
+                document.querySelectorAll(".leyenda-chip[data-rol]").forEach(c => c.classList.remove("filtro-activo"));
+            } else {
+                filtroActivo = rol;
+                document.querySelectorAll(".leyenda-chip[data-rol]").forEach(c => c.classList.remove("filtro-activo"));
+                this.classList.add("filtro-activo");
+            }
+
+            // Re-renderizar con los datos en cache sin esperar el polling
+            renderOrdenes(ultimosOrdenes, ultimosItemsPorOrden);
+        });
+    });
+}
 
 // ── POLLING ───────────────────────────────────────────────────
 function iniciarPolling() {
@@ -35,7 +67,6 @@ function iniciarPolling() {
         if (countdownSeg <= 0) {
             countdownSeg = 10;
             cargarOrdenes();
-
             const icon = document.getElementById("iconRefresh");
             icon.classList.add("spinning");
             setTimeout(() => icon.classList.remove("spinning"), 650);
@@ -43,7 +74,7 @@ function iniciarPolling() {
     }, 1000);
 }
 
-// ── FETCH ÓRDENES (proceso 7) ─────────────────────────────────
+// ── FETCH ÓRDENES ─────────────────────────────────────────────
 function cargarOrdenes() {
     $.ajax({
         url: "/operador/ordenes",
@@ -52,13 +83,16 @@ function cargarOrdenes() {
             const ordenes = data.ordenes || [];
             const items   = data.items   || [];
 
-            // Agrupar ítems por id_orden para acceso rápido
             const itemsPorOrden = {};
             items.forEach(item => {
                 const id = String(item.id_orden);
                 if (!itemsPorOrden[id]) itemsPorOrden[id] = [];
                 itemsPorOrden[id].push(item);
             });
+
+            // Guardar en cache para uso del filtro
+            ultimosOrdenes       = ordenes;
+            ultimosItemsPorOrden = itemsPorOrden;
 
             renderOrdenes(ordenes, itemsPorOrden);
         },
@@ -74,20 +108,43 @@ function renderOrdenes(ordenes, itemsPorOrden) {
     primeraVez = false;
     const grid = document.getElementById("ordenesGrid");
 
-    // Actualizar stats
-    const totalItems = Object.values(itemsPorOrden)
+    // Aplicar filtro: si hay filtro activo, solo mostrar ítems de ese rol
+    // y excluir órdenes que queden sin ítems tras el filtro
+    let ordenesFiltradas = [];
+    let itemsFiltrados   = {};
+
+    ordenes.forEach(orden => {
+        const idStr = String(orden.id_orden);
+        const items = itemsPorOrden[idStr] || [];
+
+        const itemsVisibles = filtroActivo
+            ? items.filter(i => i.id_rol_preparacion === filtroActivo)
+            : items;
+
+        if (itemsVisibles.length > 0) {
+            ordenesFiltradas.push(orden);
+            itemsFiltrados[idStr] = itemsVisibles;
+        }
+    });
+
+    // Stats: siempre muestran el total real (sin filtro)
+    const totalItemsReal = Object.values(itemsPorOrden)
         .reduce((acc, arr) => acc + arr.length, 0);
     animarNum("numOrdenes", ordenes.length);
-    animarNum("numItems",   totalItems);
+    animarNum("numItems",   totalItemsReal);
 
-    // Sin órdenes
-    if (ordenes.length === 0) {
+    // Sin órdenes tras el filtro
+    if (ordenesFiltradas.length === 0) {
+        const msg = filtroActivo
+            ? `Sin órdenes con ítems de <strong>${AREA_MAP[filtroActivo]?.label || 'esta área'}</strong>.`
+            : 'Sin órdenes pendientes. Todo al día.';
+
         grid.innerHTML = `
             <div class="op-empty-state">
                 <div class="op-empty-icon">
                     <i class="bi bi-check2-circle"></i>
                 </div>
-                <p>Sin órdenes pendientes. Todo al día.</p>
+                <p>${msg}</p>
             </div>`;
         return;
     }
@@ -95,18 +152,16 @@ function renderOrdenes(ordenes, itemsPorOrden) {
     const tplCard = document.getElementById("tplOrdenCard");
     const tplItem = document.getElementById("tplItem");
 
-    const idsNuevos = new Set(ordenes.map(o => String(o.id_orden)));
+    const idsNuevos = new Set(ordenesFiltradas.map(o => String(o.id_orden)));
 
-    // Eliminar cards que ya no están
+    // Eliminar cards que ya no están en el filtro actual
     grid.querySelectorAll(".orden-card").forEach(el => {
         if (!idsNuevos.has(el.dataset.id)) el.remove();
     });
 
-    // Limpiar empty state si existía
     grid.querySelectorAll(".op-empty-state").forEach(el => el.remove());
 
-    // Crear o actualizar cada card
-    ordenes.forEach((orden, idx) => {
+    ordenesFiltradas.forEach((orden, idx) => {
         const idStr = String(orden.id_orden);
         let card = grid.querySelector(`.orden-card[data-id="${idStr}"]`);
 
@@ -118,20 +173,18 @@ function renderOrdenes(ordenes, itemsPorOrden) {
             grid.appendChild(card);
         }
 
-        // ── Cabecera ──────────────────────────────────────────
+        // Cabecera
         card.querySelector(".orden-id-val").textContent = `Orden #${orden.id_orden}`;
-
         const hora = orden.t_hora_creacion
             ? orden.t_hora_creacion.toString().replace("T", " ").substring(11, 16)
             : "—";
-        card.querySelector(".orden-hora-val").innerHTML =
-            `<i class="bi bi-clock"></i> ${hora}`;
+        card.querySelector(".orden-hora-val").innerHTML = `<i class="bi bi-clock"></i> ${hora}`;
 
-        // ── Ítems ─────────────────────────────────────────────
+        // Ítems
         const itemsEl = card.querySelector(".orden-items-list");
         itemsEl.innerHTML = "";
 
-        const misItems = itemsPorOrden[idStr] || [];
+        const misItems = itemsFiltrados[idStr] || [];
 
         misItems.forEach(item => {
             const cloneItem = tplItem.content.cloneNode(true);
@@ -139,15 +192,9 @@ function renderOrdenes(ordenes, itemsPorOrden) {
 
             const area = AREA_MAP[item.id_rol_preparacion] || AREA_DEFAULT;
             itemEl.classList.add(area.clase);
-
-            itemEl.querySelector(".item-icono").innerHTML =
-                `<i class="${area.icono}"></i>`;
-
-            itemEl.querySelector(".item-nombre").textContent =
-                item.n_nombre_producto || "—";
-
-            itemEl.querySelector(".item-badge-cantidad").textContent =
-                `×${item.p_cantidad}`;
+            itemEl.querySelector(".item-icono").innerHTML   = `<i class="${area.icono}"></i>`;
+            itemEl.querySelector(".item-nombre").textContent = item.n_nombre_producto || "—";
+            itemEl.querySelector(".item-badge-cantidad").textContent = `×${item.p_cantidad}`;
 
             const extrasEl = itemEl.querySelector(".item-extras");
             if (item.n_extras_descripcion) {
@@ -159,7 +206,7 @@ function renderOrdenes(ordenes, itemsPorOrden) {
             itemsEl.appendChild(cloneItem);
         });
 
-        // ── Footer: conteo de ítems ───────────────────────────
+        // Footer
         card.querySelector(".orden-items-count").textContent =
             `${misItems.length} ítem${misItems.length !== 1 ? "s" : ""}`;
     });
