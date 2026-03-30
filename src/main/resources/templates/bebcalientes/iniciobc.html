@@ -13,12 +13,12 @@
 
 <body>
 
-<!-- ── BLOBS FONDO ────────────────────────────────────────── -->
+<!-- BLOBS FONDO -->
 <div class="blob blob-1" aria-hidden="true"></div>
 <div class="blob blob-2" aria-hidden="true"></div>
 <div class="blob blob-3" aria-hidden="true"></div>
 
-<!-- ── HEADER ─────────────────────────────────────────────── -->
+<!-- HEADER -->
 <header class="op-header">
     <div class="op-header-inner">
 
@@ -34,10 +34,11 @@
             </div>
         </div>
 
+        <!-- Pill de refresh — visible en tablet/desktop -->
         <div class="op-header-center">
             <div class="op-refresh-pill">
                 <i class="bi bi-arrow-clockwise" id="iconRefresh"></i>
-                <span>Auto-refresh en <strong id="countdownDisplay">10s</strong></span>
+                <span>Refresh en <strong id="countdownDisplay">10s</strong></span>
             </div>
         </div>
 
@@ -59,7 +60,12 @@
     </div>
 </header>
 
-<!-- ── HERO ───────────────────────────────────────────────── -->
+<!-- Countdown visible solo en móvil (el pill se oculta en pantallas pequeñas) -->
+<div class="op-mobile-refresh">
+    <i class="bi bi-arrow-clockwise"></i> Refresh en <strong id="countdownMobile">10s</strong>
+</div>
+
+<!-- HERO -->
 <section class="op-hero">
     <div class="op-hero-inner">
         <div class="op-hero-text">
@@ -70,7 +76,7 @@
                 Hola, <span th:text="${nombreUsuario}">Operador</span>
             </h1>
             <p class="op-hero-sub">
-                Aquí verás todas las órdenes activas en tiempo real. Cada ítem está identificado por área con color e ícono.
+                Órdenes activas en tiempo real. Color e ícono por área.
             </p>
         </div>
 
@@ -86,62 +92,50 @@
                 <div class="op-stat-icon"><i class="bi bi-list-check"></i></div>
                 <div class="op-stat-body">
                     <span class="op-stat-num" id="numItems">—</span>
-                    <span class="op-stat-label">Ítems totales</span>
+                    <span class="op-stat-label">Ítems</span>
                 </div>
             </div>
             <div class="op-stat-chip">
                 <div class="op-stat-icon"><i class="bi bi-clock"></i></div>
                 <div class="op-stat-body">
                     <span class="op-stat-num" id="horaActual">—</span>
-                    <span class="op-stat-label">Hora actual</span>
+                    <span class="op-stat-label">Hora</span>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- ── MAIN ───────────────────────────────────────────────── -->
+<!-- MAIN -->
 <main class="op-main">
 
-    <!-- Leyenda de áreas -->
+    <!-- Leyenda scroll horizontal en móvil -->
     <div class="op-leyenda">
         <span class="leyenda-title"><i class="bi bi-grid-fill"></i> Áreas:</span>
-        <span class="leyenda-chip area-salados">
-            <i class="bi bi-egg-fried"></i> Salados
-        </span>
-        <span class="leyenda-chip area-crepas">
-            <i class="bi bi-layers-fill"></i> Crepas &amp; Waffles
-        </span>
-        <span class="leyenda-chip area-bcalientes">
-            <i class="bi bi-cup-hot-fill"></i> Beb. Calientes
-        </span>
-        <span class="leyenda-chip area-bfrias">
-            <i class="bi bi-cup-straw"></i> Beb. Frías
-        </span>
-        <span class="leyenda-chip area-fitness">
-            <i class="bi bi-apple"></i> Fitness
-        </span>
+        <span class="leyenda-chip area-salados"><i class="bi bi-egg-fried"></i> Salados</span>
+        <span class="leyenda-chip area-crepas"><i class="bi bi-layers-fill"></i> Crepas &amp; Waffles</span>
+        <span class="leyenda-chip area-bcalientes"><i class="bi bi-cup-hot-fill"></i> Beb. Calientes</span>
+        <span class="leyenda-chip area-bfrias"><i class="bi bi-cup-straw"></i> Beb. Frías</span>
+        <span class="leyenda-chip area-fitness"><i class="bi bi-apple"></i> Fitness</span>
     </div>
 
-    <!-- Grid de órdenes (llenado por JS) -->
+    <!-- Grid de órdenes -->
     <div class="op-grid" id="ordenesGrid">
         <div class="op-empty-state" id="estadoInicial">
-            <div class="op-empty-icon">
-                <i class="bi bi-arrow-repeat"></i>
-            </div>
+            <div class="op-empty-icon"><i class="bi bi-arrow-repeat"></i></div>
             <p>Cargando órdenes…</p>
         </div>
     </div>
 
 </main>
 
-<!-- ── FOOTER ─────────────────────────────────────────────── -->
+<!-- FOOTER -->
 <footer class="op-footer">
     <span>&copy; 2025 · <span th:text="${nombreNegocio}">Negocio</span>. Todos los derechos reservados.</span>
     <span>Panel Operador</span>
 </footer>
 
-<!-- ── TEMPLATES (ocultos, clonados por JS) ───────────────── -->
+<!-- TEMPLATES -->
 <template id="tplOrdenCard">
     <div class="orden-card">
         <div class="orden-card-header">
@@ -175,6 +169,18 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script th:src="@{/js/Operador/OperadorPantalla.js}"></script>
+
+<!-- Sincronizar countdown móvil con el principal -->
+<script>
+    const origActualizar = window.actualizarCountdown;
+    const observer = new MutationObserver(() => {
+        const val = document.getElementById('countdownDisplay')?.textContent;
+        const mob = document.getElementById('countdownMobile');
+        if (val && mob) mob.textContent = val;
+    });
+    const cd = document.getElementById('countdownDisplay');
+    if (cd) observer.observe(cd, { childList: true, characterData: true, subtree: true });
+</script>
 
 </body>
 </html>
