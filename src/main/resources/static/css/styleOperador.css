@@ -34,13 +34,6 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/*
- * TRUCO DE ESCALA GLOBAL
- * En móvil/tablet/desktop → 16px (normal)
- * En TV con Fire TV (≥1200px) → 11.2px (= 16 × 0.70)
- * Todo lo que usa rem se encoge automáticamente, igual que
- * hacer Ctrl+- en el navegador hasta 70%.
- */
 html { font-size: 16px; }
 @media (min-width: 1200px) { html { font-size: 11.2px; } }
 
@@ -205,10 +198,17 @@ body {
    ═══════════════════════════════════════════════════════════ */
 .op-main { position:relative; z-index:1; flex:1; width:100%; padding:0 1rem 1.5rem; }
 
+/* ── Barra de filtros ─────────────────────────────────────── */
+.op-filtros {
+    display:flex; align-items:center; gap:.5rem;
+    margin-bottom:.875rem; flex-wrap:wrap;
+}
+
+/* Chips de área individuales */
 .op-leyenda {
     display:flex; align-items:center; gap:.375rem;
-    margin-bottom:.875rem; overflow-x:auto;
-    -webkit-overflow-scrolling:touch; padding-bottom:4px; scrollbar-width:none;
+    overflow-x:auto; -webkit-overflow-scrolling:touch;
+    padding-bottom:4px; scrollbar-width:none; flex-wrap:wrap;
 }
 .op-leyenda::-webkit-scrollbar { display:none; }
 .leyenda-title {
@@ -227,6 +227,46 @@ body {
 .leyenda-chip.area-bcalientes { background:var(--bcalientes-bg); color:var(--bcalientes-accent); border-color:var(--bcalientes-border); }
 .leyenda-chip.area-bfrias     { background:var(--bfrias-bg);     color:var(--bfrias-accent);     border-color:var(--bfrias-border); }
 .leyenda-chip.area-fitness    { background:var(--fitness-bg);    color:var(--fitness-accent);    border-color:var(--fitness-border); }
+
+/* ── Botones de cocina ────────────────────────────────────── */
+.op-cocinas {
+    display:flex; gap:.5rem; flex-shrink:0;
+}
+.btn-cocina {
+    display:inline-flex; align-items:center; gap:.4rem;
+    font-size:.75rem; font-weight:700;
+    border-radius:20px; padding:.35rem .9rem;
+    border:2px solid transparent; cursor:pointer;
+    white-space:nowrap; transition:transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+    font-family: inherit;
+}
+.btn-cocina:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,.12);
+}
+.btn-cocina.cocina-atras {
+    background: #FFF3E0;
+    color: #BF360C;
+    border-color: #FFAB91;
+}
+.btn-cocina.cocina-adelante {
+    background: #F3E5F5;
+    color: #6A1B9A;
+    border-color: #CE93D8;
+}
+.btn-cocina.cocina-activa {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(0,0,0,.18);
+    border-width: 3px;
+}
+.btn-cocina.cocina-atras.cocina-activa  { background: #FFE0B2; }
+.btn-cocina.cocina-adelante.cocina-activa { background: #E1BEE7; }
+
+/* Separador entre cocinas y chips */
+.filtros-sep {
+    width:1.5px; height:1.5rem;
+    background:rgba(212,184,150,.4); flex-shrink:0; align-self:center;
+}
 
 /* ── GRID ─────────────────────────────────────────────────── */
 .op-grid { display:grid; gap:.75rem; align-content:start; grid-template-columns:1fr; }
@@ -337,7 +377,6 @@ body {
     min-width: 3rem;
     text-align: center;
     letter-spacing: -.01em;
-
 }
 .area-salados    .item-badge-cantidad { background:var(--salados-accent); }
 .area-crepas     .item-badge-cantidad { background:var(--crepas-accent); }
@@ -368,9 +407,10 @@ body {
 }
 .wave { display:none; }
 
-/* Filtro activo — resalta el chip seleccionado */
+/* ── Estados activos de chips individuales ────────────────── */
 .leyenda-chip[data-rol] {
     transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+    cursor: pointer;
 }
 .leyenda-chip[data-rol]:hover {
     transform: translateY(-2px);
@@ -382,7 +422,6 @@ body {
     border-width: 3px;
     opacity: 1 !important;
 }
-/* Atenuar los chips no activos cuando hay filtro */
 .op-leyenda:has(.filtro-activo) .leyenda-chip[data-rol]:not(.filtro-activo) {
     opacity: 0.45;
 }

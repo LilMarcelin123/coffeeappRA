@@ -19,10 +19,17 @@ const AREA_MAP = {
 
 const AREA_DEFAULT = { clase: "area-bcalientes", icono: "bi bi-cup-hot-fill", label: "Sin área" };
 
+// Filtros compuestos: conjunto de id_rol_preparacion que agrupa cada cocina
+const FILTROS_COCINA = {
+    atras:   new Set([2, 5, 6]),   // Salados, Beb. Frías, Fitness
+    adelante: new Set([3, 4]),     // Crepas & Waffles, Beb. Calientes
+};
+
 // ── ESTADO ────────────────────────────────────────────────────
 
 let primeraVez        = true;
-let filtroActivo      = null;   // null = todos, número = id_rol_preparacion
+let filtroActivo      = null;   // null = todos | número = id_rol_preparacion individual
+let filtroCocina      = null;   // null | "atras" | "adelante"
 let idsConocidos      = new Set();
 let countdownSeg      = POLLING_INTERVAL_MS / 1000;
 let audioCtx          = null;
@@ -42,6 +49,7 @@ $(document).ready(() => {
     document.addEventListener("click", () => obtenerAudioCtx(), { once: true });
 
     iniciarBotonesFiltro();
+    iniciarBotonesCocina();
     cargarOrdenes();
     iniciarPolling();
 });
@@ -132,7 +140,6 @@ function obtenerAudioCtx() {
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
-    // El navegador suspende el contexto si no hubo interacción — lo reanudamos
     if (audioCtx.state === "suspended") {
         audioCtx.resume();
     }
@@ -173,7 +180,6 @@ function reproducirCampana(ctx, frecuencia, inicioSeg, duracionSeg, volumen = 0.
     osc.type            = "sine";
     osc.frequency.value = frecuencia;
 
-    // Ataque instantáneo (5 ms) + decaimiento exponencial largo → timbre de campana
     gain.gain.setValueAtTime(0, ctx.currentTime + inicioSeg);
     gain.gain.linearRampToValueAtTime(volumen, ctx.currentTime + inicioSeg + 0.005);
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + inicioSeg + duracionSeg);
@@ -182,7 +188,7 @@ function reproducirCampana(ctx, frecuencia, inicioSeg, duracionSeg, volumen = 0.
     osc.stop(ctx.currentTime  + inicioSeg + duracionSeg + 0.05);
 }
 
-// ── FILTRO POR ÁREA ───────────────────────────────────────────
+// ── FILTRO POR ÁREA (chips individuales) ─────────────────────
 
 function iniciarBotonesFiltro() {
     document.querySelectorAll(".leyenda-chip[data-rol]").forEach(chip => {
@@ -194,14 +200,45 @@ function iniciarBotonesFiltro() {
 function onClickFiltro() {
     const rol = parseInt(this.dataset.rol);
 
+    // Al usar filtro individual, limpiar filtro de cocina
+    filtroCocina = null;
+    limpiarActivoBotonesCocina();
+
     filtroActivo = filtroActivo === rol ? null : rol;
 
     document.querySelectorAll(".leyenda-chip[data-rol]").forEach(c => {
         c.classList.toggle("filtro-activo", parseInt(c.dataset.rol) === filtroActivo);
     });
 
-    // Re-renderizar con datos en cache sin esperar el polling
     renderOrdenes(ultimosOrdenes, ultimosItemsPorOrden);
+}
+
+// ── FILTRO POR COCINA (botones compuestos) ────────────────────
+
+function iniciarBotonesCocina() {
+    document.querySelectorAll(".btn-cocina[data-cocina]").forEach(btn => {
+        btn.addEventListener("click", onClickCocina);
+    });
+}
+
+function onClickCocina() {
+    const cocina = this.dataset.cocina;
+
+    // Al usar filtro de cocina, limpiar filtro individual
+    filtroActivo = null;
+    document.querySelectorAll(".leyenda-chip[data-rol]").forEach(c => c.classList.remove("filtro-activo"));
+
+    filtroCocina = filtroCocina === cocina ? null : cocina;
+
+    document.querySelectorAll(".btn-cocina[data-cocina]").forEach(b => {
+        b.classList.toggle("cocina-activa", b.dataset.cocina === filtroCocina);
+    });
+
+    renderOrdenes(ultimosOrdenes, ultimosItemsPorOrden);
+}
+
+function limpiarActivoBotonesCocina() {
+    document.querySelectorAll(".btn-cocina[data-cocina]").forEach(b => b.classList.remove("cocina-activa"));
 }
 
 // ── RENDER PRINCIPAL ──────────────────────────────────────────
@@ -231,9 +268,19 @@ function aplicarFiltro(ordenes, itemsPorOrden) {
         const idStr = String(orden.id_orden);
         const items = itemsPorOrden[idStr] || [];
 
-        const itemsVisibles = filtroActivo
-            ? items.filter(i => i.id_rol_preparacion === filtroActivo)
-            : items;
+        let itemsVisibles;
+
+        if (filtroCocina) {
+            // Filtro compuesto: mostrar ítems cuyo rol esté en el set de la cocina
+            const rolesPermitidos = FILTROS_COCINA[filtroCocina];
+            itemsVisibles = items.filter(i => rolesPermitidos.has(i.id_rol_preparacion));
+        } else if (filtroActivo) {
+            // Filtro individual por área
+            itemsVisibles = items.filter(i => i.id_rol_preparacion === filtroActivo);
+        } else {
+            // Sin filtro — mostrar todo
+            itemsVisibles = items;
+        }
 
         if (itemsVisibles.length > 0) {
             ordenesFiltradas.push(orden);
@@ -251,9 +298,16 @@ function actualizarStats(ordenes, itemsPorOrden) {
 }
 
 function mostrarEstadoVacio(grid) {
-    const msg = filtroActivo
-        ? `Sin órdenes con ítems de <strong>${AREA_MAP[filtroActivo]?.label || "esta área"}</strong>.`
-        : "Sin órdenes pendientes. Todo al día.";
+    let msg;
+    if (filtroCocina === "atras") {
+        msg = "Sin órdenes para <strong>Cocina de Atrás</strong>.";
+    } else if (filtroCocina === "adelante") {
+        msg = "Sin órdenes para <strong>Cocina de Adelante</strong>.";
+    } else if (filtroActivo) {
+        msg = `Sin órdenes con ítems de <strong>${AREA_MAP[filtroActivo]?.label || "esta área"}</strong>.`;
+    } else {
+        msg = "Sin órdenes pendientes. Todo al día.";
+    }
 
     grid.innerHTML = `
         <div class="op-empty-state">
@@ -267,7 +321,6 @@ function mostrarEstadoVacio(grid) {
 function sincronizarCards(grid, ordenesFiltradas, itemsFiltrados) {
     const idsActivos = new Set(ordenesFiltradas.map(o => String(o.id_orden)));
 
-    // Eliminar cards que ya no aplican
     grid.querySelectorAll(".orden-card").forEach(el => {
         if (!idsActivos.has(el.dataset.id)) el.remove();
     });
