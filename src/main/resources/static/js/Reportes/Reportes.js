@@ -1,3 +1,4 @@
+import { mensajesAlert, mostrarConfirmacion2 } from '../FuncionesGenerales.js';
 
 const API = {
     detalle : "/admin/reportes/detalle",
@@ -5,11 +6,12 @@ const API = {
     excel   : "/admin/reportes/excel",
 };
 
-const SUFIJO_EXCEL = { 1: "_efectivo", 2: "_tarjeta" };
+const SUFIJO_EXCEL = { 1: "_efectivo", 2: "_tarjeta", 3: "_transferencia" };
 
 const METODO = {
     EFECTIVO      : "EFECTIVO",
     TARJETA       : "TARJETA",
+    TRANSFERENCIA : "TRANSFERENCIA",
     TOTAL_GENERAL : "TOTAL GENERAL",
 };
 
@@ -26,10 +28,11 @@ const dom = {
     labelConteo    : () => document.getElementById("labelConteo"),
     wrapTablaCorte : () => document.getElementById("wrapTablaCorte"),
     btnCorte       : () => document.getElementById("btnGenerarCorte"),
-    totalGeneral   : () => document.getElementById("totalGeneral"),
-    totalEfectivo  : () => document.getElementById("totalEfectivo"),
-    totalTarjeta   : () => document.getElementById("totalTarjeta"),
-    totalOrdenes   : () => document.getElementById("totalOrdenes"),
+    totalGeneral       : () => document.getElementById("totalGeneral"),
+    totalEfectivo      : () => document.getElementById("totalEfectivo"),
+    totalTarjeta       : () => document.getElementById("totalTarjeta"),
+    totalTransferencia : () => document.getElementById("totalTransferencia"),  // ← NUEVO
+    totalOrdenes       : () => document.getElementById("totalOrdenes"),
 };
 
 /* ════════════════════════════════════════════════════════════
@@ -64,7 +67,7 @@ $(document).ready(() => {
         descargarExcel(estado.filtroActivo, this);
     });
 
-    /* Cierre del día ← única línea que se agregó */
+    /* Cierre del día */
     initModalCierre();
 
 });
@@ -104,12 +107,22 @@ function renderTablaDetalle(lista) {
     const fragment = document.createDocumentFragment();
 
     lista.forEach((row, idx) => {
-        const metodo     = String(row.metodo_pago ?? "").toUpperCase();
-        const esEfectivo = metodo === METODO.EFECTIVO;
-        const badgeClass = esEfectivo ? "badge-efectivo" : "badge-tarjeta";
-        const badgeIcon  = esEfectivo
-            ? '<i class="bi bi-cash-coin" aria-hidden="true"></i>'
-            : '<i class="bi bi-credit-card-fill" aria-hidden="true"></i>';
+        const metodo = String(row.metodo_pago ?? "").toUpperCase();
+
+        let badgeClass, badgeIcon;
+        if (metodo === METODO.EFECTIVO) {
+            badgeClass = "badge-efectivo";
+            badgeIcon  = '<i class="bi bi-cash-coin" aria-hidden="true"></i>';
+        } else if (metodo === METODO.TARJETA) {
+            badgeClass = "badge-tarjeta";
+            badgeIcon  = '<i class="bi bi-credit-card-fill" aria-hidden="true"></i>';
+        } else if (metodo === METODO.TRANSFERENCIA) {
+            badgeClass = "badge-transferencia";
+            badgeIcon  = '<i class="bi bi-phone-fill" aria-hidden="true"></i>';
+        } else {
+            badgeClass = "badge-tarjeta";
+            badgeIcon  = '<i class="bi bi-question-circle" aria-hidden="true"></i>';
+        }
 
         const total = row.total != null
             ? `$${Number(row.total).toFixed(2)}`
@@ -177,19 +190,21 @@ function cargarCorte() {
 }
 
 function renderCardsCorte(lista) {
-    const totales = { general: 0, efectivo: 0, tarjeta: 0, ordenes: 0 };
+    const totales = { general: 0, efectivo: 0, tarjeta: 0, transferencia: 0, ordenes: 0 };
     lista.forEach(row => {
         const metodo  = String(row.metodo_pago ?? "").toUpperCase();
-        const monto   = Number(row.total_monto   ?? 0);
-        const ordenes = Number(row.total_ordenes  ?? 0);
-        if      (metodo === METODO.TOTAL_GENERAL) { totales.general  = monto; totales.ordenes = ordenes; }
-        else if (metodo === METODO.EFECTIVO)      { totales.efectivo = monto; }
-        else if (metodo === METODO.TARJETA)       { totales.tarjeta  = monto; }
+        const monto   = Number(row.total_monto  ?? 0);
+        const ordenes = Number(row.total_ordenes ?? 0);
+        if      (metodo === METODO.TOTAL_GENERAL) { totales.general       = monto; totales.ordenes = ordenes; }
+        else if (metodo === METODO.EFECTIVO)      { totales.efectivo      = monto; }
+        else if (metodo === METODO.TARJETA)       { totales.tarjeta       = monto; }
+        else if (metodo === METODO.TRANSFERENCIA) { totales.transferencia = monto; }
     });
-    animarValor(dom.totalGeneral(),  `$${totales.general.toFixed(2)}`);
-    animarValor(dom.totalEfectivo(), `$${totales.efectivo.toFixed(2)}`);
-    animarValor(dom.totalTarjeta(),  `$${totales.tarjeta.toFixed(2)}`);
-    animarValor(dom.totalOrdenes(),  String(totales.ordenes));
+    animarValor(dom.totalGeneral(),       `$${totales.general.toFixed(2)}`);
+    animarValor(dom.totalEfectivo(),      `$${totales.efectivo.toFixed(2)}`);
+    animarValor(dom.totalTarjeta(),       `$${totales.tarjeta.toFixed(2)}`);
+    animarValor(dom.totalTransferencia(), `$${totales.transferencia.toFixed(2)}`);  // ← NUEVO
+    animarValor(dom.totalOrdenes(),       String(totales.ordenes));
 }
 
 function renderTablaCorte(lista) {
@@ -286,7 +301,8 @@ function abrirModalCierre() {
                 var esTotal = metodo === "TOTAL GENERAL";
                 var colorClass = esTotal
                     ? "bg-danger text-white"
-                    : metodo.includes("EFECTIVO") ? "bg-success text-white"
+                    : metodo === "EFECTIVO"       ? "bg-success text-white"
+                    : metodo === "TRANSFERENCIA"  ? "bg-info text-white"
                     : "bg-primary text-white";
                 html += '<li class="d-flex justify-content-between align-items-center mb-2">' +
                     '<span class="badge ' + colorClass + ' rounded-pill" style="font-size:.72rem;">' +
@@ -304,7 +320,6 @@ function abrirModalCierre() {
         }
     });
 }
-
 
 function ejecutarCierre() {
     var btn     = document.getElementById("btnConfirmarCierreFinal");
@@ -391,47 +406,6 @@ function actualizarConteo(n) {
     const el = dom.labelConteo();
     if (el) el.textContent = `${n} registro${n !== 1 ? "s" : ""}`;
 }
-function mostrarConfirmacion2(mensaje, onContinuar, onRegresar, tipo) {
-    const modalEl = document.getElementById("modalConfirmacion");
-    if (!modalEl) { console.error("No existe #modalConfirmacion"); return; }
 
-    const msgEl       = modalEl.querySelector("#mensajeConfirmacion");
-    const btnContinuar = modalEl.querySelector("#btnContinuar");
-    const btnRegresar  = modalEl.querySelector("#btnRegresar");
-    const header       = modalEl.querySelector(".modal-header");
-    const titulo       = modalEl.querySelector(".modal-title");
 
-    if (!msgEl) return;
-    msgEl.textContent = mensaje;
-
-    // ── Reset ─────────────────────────────────────────────
-    btnContinuar.className = "btn px-4 rounded-pill";
-    header.style.background = "";
-    titulo.textContent = "Confirmación";
-
-    // ── Estilos por tipo ──────────────────────────────────
-    if (tipo === "exito") {
-        header.style.background = "#d1fae5";
-        titulo.innerHTML = '<i class="bi bi-check-circle-fill text-success me-2"></i>Éxito';
-        btnContinuar.classList.add("btn-success");
-        btnContinuar.innerHTML = '<i class="bi bi-check-circle me-2"></i>Aceptar';
-    } else if (tipo === "advertencia") {
-        header.style.background = "#fef9c3";
-        titulo.innerHTML = '<i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>Advertencia';
-        btnContinuar.classList.add("btn-warning");
-        btnContinuar.innerHTML = '<i class="bi bi-exclamation-circle me-2"></i>Entendido';
-    } else if (tipo === "error") {
-        header.style.background = "#fee2e2";
-        titulo.innerHTML = '<i class="bi bi-x-circle-fill text-danger me-2"></i>Error';
-        btnContinuar.classList.add("btn-danger");
-        btnContinuar.innerHTML = '<i class="bi bi-x-circle me-2"></i>Cerrar';
-    } else {
-        btnContinuar.classList.add("btn-primary");
-        btnContinuar.innerHTML = '<i class="bi bi-check-circle me-2"></i>Continuar';
-    }
-
-    btnContinuar.onclick = () => { if (onContinuar) onContinuar(); $('#modalConfirmacion').modal('hide'); };
-    btnRegresar.onclick  = () => { if (onRegresar)  onRegresar();  $('#modalConfirmacion').modal('hide'); };
-    $('#modalConfirmacion').modal('show');
-}
 window.ejecutarCierre = ejecutarCierre;

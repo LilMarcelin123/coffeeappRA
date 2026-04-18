@@ -17,16 +17,19 @@
     --text-muted:    #8A7060;
 
     /* Acentos semánticos */
-    --color-efectivo:     #15803D;
-    --color-efectivo-bg:  rgba(21,128,61,.10);
-    --color-efectivo-bdr: rgba(21,128,61,.22);
-    --color-tarjeta:      #1D4ED8;
-    --color-tarjeta-bg:   rgba(29,78,216,.09);
-    --color-tarjeta-bdr:  rgba(29,78,216,.20);
-    --color-oro:          #92400E;
-    --color-oro-bg:       rgba(180,120,40,.10);
-    --color-purple:       #6D28D9;
-    --color-purple-bg:    rgba(109,40,217,.09);
+    --color-efectivo:          #15803D;
+    --color-efectivo-bg:       rgba(21,128,61,.10);
+    --color-efectivo-bdr:      rgba(21,128,61,.22);
+    --color-tarjeta:           #1D4ED8;
+    --color-tarjeta-bg:        rgba(29,78,216,.09);
+    --color-tarjeta-bdr:       rgba(29,78,216,.20);
+    --color-transferencia:     #0E7490;
+    --color-transferencia-bg:  rgba(14,116,144,.09);
+    --color-transferencia-bdr: rgba(14,116,144,.22);
+    --color-oro:               #92400E;
+    --color-oro-bg:            rgba(180,120,40,.10);
+    --color-purple:            #6D28D9;
+    --color-purple-bg:         rgba(109,40,217,.09);
 
     /* Geometría */
     --radius-xl:   24px;
@@ -53,7 +56,7 @@ body {
 }
 
 /* ════════════════════════════════════════════════════════════
-   FRANJA IMAGEN — delgada, margen superior (igual que otros módulos)
+   FRANJA IMAGEN
    ════════════════════════════════════════════════════════════ */
 .rpt-strip {
     position: relative;
@@ -63,7 +66,6 @@ body {
     flex-shrink: 0;
 }
 
-/* Imagen real → sin degradar calidad, sin blur */
 .rpt-strip__img {
     position: absolute;
     inset: 0;
@@ -85,7 +87,6 @@ body {
     );
 }
 
-/* Línea dorada decorativa inferior */
 .rpt-strip::after {
     content: '';
     position: absolute;
@@ -141,7 +142,7 @@ body {
 }
 
 /* ════════════════════════════════════════════════════════════
-   HEADER BLOCK — título grande debajo de la franja
+   HEADER BLOCK
    ════════════════════════════════════════════════════════════ */
 .header-block {
     max-width: 1060px;
@@ -227,7 +228,7 @@ body {
 }
 
 /* ════════════════════════════════════════════════════════════
-   PANEL CARD — mismo estilo que otros módulos
+   PANEL CARD
    ════════════════════════════════════════════════════════════ */
 .panel-card {
     background: rgba(255,255,255,.94);
@@ -235,7 +236,7 @@ body {
     border: 1.5px solid rgba(212,184,150,.28);
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-card);
-    overflow: hidden;   /* para que la tabla no rompa el borde-radius */
+    overflow: hidden;
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -433,9 +434,10 @@ body {
     font-size: .95rem;
 }
 
-/* Badges de método de pago */
+/* ── Badges de método de pago ────────────────────────────── */
 .badge-efectivo,
-.badge-tarjeta {
+.badge-tarjeta,
+.badge-transferencia {
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -457,6 +459,12 @@ body {
     background: var(--color-tarjeta-bg);
     color: var(--color-tarjeta);
     border: 1px solid var(--color-tarjeta-bdr);
+}
+
+.badge-transferencia {
+    background: var(--color-transferencia-bg);
+    color: var(--color-transferencia);
+    border: 1px solid var(--color-transferencia-bdr);
 }
 
 /* Empty / loading state */
@@ -578,12 +586,12 @@ body {
 /* ════════════════════════════════════════════════════════════
    CORTE — GRID DE CARDS
    ════════════════════════════════════════════════════════════ */
-.corte-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    border-top: 1.5px solid rgba(212,184,150,.18);
-    border-bottom: 1.5px solid rgba(212,184,150,.18);
-}
+   .corte-grid {
+       display: grid;
+       grid-template-columns: repeat(5, 1fr);
+       border-top: 1.5px solid rgba(212,184,150,.18);
+       border-bottom: 1.5px solid rgba(212,184,150,.18);
+   }
 
 .corte-card {
     display: flex;
@@ -609,11 +617,10 @@ body {
     flex-shrink: 0;
 }
 
-/* Colores semánticos por card */
-.cc-total    .cc-icon { background: var(--color-oro-bg);    color: var(--color-oro);    border: 1.5px solid rgba(180,120,40,.2); }
-.cc-efectivo .cc-icon { background: var(--color-efectivo-bg); color: var(--color-efectivo); border: 1.5px solid var(--color-efectivo-bdr); }
-.cc-tarjeta  .cc-icon { background: var(--color-tarjeta-bg);  color: var(--color-tarjeta);  border: 1.5px solid var(--color-tarjeta-bdr); }
-.cc-ordenes  .cc-icon { background: var(--color-purple-bg);  color: var(--color-purple);  border: 1.5px solid rgba(109,40,217,.18); }
+.cc-total    .cc-icon { background: var(--color-oro-bg);            color: var(--color-oro);            border: 1.5px solid rgba(180,120,40,.2); }
+.cc-efectivo .cc-icon { background: var(--color-efectivo-bg);       color: var(--color-efectivo);       border: 1.5px solid var(--color-efectivo-bdr); }
+.cc-tarjeta  .cc-icon { background: var(--color-tarjeta-bg);        color: var(--color-tarjeta);        border: 1.5px solid var(--color-tarjeta-bdr); }
+.cc-ordenes  .cc-icon { background: var(--color-purple-bg);         color: var(--color-purple);         border: 1.5px solid rgba(109,40,217,.18); }
 
 .cc-body {
     display: flex;
@@ -645,7 +652,7 @@ body {
 .cc-ordenes  .cc-value { color: var(--color-purple); }
 
 /* ════════════════════════════════════════════════════════════
-   BOTÓN REGRESAR (inferior, igual que otros módulos)
+   BOTÓN REGRESAR
    ════════════════════════════════════════════════════════════ */
 .btn-back-main {
     display: inline-flex;
@@ -724,23 +731,23 @@ body {
     .rpt-footer    { flex-direction: column; text-align: center; }
     .search-wrap input { width: 140px; }
     .rpt-main, .header-block { padding-left: 16px; padding-right: 16px; }
-	
-	
-	
+}
+@media (max-width: 900px) {
+    .corte-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 640px) {
+    .corte-grid { grid-template-columns: 1fr; }
 }
 
 /* ════════════════════════════════════════════════════════════
    SECCIÓN CIERRE DEL DÍA
-   PEGAR AL FINAL DE styleGeneracionReportes.css
-   (FUERA del @media — a nivel raíz)
    ════════════════════════════════════════════════════════════ */
-
 .section-icon--red {
     background: linear-gradient(135deg, #f87171, #b91c1c);
     box-shadow: 0 4px 12px rgba(185,28,28,.30);
 }
 
-/* ── Botón principal ─────────────────────────────────────── */
 .btn-cierre-dia {
     display: inline-flex;
     align-items: center;
@@ -767,7 +774,6 @@ body {
     white-space: nowrap;
 }
 
-/* Brillo diagonal animado */
 .btn-cierre-dia::before {
     content: '';
     position: absolute;
@@ -792,9 +798,7 @@ body {
         0 1px 0 rgba(255,255,255,.15) inset;
 }
 
-.btn-cierre-dia:hover::before {
-    left: 130%;
-}
+.btn-cierre-dia:hover::before { left: 130%; }
 
 .btn-cierre-dia:active {
     transform: translateY(0);
@@ -808,14 +812,12 @@ body {
     box-shadow: none;
 }
 
-/* Estado: cierre ejecutado (verde) */
 .btn-cierre-dia.ejecutado {
     background: linear-gradient(135deg, #16a34a, #15803d);
     box-shadow: 0 4px 16px rgba(21,128,61,.38);
     pointer-events: none;
 }
 
-/* ── Bloque de advertencia ───────────────────────────────── */
 .cierre-warning {
     display: flex;
     align-items: flex-start;
@@ -848,3 +850,11 @@ body {
     margin-top: 1px;
     filter: drop-shadow(0 2px 4px rgba(185,28,28,.25));
 }
+
+.cc-transferencia .cc-icon {
+    background: var(--color-transferencia-bg);
+    color: var(--color-transferencia);
+    border: 1.5px solid var(--color-transferencia-bdr);
+}
+
+.cc-transferencia .cc-value { color: var(--color-transferencia); }

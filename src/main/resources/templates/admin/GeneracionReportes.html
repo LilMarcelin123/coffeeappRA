@@ -70,11 +70,18 @@
                 <button class="filter-pill" data-filtro="2" aria-pressed="false">
                     <i class="bi bi-credit-card-fill"></i> Tarjeta
                 </button>
+				
+				<button class="filter-pill" data-filtro="3" aria-pressed="false">
+				    <i class="bi bi-phone-fill"></i> Transferencia
+				</button>
+				
             </div>
         </div>
 
         <!-- Toolbar -->
         <div class="table-toolbar">
+			
+			
             <span class="tbl-count" id="labelConteo">— registros</span>
             <label class="search-wrap">
                 <i class="bi bi-search" aria-hidden="true"></i>
@@ -139,36 +146,43 @@
         </div>
 
         <!-- Cards totales -->
-        <div class="corte-grid">
-            <div class="corte-card cc-total">
-                <span class="cc-icon"><i class="bi bi-currency-dollar"></i></span>
-                <div class="cc-body">
-                    <span class="cc-label">Total general</span>
-                    <span class="cc-value" id="totalGeneral">—</span>
-                </div>
-            </div>
-            <div class="corte-card cc-efectivo">
-                <span class="cc-icon"><i class="bi bi-cash-stack"></i></span>
-                <div class="cc-body">
-                    <span class="cc-label">Efectivo</span>
-                    <span class="cc-value" id="totalEfectivo">—</span>
-                </div>
-            </div>
-            <div class="corte-card cc-tarjeta">
-                <span class="cc-icon"><i class="bi bi-credit-card-fill"></i></span>
-                <div class="cc-body">
-                    <span class="cc-label">Tarjeta</span>
-                    <span class="cc-value" id="totalTarjeta">—</span>
-                </div>
-            </div>
-            <div class="corte-card cc-ordenes">
-                <span class="cc-icon"><i class="bi bi-clipboard2-check-fill"></i></span>
-                <div class="cc-body">
-                    <span class="cc-label">Órdenes cerradas</span>
-                    <span class="cc-value" id="totalOrdenes">—</span>
-                </div>
-            </div>
-        </div>
+		<div class="corte-grid">
+		    <div class="corte-card cc-total">
+		        <span class="cc-icon"><i class="bi bi-currency-dollar"></i></span>
+		        <div class="cc-body">
+		            <span class="cc-label">Total general</span>
+		            <span class="cc-value" id="totalGeneral">—</span>
+		        </div>
+		    </div>
+		    <div class="corte-card cc-efectivo">
+		        <span class="cc-icon"><i class="bi bi-cash-stack"></i></span>
+		        <div class="cc-body">
+		            <span class="cc-label">Efectivo</span>
+		            <span class="cc-value" id="totalEfectivo">—</span>
+		        </div>
+		    </div>
+		    <div class="corte-card cc-tarjeta">
+		        <span class="cc-icon"><i class="bi bi-credit-card-fill"></i></span>
+		        <div class="cc-body">
+		            <span class="cc-label">Tarjeta</span>
+		            <span class="cc-value" id="totalTarjeta">—</span>
+		        </div>
+		    </div>
+		    <div class="corte-card cc-transferencia">
+		        <span class="cc-icon"><i class="bi bi-phone-fill"></i></span>
+		        <div class="cc-body">
+		            <span class="cc-label">Transferencia</span>
+		            <span class="cc-value" id="totalTransferencia">—</span>
+		        </div>
+		    </div>
+		    <div class="corte-card cc-ordenes">
+		        <span class="cc-icon"><i class="bi bi-clipboard2-check-fill"></i></span>
+		        <div class="cc-body">
+		            <span class="cc-label">Órdenes cerradas</span>
+		            <span class="cc-value" id="totalOrdenes">—</span>
+		        </div>
+		    </div>
+		</div>
 
         <!-- Tabla corte (oculta hasta generar) -->
         <div class="table-wrap" id="wrapTablaCorte" style="display:none;">
