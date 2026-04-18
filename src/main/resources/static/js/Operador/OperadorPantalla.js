@@ -19,24 +19,25 @@ const AREA_MAP = {
 
 const AREA_DEFAULT = { clase: "area-bcalientes", icono: "bi bi-cup-hot-fill", label: "Sin área" };
 
-// Filtros compuestos: conjunto de id_rol_preparacion que agrupa cada cocina
 const FILTROS_COCINA = {
-    atras:    new Set([2, 5, 6]),   // Salados, Beb. Frías, Fitness
-    adelante: new Set([3, 4]),      // Crepas & Waffles, Beb. Calientes
+    atras:    new Set([2, 5, 6]),
+    adelante: new Set([3, 4]),
 };
 
 // ── ESTADO ────────────────────────────────────────────────────
 
 let primeraVez        = true;
-let filtroActivo      = null;   // null = todos | número = id_rol_preparacion individual
-let filtroCocina      = null;   // null | "atras" | "adelante"
+let filtroActivo      = null;
+let filtroCocina      = null;
 let idsConocidos      = new Set();
 let countdownSeg      = POLLING_INTERVAL_MS / 1000;
 let audioCtx          = null;
 
-// Cache para re-renderizar al cambiar filtro sin esperar el polling
 let ultimosOrdenes       = [];
 let ultimosItemsPorOrden = {};
+
+// ── ESTADO ITEMS TACHADOS ─────────────────────────────────────
+const itemsTachados = new Set();
 
 // ── INICIO ────────────────────────────────────────────────────
 
@@ -361,6 +362,9 @@ function actualizarItemsCard(card, items) {
         const itemEl    = cloneItem.querySelector(".orden-item");
         const area      = AREA_MAP[item.id_rol_preparacion] || AREA_DEFAULT;
 
+        // ── Clave única por item ───────────────────────────────
+        const claveItem = `${item.id_orden}-${item.id_orden_item}`;
+
         itemEl.classList.add(area.clase);
         itemEl.querySelector(".item-icono").innerHTML            = `<i class="${area.icono}"></i>`;
         itemEl.querySelector(".item-nombre").textContent         = item.n_nombre_producto || "—";
@@ -373,9 +377,19 @@ function actualizarItemsCard(card, items) {
             extrasEl.style.display = "none";
         }
 
-        // ── TOGGLE VISUAL "HECHO" ──────────────────────────────────
+        // ── Restaurar estado tachado si existía ───────────────
+        if (itemsTachados.has(claveItem)) {
+            itemEl.classList.add("item-hecho");
+        }
+
+        // ── Toggle con persistencia en memoria ────────────────
         itemEl.addEventListener("click", () => {
             itemEl.classList.toggle("item-hecho");
+            if (itemsTachados.has(claveItem)) {
+                itemsTachados.delete(claveItem);
+            } else {
+                itemsTachados.add(claveItem);
+            }
         });
 
         itemsEl.appendChild(cloneItem);
