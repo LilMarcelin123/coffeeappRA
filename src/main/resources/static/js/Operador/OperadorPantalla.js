@@ -21,8 +21,8 @@ const AREA_DEFAULT = { clase: "area-bcalientes", icono: "bi bi-cup-hot-fill", la
 
 // Filtros compuestos: conjunto de id_rol_preparacion que agrupa cada cocina
 const FILTROS_COCINA = {
-    atras:   new Set([2, 5, 6]),   // Salados, Beb. Frías, Fitness
-    adelante: new Set([3, 4]),     // Crepas & Waffles, Beb. Calientes
+    atras:    new Set([2, 5, 6]),   // Salados, Beb. Frías, Fitness
+    adelante: new Set([3, 4]),      // Crepas & Waffles, Beb. Calientes
 };
 
 // ── ESTADO ────────────────────────────────────────────────────
@@ -44,8 +44,6 @@ $(document).ready(() => {
     actualizarHora();
     setInterval(actualizarHora, 1000);
 
-    // Inicializar AudioContext en el primer click del usuario
-    // (los navegadores requieren interacción antes de permitir audio)
     document.addEventListener("click", () => obtenerAudioCtx(), { once: true });
 
     iniciarBotonesFiltro();
@@ -150,17 +148,14 @@ function sonarAlertar() {
     try {
         const ctx = obtenerAudioCtx();
 
-        // Primera campanada — tono principal + armónicos (timbre metálico)
         reproducirCampana(ctx, 880,  0.00, 1.8, 0.5);
         reproducirCampana(ctx, 1760, 0.00, 1.2, 0.2);
         reproducirCampana(ctx, 2640, 0.00, 0.8, 0.1);
 
-        // Segunda campanada
         reproducirCampana(ctx, 880,  0.55, 1.8, 0.5);
         reproducirCampana(ctx, 1760, 0.55, 1.2, 0.2);
         reproducirCampana(ctx, 2640, 0.55, 0.8, 0.1);
 
-        // Tercera campanada (más suave, efecto eco)
         reproducirCampana(ctx, 880,  1.10, 1.8, 0.3);
         reproducirCampana(ctx, 1760, 1.10, 1.2, 0.12);
         reproducirCampana(ctx, 2640, 1.10, 0.8, 0.06);
@@ -200,7 +195,6 @@ function iniciarBotonesFiltro() {
 function onClickFiltro() {
     const rol = parseInt(this.dataset.rol);
 
-    // Al usar filtro individual, limpiar filtro de cocina
     filtroCocina = null;
     limpiarActivoBotonesCocina();
 
@@ -224,7 +218,6 @@ function iniciarBotonesCocina() {
 function onClickCocina() {
     const cocina = this.dataset.cocina;
 
-    // Al usar filtro de cocina, limpiar filtro individual
     filtroActivo = null;
     document.querySelectorAll(".leyenda-chip[data-rol]").forEach(c => c.classList.remove("filtro-activo"));
 
@@ -271,14 +264,11 @@ function aplicarFiltro(ordenes, itemsPorOrden) {
         let itemsVisibles;
 
         if (filtroCocina) {
-            // Filtro compuesto: mostrar ítems cuyo rol esté en el set de la cocina
             const rolesPermitidos = FILTROS_COCINA[filtroCocina];
             itemsVisibles = items.filter(i => rolesPermitidos.has(i.id_rol_preparacion));
         } else if (filtroActivo) {
-            // Filtro individual por área
             itemsVisibles = items.filter(i => i.id_rol_preparacion === filtroActivo);
         } else {
-            // Sin filtro — mostrar todo
             itemsVisibles = items;
         }
 
@@ -382,6 +372,11 @@ function actualizarItemsCard(card, items) {
         } else {
             extrasEl.style.display = "none";
         }
+
+        // ── TOGGLE VISUAL "HECHO" ──────────────────────────────────
+        itemEl.addEventListener("click", () => {
+            itemEl.classList.toggle("item-hecho");
+        });
 
         itemsEl.appendChild(cloneItem);
     });

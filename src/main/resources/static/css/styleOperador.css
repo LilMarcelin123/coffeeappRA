@@ -425,3 +425,33 @@ body {
 .op-leyenda:has(.filtro-activo) .leyenda-chip[data-rol]:not(.filtro-activo) {
     opacity: 0.45;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   ÍTEM MARCADO COMO HECHO (toggle visual)
+   ═══════════════════════════════════════════════════════════ */
+.orden-item {
+    cursor: pointer;
+}
+
+.orden-item.item-hecho {
+    opacity: 0.38;
+    filter: grayscale(100%);
+    transition: opacity 0.25s ease, filter 0.25s ease;
+}
+
+.orden-item.item-hecho .item-nombre {
+    text-decoration: line-through;
+    color: var(--text-muted);
+}
+
+.orden-item.item-hecho .item-badge-cantidad {
+    background: #9E9E9E !important;
+}
+
+.orden-item.item-hecho .item-area-dot {
+    background: #9E9E9E !important;
+}
+
+.orden-item:not(.item-hecho) {
+    transition: opacity 0.25s ease, filter 0.25s ease;
+}

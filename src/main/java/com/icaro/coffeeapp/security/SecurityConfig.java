@@ -24,22 +24,18 @@ public class SecurityConfig {
                 headers.frameOptions(frameOptions -> frameOptions.sameOrigin())
             )
             .authorizeHttpRequests(auth -> auth
-                // Recursos públicos + postLogin
                 .requestMatchers("/login", "/postLogin",
                                  "/img/**", "/css/**", "/js/**", "/webjars/**").permitAll()
 
-                // Admin
                 .requestMatchers("/admin/**").hasRole("ADMINISTRADOR")
                 .requestMatchers("/tomaOrden/**").hasRole("ADMINISTRADOR")
 
-                // Vistas por rol de operador
                 .requestMatchers("/bebcalientes/**").hasRole("OPERADOR_BEBIDAS_CALIENTES")
                 .requestMatchers("/salados/**").hasRole("OPERADOR_SALADOS")
                 .requestMatchers("/crepas/**").hasRole("OPERADOR_CREPAS_WAFFLES")
                 .requestMatchers("/bebfrias/**").hasRole("OPERADOR_BEBIDAS_FRIAS")
                 .requestMatchers("/fitness/**").hasRole("OPERADOR_FITNESS")
 
-                // Endpoint AJAX compartido para todos los operadores
                 .requestMatchers("/operador/**").hasAnyRole(
                     "OPERADOR_SALADOS",
                     "OPERADOR_CREPAS_WAFFLES",
@@ -65,7 +61,7 @@ public class SecurityConfig {
                 .invalidSessionUrl("/login?error")
                 .sessionFixation(sf -> sf.migrateSession())
                 .maximumSessions(1)
-                    .maxSessionsPreventsLogin(true)
+                    .maxSessionsPreventsLogin(false)  // ← CAMBIO: permite reconectar
                     .expiredUrl("/login?expired")
             );
 
