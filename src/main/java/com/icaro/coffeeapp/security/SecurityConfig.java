@@ -25,7 +25,8 @@ public class SecurityConfig {
             )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/postLogin",
-                                 "/img/**", "/css/**", "/js/**", "/webjars/**").permitAll()
+                                 "/img/**", "/css/**", "/js/**", "/webjars/**",
+                                 "/webhook/whatsapp").permitAll()  // ← AGREGADO
 
                 .requestMatchers("/admin/**").hasRole("ADMINISTRADOR")
                 .requestMatchers("/tomaOrden/**").hasRole("ADMINISTRADOR")
@@ -61,7 +62,7 @@ public class SecurityConfig {
                 .invalidSessionUrl("/login?error")
                 .sessionFixation(sf -> sf.migrateSession())
                 .maximumSessions(1)
-                    .maxSessionsPreventsLogin(false)  // ← CAMBIO: permite reconectar
+                    .maxSessionsPreventsLogin(false)
                     .expiredUrl("/login?expired")
             );
 
