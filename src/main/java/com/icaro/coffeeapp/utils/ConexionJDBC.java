@@ -25,9 +25,9 @@ public class ConexionJDBC {
 	}
 	
 	public Connection getConexion2() throws ClassNotFoundException, SQLException {
-		Class.forName("com.mysql.cj.jdbc.Driver");
-		conn = DriverManager.getConnection(url, user, password);
-		return conn;
+	    Class.forName("com.mysql.cj.jdbc.Driver");
+	    // ← ya NO asigna a conn estático, solo devuelve la conexión local
+	    return DriverManager.getConnection(url, user, password);
 	}
 	
 	public void cerrarConexion() throws SQLException {

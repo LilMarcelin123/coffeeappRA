@@ -272,15 +272,6 @@ public class ProcedimientosAlmacenadosController {
 	    
 	    
 	    
-	    
-	    
-	    
-	 // ════════════════════════════════════════════════════════════════════════════
-	//  PEGAR ESTOS MÉTODOS DENTRO DE LA CLASE ProcedimientosAlmacenadosController
-	//  Agregar estos imports al inicio del archivo si no los tienes:
-//	    import org.springframework.web.bind.annotation.*;
-//	    import org.springframework.http.HttpStatus;
-	// ════════════════════════════════════════════════════════════════════════════
 
 
 	    // ═════════════════════════════════════════════════════════════════════════
@@ -540,4 +531,148 @@ public class ProcedimientosAlmacenadosController {
 	        if (resultado == 0)  return ResponseEntity.status(400).body(res);
 	        return ResponseEntity.status(500).body(res);
 	    }
+	    
+	    
+	    
+	    
+	    
+	    
+	 // ════════════════════════════════════════════════════════════════════════════
+	//  PEGAR ESTOS MÉTODOS DENTRO DE ProcedimientosAlmacenadosController.java
+	//  ── Módulo: Gestión de Inventario y Recetas ──
+	// ════════════════════════════════════════════════════════════════════════════
+
+
+	// ════════════════════════════════════════════════════════
+	//  GET /admin/inventario/gestionar
+	//  Dispatcher para sp_gestion_inventario (procesos de lectura)
+	//  tipoProceso: 1=insumos, 6=categorias, 7=unidades, 10=log
+	// ════════════════════════════════════════════════════════
+	@GetMapping("/admin/inventario/gestionar")
+	@ResponseBody
+	public ResponseEntity<?> inventarioGestionarGet(
+	        @RequestParam("tipoProceso") Integer tipoProceso) {
+
+	    return switch (tipoProceso) {
+	        case 1  -> ResponseEntity.ok(procedimientosAlmacenados.spListarInsumos());
+	        case 6  -> ResponseEntity.ok(procedimientosAlmacenados.spListarCategoriasInsumo());
+	        case 7  -> ResponseEntity.ok(procedimientosAlmacenados.spListarUnidadesMedida());
+	        case 10 -> ResponseEntity.ok(procedimientosAlmacenados.spLogInventario());
+	        default -> ResponseEntity.badRequest().body(Map.of("mensaje", "tipoProceso GET no válido: " + tipoProceso));
+	    };
+	}
+
+
+	// ════════════════════════════════════════════════════════
+	//  POST /admin/inventario/gestionar
+	//  Dispatcher para sp_gestion_inventario (procesos de escritura)
+	//  tipoProceso: 2=crear, 3=editar, 4=desactivar, 5=entrada stock, 8=cat, 9=unidad
+	// ════════════════════════════════════════════════════════
+	@PostMapping("/admin/inventario/gestionar")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> inventarioGestionarPost(
+	        @RequestParam("tipoProceso")                               Integer    tipoProceso,
+	        @RequestParam(value = "idInsumo",        required = false) Integer    idInsumo,
+	        @RequestParam(value = "nombre",          required = false) String     nombre,
+	        @RequestParam(value = "idCategoria",     required = false) Integer    idCategoria,
+	        @RequestParam(value = "idUnidad",        required = false) Integer    idUnidad,
+	        @RequestParam(value = "stockInicial",    required = false) BigDecimal stockInicial,
+	        @RequestParam(value = "stockMinimo",     required = false) BigDecimal stockMinimo,
+	        @RequestParam(value = "cantidadEntrada", required = false) BigDecimal cantidadEntrada,
+	        @RequestParam(value = "descripcion",     required = false) String     descripcion,
+	        HttpSession session) {
+
+	    String usuario = obtenerUsuarioSesion(session);
+
+	    Map<String, Object> res = switch (tipoProceso) {
+	        case 2 -> procedimientosAlmacenados.spCrearInsumo(
+	                        nombre, idCategoria, idUnidad, stockInicial, stockMinimo, usuario);
+	        case 3 -> procedimientosAlmacenados.spEditarInsumo(
+	                        idInsumo, nombre, idCategoria, idUnidad, stockMinimo, usuario);
+	        case 4 -> procedimientosAlmacenados.spDesactivarInsumo(idInsumo, usuario);
+	        case 5 -> procedimientosAlmacenados.spEntradaStock(
+	                        idInsumo, cantidadEntrada, descripcion, usuario);
+	        case 8 -> procedimientosAlmacenados.spCrearCategoriaInsumo(nombre, descripcion);
+	        case 9 -> procedimientosAlmacenados.spCrearUnidadMedida(nombre, descripcion);
+	        default -> Map.of("resultado", -1, "mensaje", "tipoProceso POST no válido: " + tipoProceso);
+	    };
+
+	    return resolverRespuesta(res);
+	}
+
+
+	// ════════════════════════════════════════════════════════
+	//  GET /admin/inventario/recetas
+	//  Dispatcher para sp_gestion_recetas (lectura)
+	//  tipoProceso: 1=receta de producto, 5=lista productos
+	// ════════════════════════════════════════════════════════
+	@GetMapping("/admin/inventario/recetas")
+	@ResponseBody
+	public ResponseEntity<?> recetasGet(
+	        @RequestParam("tipoProceso")                           Integer tipoProceso,
+	        @RequestParam(value = "idProducto", required = false)  Integer idProducto) {
+
+		return switch (tipoProceso) {
+	    case 1  -> ResponseEntity.ok(procedimientosAlmacenados.spListarRecetaProducto(idProducto));
+	    case 5  -> ResponseEntity.ok(procedimientosAlmacenados.spListarProductosConReceta());
+	    case 6  -> ResponseEntity.ok(procedimientosAlmacenados.spListarRecetaOpcion(idProducto));
+	    case 10 -> ResponseEntity.ok(procedimientosAlmacenados.spListarOpcionesConReceta());
+	    default -> ResponseEntity.badRequest().body(Map.of("mensaje", "tipoProceso GET no válido: " + tipoProceso));
+	};
+	}
+
+
+	// ════════════════════════════════════════════════════════
+	//  POST /admin/inventario/recetas
+	//  Dispatcher para sp_gestion_recetas (escritura)
+	//  tipoProceso: 2=agregar, 3=editar cantidad, 4=eliminar
+	// ════════════════════════════════════════════════════════
+	@PostMapping("/admin/inventario/recetas")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> recetasPost(
+	        @RequestParam("tipoProceso")                                   Integer    tipoProceso,
+	        @RequestParam(value = "idProducto",       required = false)    Integer    idProducto,
+	        @RequestParam(value = "idInsumo",         required = false)    Integer    idInsumo,
+	        @RequestParam(value = "cantidadRequerida",required = false)    BigDecimal cantidadRequerida,
+	        @RequestParam(value = "idProductoInsumo", required = false)    Integer    idProductoInsumo,
+	        @RequestParam(value = "idOpcionInsumo", required = false) Integer idOpcionInsumo) {
+
+		Map<String, Object> res = switch (tipoProceso) {
+	    case 2 -> procedimientosAlmacenados.spAgregarInsumoReceta(
+	                    idProducto, idInsumo, cantidadRequerida);
+	    case 3 -> procedimientosAlmacenados.spEditarCantidadReceta(
+	                    idProductoInsumo, cantidadRequerida);
+	    case 4 -> procedimientosAlmacenados.spEliminarInsumoReceta(idProductoInsumo);
+	    case 7 -> procedimientosAlmacenados.spAgregarInsumoRecetaOpcion(
+	                    idProducto, idInsumo, cantidadRequerida);
+	    case 8 -> procedimientosAlmacenados.spEditarCantidadRecetaOpcion(
+	                    idOpcionInsumo, cantidadRequerida);
+	    case 9 -> procedimientosAlmacenados.spEliminarInsumoRecetaOpcion(idOpcionInsumo);
+	    default -> Map.of("resultado", -1, "mensaje", "tipoProceso POST no válido: " + tipoProceso);
+	};
+
+	    return resolverRespuesta(res);
+	}
+
+
+	// ════════════════════════════════════════════════════════
+	//  HELPERS PRIVADOS
+	// ════════════════════════════════════════════════════════
+
+	private String obtenerUsuarioSesion(HttpSession session) {
+	    String u = (String) session.getAttribute("nombreUsuario");
+	    return (u != null && !u.isBlank()) ? u : "sistema";
+	}
+
+	private ResponseEntity<Map<String, Object>> resolverRespuesta(Map<String, Object> res) {
+	    int resultado = ((Number) res.getOrDefault("resultado", -1)).intValue();
+	    return switch (resultado) {
+	        case  1 -> ResponseEntity.ok(res);
+	        case  0 -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+	        default -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
+	    };
+	}	    
+	    
+	    
+	    
 }
