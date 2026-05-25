@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   styleTomaOrdenes.css — Rincón Arboledas  (rediseño v2)
+   styleTomaOrdenes.css — Rincón Arboledas
    ═══════════════════════════════════════════════════════════ */
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap');
@@ -33,31 +33,33 @@ body {
 }
 
 /* ══════════════════════════════════════════════════════════
-   FRANJA IMAGEN — delgada, tipo margen superior
+   FRANJA SUPERIOR — fondo CSS generativo (igual que inicio)
    ══════════════════════════════════════════════════════════ */
 .hero-section {
     position: relative;
     width: 100%;
-    height: 110px;                      /* franja delgada */
-    background-size: cover;
-    background-position: center 38%;
-    background-repeat: no-repeat;
+    height: 110px;
     overflow: hidden;
+    /* Mismo fondo generativo que la pantalla de inicio */
+    background-color: #3B1F0A;
+    background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cellipse cx='22' cy='18' rx='13' ry='10' fill='none' stroke='%235C3317' stroke-width='1.4' opacity='.55' transform='rotate(-20 22 18)'/%3E%3Cellipse cx='22' cy='18' rx='5' ry='3' fill='none' stroke='%235C3317' stroke-width='1' opacity='.4' transform='rotate(-20 22 18)'/%3E%3Cellipse cx='65' cy='12' rx='11' ry='8' fill='none' stroke='%234a2810' stroke-width='1.4' opacity='.5' transform='rotate(15 65 12)'/%3E%3Cellipse cx='65' cy='12' rx='4' ry='2.5' fill='none' stroke='%234a2810' stroke-width='1' opacity='.35' transform='rotate(15 65 12)'/%3E%3Cellipse cx='100' cy='22' rx='12' ry='9' fill='none' stroke='%23613820' stroke-width='1.4' opacity='.48' transform='rotate(-10 100 22)'/%3E%3Cellipse cx='100' cy='22' rx='4.5' ry='2.5' fill='none' stroke='%23613820' stroke-width='1' opacity='.38' transform='rotate(-10 100 22)'/%3E%3Cellipse cx='10' cy='55' rx='10' ry='8' fill='none' stroke='%23502e15' stroke-width='1.4' opacity='.45' transform='rotate(25 10 55)'/%3E%3Cellipse cx='10' cy='55' rx='4' ry='2.5' fill='none' stroke='%23502e15' stroke-width='1' opacity='.35' transform='rotate(25 10 55)'/%3E%3Cellipse cx='45' cy='50' rx='14' ry='10' fill='none' stroke='%23694020' stroke-width='1.4' opacity='.52' transform='rotate(-30 45 50)'/%3E%3Cellipse cx='45' cy='50' rx='5.5' ry='3' fill='none' stroke='%23694020' stroke-width='1' opacity='.4' transform='rotate(-30 45 50)'/%3E%3Cellipse cx='88' cy='58' rx='11' ry='8' fill='none' stroke='%235a3418' stroke-width='1.4' opacity='.48' transform='rotate(12 88 58)'/%3E%3Cellipse cx='88' cy='58' rx='4' ry='2.5' fill='none' stroke='%235a3418' stroke-width='1' opacity='.36' transform='rotate(12 88 58)'/%3E%3Cellipse cx='110' cy='50' rx='9' ry='7' fill='none' stroke='%23472510' stroke-width='1.4' opacity='.44' transform='rotate(-22 110 50)'/%3E%3Cellipse cx='110' cy='50' rx='3.5' ry='2' fill='none' stroke='%23472510' stroke-width='1' opacity='.32' transform='rotate(-22 110 50)'/%3E%3Cellipse cx='28' cy='90' rx='12' ry='9' fill='none' stroke='%23603b1e' stroke-width='1.4' opacity='.50' transform='rotate(18 28 90)'/%3E%3Cellipse cx='28' cy='90' rx='4.5' ry='2.5' fill='none' stroke='%23603b1e' stroke-width='1' opacity='.38' transform='rotate(18 28 90)'/%3E%3Cellipse cx='70' cy='95' rx='13' ry='9' fill='none' stroke='%23543215' stroke-width='1.4' opacity='.46' transform='rotate(-15 70 95)'/%3E%3Cellipse cx='70' cy='95' rx='5' ry='3' fill='none' stroke='%23543215' stroke-width='1' opacity='.36' transform='rotate(-15 70 95)'/%3E%3Cellipse cx='108' cy='100' rx='10' ry='7' fill='none' stroke='%234e2e12' stroke-width='1.4' opacity='.44' transform='rotate(8 108 100)'/%3E%3Cellipse cx='108' cy='100' rx='4' ry='2.5' fill='none' stroke='%234e2e12' stroke-width='1' opacity='.34' transform='rotate(8 108 100)'/%3E%3C%2Fsvg%3E"),
+        radial-gradient(ellipse at 30% 50%, #5C3317 0%, #3B1F0A 45%, #2A1206 100%);
 }
 
-/* Velo encima de la imagen para que no distraiga */
+/* Overlay sutil sobre el fondo CSS */
 .hero-overlay {
     position: absolute;
     inset: 0;
     background: linear-gradient(
-        to right,
-        rgba(59,31,10,.72) 0%,
-        rgba(92,51,23,.45) 50%,
-        rgba(59,31,10,.68) 100%
+        135deg,
+        rgba(0,0,0,.22) 0%,
+        rgba(0,0,0,.05) 60%,
+        rgba(0,0,0,.15) 100%
     );
 }
 
-/* Línea decorativa inferior de la franja */
+/* Línea decorativa inferior */
 .hero-section::after {
     content: '';
     position: absolute;
@@ -66,7 +68,6 @@ body {
     background: linear-gradient(90deg, var(--cafe-mid), var(--cafe-light), var(--cafe-mid));
 }
 
-/* El hero-content solo centra el badge en la franja */
 .hero-content {
     position: relative;
     z-index: 1;
@@ -93,10 +94,6 @@ body {
     backdrop-filter: blur(12px);
 }
 
-/* Escondemos title y subtitle dentro del hero (van en el header-block) */
-.hero-title,
-.hero-subtitle { display: none; }
-
 .hero-logo {
     width: 52px; height: 52px;
     border-radius: 14px;
@@ -109,7 +106,7 @@ body {
 
 
 /* ══════════════════════════════════════════════════════════
-   HEADER BLOCK — texto grande debajo de la franja
+   HEADER BLOCK — título grande debajo de la franja
    ══════════════════════════════════════════════════════════ */
 .header-block {
     max-width: 1100px;
@@ -119,6 +116,7 @@ body {
     align-items: flex-end;
     justify-content: space-between;
     gap: 24px;
+    animation: slideDown .5s ease both;
 }
 
 .header-eyebrow {
@@ -139,36 +137,18 @@ body {
     margin: 0 0 6px;
     letter-spacing: -.02em;
 }
-
-.header-main-title em {
-    font-style: italic;
-    color: var(--cafe-dark);
-}
+.header-main-title em { font-style: italic; color: var(--cafe-dark); }
 
 .header-divider {
-    width: 64px;
-    height: 3px;
+    width: 64px; height: 3px;
     border-radius: 4px;
     background: linear-gradient(90deg, var(--cafe-mid), var(--cafe-light));
     margin-top: 12px;
 }
 
-.header-right {
-    text-align: right;
-    flex-shrink: 0;
-}
-
-.header-negocio {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--cafe-dark);
-}
-
-.header-fecha {
-    font-size: .78rem;
-    color: var(--text-muted);
-    margin-top: 2px;
-}
+.header-right { text-align: right; flex-shrink: 0; }
+.header-negocio { font-size: 1rem; font-weight: 600; color: var(--cafe-dark); }
+.header-fecha { font-size: .78rem; color: var(--text-muted); margin-top: 2px; }
 
 
 /* ══════════════════════════════════════════════════════════
@@ -181,6 +161,7 @@ body {
     max-width: 1100px;
     margin: 28px auto;
     padding: 0 24px 60px;
+    animation: fadeUp .5s ease .1s both;
 }
 @media (max-width: 900px) {
     .main-grid { grid-template-columns: 1fr; }
@@ -244,7 +225,7 @@ body {
 
 
 /* ══════════════════════════════════════════════════════════
-   FORM CONTROLS — más visuales
+   FORM CONTROLS
    ══════════════════════════════════════════════════════════ */
 .form-label-custom {
     font-size: .72rem;
@@ -332,7 +313,7 @@ body {
 
 
 /* ══════════════════════════════════════════════════════════
-   BOTONES — más grandes y llamativos
+   BOTONES
    ══════════════════════════════════════════════════════════ */
 .btn-cafe {
     display: flex;
@@ -349,6 +330,7 @@ body {
     cursor: pointer;
     transition: transform .2s, box-shadow .2s, opacity .2s;
     letter-spacing: .01em;
+    text-decoration: none;
 }
 .btn-cafe:active { transform: scale(.97); }
 
@@ -376,7 +358,7 @@ body {
 
 
 /* ══════════════════════════════════════════════════════════
-   RESUMEN PANEL — columna derecha
+   RESUMEN PANEL
    ══════════════════════════════════════════════════════════ */
 .resumen-empty {
     text-align: center;
@@ -410,24 +392,9 @@ body {
     flex-shrink: 0;
     margin-top: 1px;
 }
-.resumen-item .producto {
-    font-weight: 600;
-    color: var(--cafe-deep);
-    font-size: .92rem;
-    flex: 1;
-}
-.resumen-item .extras {
-    font-size: .78rem;
-    color: var(--text-muted);
-    margin-top: 3px;
-    font-style: italic;
-}
-.resumen-item .total-item {
-    font-weight: 700;
-    color: var(--cafe-dark);
-    font-size: .92rem;
-    white-space: nowrap;
-}
+.resumen-item .producto { font-weight: 600; color: var(--cafe-deep); font-size: .92rem; flex: 1; }
+.resumen-item .extras { font-size: .78rem; color: var(--text-muted); margin-top: 3px; font-style: italic; }
+.resumen-item .total-item { font-weight: 700; color: var(--cafe-dark); font-size: .92rem; white-space: nowrap; }
 
 .btn-eliminar-item {
     width: 30px; height: 30px;
@@ -471,23 +438,6 @@ body {
 
 
 /* ══════════════════════════════════════════════════════════
-   ANIMACIONES
-   ══════════════════════════════════════════════════════════ */
-@keyframes fadeUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0);    }
-}
-
-@keyframes slideDown {
-    from { opacity: 0; transform: translateY(-8px); }
-    to   { opacity: 1; transform: translateY(0);    }
-}
-
-.header-block { animation: slideDown .5s ease both; }
-.main-grid    { animation: fadeUp .5s ease .1s both; }
-
-
-/* ══════════════════════════════════════════════════════════
    FOOTER
    ══════════════════════════════════════════════════════════ */
 .footer-custom {
@@ -507,3 +457,16 @@ body {
     border: 1.5px solid rgba(212,184,150,.4);
 }
 .footer-logo img { width: 100%; height: 100%; object-fit: cover; }
+
+
+/* ══════════════════════════════════════════════════════════
+   ANIMACIONES
+   ══════════════════════════════════════════════════════════ */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}

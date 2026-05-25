@@ -9,8 +9,8 @@ var _moduloActual    = "";
 var _accesoBloqueado = false;
 
 var MODULOS_ACCESO = {
-    "usuarios": { label: "Gestion de Usuarios",    redirect: "/admin/GestionUsuarios"    },
-    "reportes": { label: "Generacion de Reportes", redirect: "/admin/GeneracionReportes"  }
+    "usuarios": { label: "Gestion de Usuarios",    redirect: "/admin/GestionUsuarios"   },
+    "reportes": { label: "Generacion de Reportes", redirect: "/admin/GeneracionReportes" }
 };
 
 function _elAcceso(id) {
@@ -52,44 +52,65 @@ $(document).ready(function () {
         });
     }
 
-    // ── Toma de ordenes — SIN contrasena ─────────────────────
-    $("#btnModalOrden").on("click", function () {
-        mostrarConfirmacion2(
-            "Seguro que quieres iniciar una orden?",
-            () => {
-                $.ajax({
-                    url: "/procesoInicialOrden",
-                    type: "GET",
-                    data: { tipoProceso: 1 },
-                    success: function (data) {
-                        window.location.href = "/admin/tomaOrden?idOrden=" + data.idOrden;
+    // ── CAMBIO 3: Toda la tarjeta es clickeable via data-modulo ──
+    //    Las tarjetas con .modulo-disabled son ignoradas por CSS
+    //    (pointer-events: none), pero se agrega también una guarda JS.
+    $(".modulo-card").on("click", function () {
+        // Ignorar si la tarjeta está deshabilitada
+        if ($(this).hasClass("modulo-disabled")) return;
+
+        const modulo = $(this).data("modulo");
+
+        switch (modulo) {
+
+            // ── Toma de ordenes — SIN contrasena ─────────────
+            case "orden":
+                mostrarConfirmacion2(
+                    "¿Seguro que quieres iniciar una orden?",
+                    () => {
+                        $.ajax({
+                            url: "/procesoInicialOrden",
+                            type: "GET",
+                            data: { tipoProceso: 1 },
+                            success: function (data) {
+                                window.location.href = "/admin/tomaOrden?idOrden=" + data.idOrden;
+                            },
+                            error: function () {
+                                alert("No se pudo iniciar la orden, intenta de nuevo.");
+                            }
+                        });
                     },
-                    error: function () {
-                        alert("No se pudo iniciar la orden, intenta de nuevo.");
-                    }
-                });
-            },
-            () => { console.log("cancelado"); }
-        );
-    });
+                    () => { console.log("cancelado"); }
+                );
+                break;
 
-    // ── Gestion catalogo — SIN contrasena ────────────────────
-    $("#btnModalGestCat").on("click", function () {
-        mostrarConfirmacion2(
-            "Seguro que quieres modificar el catalogo?",
-            () => { window.location.href = "/admin/gestionCatalogo"; },
-            () => { console.log("cancelado"); }
-        );
-    });
+            // ── Gestion catalogo — SIN contrasena ────────────
+            case "catalogo":
+                mostrarConfirmacion2(
+                    "¿Seguro que quieres modificar el catálogo?",
+                    () => { window.location.href = "/admin/gestionCatalogo"; },
+                    () => { console.log("cancelado"); }
+                );
+                break;
 
-    // ── Reportes — CON contrasena maestra ────────────────────
-    $("#btnModalReportes").on("click", function () {
-        _abrirAcceso("reportes");
-    });
+            // ── Inventario — deshabilitado (guarda JS extra) ─
+            case "inventario":
+                // No hace nada; CSS ya bloquea pointer-events
+                break;
 
-    // ── Gestion usuarios — CON contrasena maestra ─────────────
-    $("#btnModalGestUser").on("click", function () {
-        _abrirAcceso("usuarios");
+            // ── Reportes — CON contrasena maestra ────────────
+            case "reportes":
+                _abrirAcceso("reportes");
+                break;
+
+            // ── Gestion usuarios — CON contrasena maestra ────
+            case "usuarios":
+                _abrirAcceso("usuarios");
+                break;
+
+            default:
+                console.warn("[Modulos] modulo desconocido:", modulo);
+        }
     });
 
     // ── Eventos modal acceso ──────────────────────────────────
@@ -225,7 +246,7 @@ function _validarAcceso() {
                 var btn = _elAcceso("btnConfirmarAcceso");
                 if (btn) {
                     btn.style.background = "#198754";
-                    btn.innerHTML = "<i class=\'bi bi-check-lg\'></i> Acceso concedido";
+                    btn.innerHTML = "<i class='bi bi-check-lg'></i> Acceso concedido";
                 }
                 setTimeout(function () {
                     if (_accesoModal) _accesoModal.hide();
@@ -333,9 +354,9 @@ function renderPendientes(lista) {
         const tr      = node.querySelector("tr");
 
         tr.dataset.idOrden = idOrden;
-        node.querySelector(".col-id").textContent     = idOrden ?? "";
-        node.querySelector(".col-hora").textContent   = o.t_hora_creacion ?? "";
-        node.querySelector(".col-total").textContent  = (o.p_total != null) ? `$${Number(o.p_total).toFixed(2)}` : "$0.00";
+        node.querySelector(".col-id").textContent      = idOrden ?? "";
+        node.querySelector(".col-hora").textContent    = o.t_hora_creacion ?? "";
+        node.querySelector(".col-total").textContent   = (o.p_total != null) ? `$${Number(o.p_total).toFixed(2)}` : "$0.00";
         node.querySelector(".col-resumen").textContent = o.resumen ?? "";
 
         const chk = node.querySelector(".chkRow");

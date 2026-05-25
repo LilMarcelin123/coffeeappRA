@@ -150,6 +150,30 @@ function buildHTMLSelectorProductos(productos) {
         </div>`;
 }
 
+
+
+
+
+function activarBuscadorProductos() {
+
+    if (!document.querySelector('#selectProducto')) {
+        return;
+    }
+
+    new TomSelect("#selectProducto", {
+        create: false,
+        sortField: {
+            field: "text",
+            direction: "asc"
+        },
+        maxOptions: 500,
+        placeholder: "Buscar producto...",
+        searchField: ['text']
+    });
+
+}
+
+
 /**
  * Renderiza el HTML del bloque de extras opcionales.
  * @param {{ id: number, nombre: string, precio: number }[]} opciones
@@ -368,7 +392,9 @@ function cargarProductosPorCategoria(idCategoria) {
                 );
                 return;
             }
-            $contenedorProductos().html(buildHTMLSelectorProductos(data));
+			$contenedorProductos().html(buildHTMLSelectorProductos(data));
+
+			activarBuscadorProductos();
         },
     });
 }
