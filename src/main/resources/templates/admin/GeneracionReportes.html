@@ -14,9 +14,8 @@
 
 <body>
 
-<!-- ══ FRANJA IMAGEN ════════════════════════════════════════ -->
+<!-- ══ HERO — fondo CSS generativo ══════════════════════════ -->
 <header class="rpt-strip">
-    <img class="rpt-strip__img" src="/img/granoscafe.jpg" alt="" aria-hidden="true">
     <div class="rpt-strip__overlay"></div>
     <div class="rpt-strip__content">
         <span class="hero-badge">
@@ -49,7 +48,6 @@
     <!-- ── SECCIÓN 1: DETALLE DE ÓRDENES ─────────────────── -->
     <section class="panel-card reveal">
 
-        <!-- Cabecera -->
         <div class="section-head">
             <div class="section-title-group">
                 <span class="section-icon"><i class="bi bi-receipt-cutoff"></i></span>
@@ -58,8 +56,6 @@
                     <p class="section-sub">Historial de transacciones cerradas hoy</p>
                 </div>
             </div>
-
-            <!-- Filtros -->
             <div class="filter-group" role="group" aria-label="Filtro por método de pago">
                 <button class="filter-pill active" data-filtro="" aria-pressed="true">
                     <i class="bi bi-list-ul"></i> Todos
@@ -70,18 +66,13 @@
                 <button class="filter-pill" data-filtro="2" aria-pressed="false">
                     <i class="bi bi-credit-card-fill"></i> Tarjeta
                 </button>
-				
-				<button class="filter-pill" data-filtro="3" aria-pressed="false">
-				    <i class="bi bi-phone-fill"></i> Transferencia
-				</button>
-				
+                <button class="filter-pill" data-filtro="3" aria-pressed="false">
+                    <i class="bi bi-phone-fill"></i> Transferencia
+                </button>
             </div>
         </div>
 
-        <!-- Toolbar -->
         <div class="table-toolbar">
-			
-			
             <span class="tbl-count" id="labelConteo">— registros</span>
             <label class="search-wrap">
                 <i class="bi bi-search" aria-hidden="true"></i>
@@ -89,7 +80,6 @@
             </label>
         </div>
 
-        <!-- Tabla -->
         <div class="table-wrap">
             <table class="rpt-table" id="tablaDetalle" aria-label="Detalle de órdenes">
                 <thead>
@@ -115,7 +105,6 @@
             </table>
         </div>
 
-        <!-- Barra de descarga -->
         <div class="download-bar">
             <span class="dl-label"><i class="bi bi-file-earmark-excel-fill"></i> Exportar Excel</span>
             <button class="btn-dl btn-dl--all" id="btnDescargaDetalle">
@@ -131,7 +120,6 @@
     <!-- ── SECCIÓN 2: CORTE DE CAJA ───────────────────────── -->
     <section class="panel-card reveal" style="animation-delay:.12s">
 
-        <!-- Cabecera -->
         <div class="section-head">
             <div class="section-title-group">
                 <span class="section-icon section-icon--green"><i class="bi bi-safe2-fill"></i></span>
@@ -145,46 +133,44 @@
             </button>
         </div>
 
-        <!-- Cards totales -->
-		<div class="corte-grid">
-		    <div class="corte-card cc-total">
-		        <span class="cc-icon"><i class="bi bi-currency-dollar"></i></span>
-		        <div class="cc-body">
-		            <span class="cc-label">Total general</span>
-		            <span class="cc-value" id="totalGeneral">—</span>
-		        </div>
-		    </div>
-		    <div class="corte-card cc-efectivo">
-		        <span class="cc-icon"><i class="bi bi-cash-stack"></i></span>
-		        <div class="cc-body">
-		            <span class="cc-label">Efectivo</span>
-		            <span class="cc-value" id="totalEfectivo">—</span>
-		        </div>
-		    </div>
-		    <div class="corte-card cc-tarjeta">
-		        <span class="cc-icon"><i class="bi bi-credit-card-fill"></i></span>
-		        <div class="cc-body">
-		            <span class="cc-label">Tarjeta</span>
-		            <span class="cc-value" id="totalTarjeta">—</span>
-		        </div>
-		    </div>
-		    <div class="corte-card cc-transferencia">
-		        <span class="cc-icon"><i class="bi bi-phone-fill"></i></span>
-		        <div class="cc-body">
-		            <span class="cc-label">Transferencia</span>
-		            <span class="cc-value" id="totalTransferencia">—</span>
-		        </div>
-		    </div>
-		    <div class="corte-card cc-ordenes">
-		        <span class="cc-icon"><i class="bi bi-clipboard2-check-fill"></i></span>
-		        <div class="cc-body">
-		            <span class="cc-label">Órdenes cerradas</span>
-		            <span class="cc-value" id="totalOrdenes">—</span>
-		        </div>
-		    </div>
-		</div>
+        <div class="corte-grid">
+            <div class="corte-card cc-total">
+                <span class="cc-icon"><i class="bi bi-currency-dollar"></i></span>
+                <div class="cc-body">
+                    <span class="cc-label">Total general</span>
+                    <span class="cc-value" id="totalGeneral">—</span>
+                </div>
+            </div>
+            <div class="corte-card cc-efectivo">
+                <span class="cc-icon"><i class="bi bi-cash-stack"></i></span>
+                <div class="cc-body">
+                    <span class="cc-label">Efectivo</span>
+                    <span class="cc-value" id="totalEfectivo">—</span>
+                </div>
+            </div>
+            <div class="corte-card cc-tarjeta">
+                <span class="cc-icon"><i class="bi bi-credit-card-fill"></i></span>
+                <div class="cc-body">
+                    <span class="cc-label">Tarjeta</span>
+                    <span class="cc-value" id="totalTarjeta">—</span>
+                </div>
+            </div>
+            <div class="corte-card cc-transferencia">
+                <span class="cc-icon"><i class="bi bi-phone-fill"></i></span>
+                <div class="cc-body">
+                    <span class="cc-label">Transferencia</span>
+                    <span class="cc-value" id="totalTransferencia">—</span>
+                </div>
+            </div>
+            <div class="corte-card cc-ordenes">
+                <span class="cc-icon"><i class="bi bi-clipboard2-check-fill"></i></span>
+                <div class="cc-body">
+                    <span class="cc-label">Órdenes cerradas</span>
+                    <span class="cc-value" id="totalOrdenes">—</span>
+                </div>
+            </div>
+        </div>
 
-        <!-- Tabla corte (oculta hasta generar) -->
         <div class="table-wrap" id="wrapTablaCorte" style="display:none;">
             <table class="rpt-table" id="tablaCorte" aria-label="Resumen de corte">
                 <thead>
@@ -213,21 +199,19 @@
                     <p class="section-sub">Archiva el historial y reinicia las tablas operativas</p>
                 </div>
             </div>
-
             <button class="btn-cierre-dia" id="btnAbrirCierre">
                 <i class="bi bi-door-closed-fill"></i>
                 Ejecutar cierre del día
             </button>
         </div>
 
-        <!-- Advertencia -->
         <div class="cierre-warning">
             <i class="bi bi-exclamation-triangle-fill cierre-warning__icon"></i>
             <div>
                 <strong>Acción irreversible.</strong>
-                Al ejecutar el cierre, todas las órdenes
-                cerradas de hoy se archivan en el historial y las tablas
-                operativas (<code>orden</code>, <code>orden_item</code>,
+                Al ejecutar el cierre, todas las órdenes cerradas de hoy se archivan
+                en el historial y las tablas operativas
+                (<code>orden</code>, <code>orden_item</code>,
                 <code>orden_item_opcion</code>, <code>orden_preparacion</code>)
                 se reinician para comenzar un nuevo día.
             </div>
@@ -237,7 +221,7 @@
 
     <!-- Regresar -->
     <div class="d-flex justify-content-start">
-        <a th:href="@{/admin/inicio}" href="/admin/inicio" class="btn-back-main">
+        <a th:href="@{/admin/inicio}" class="btn-back-main">
             <i class="bi bi-arrow-left"></i> Regresar al inicio
         </a>
     </div>
@@ -247,7 +231,11 @@
 <!-- ══ FOOTER ════════════════════════════════════════════════ -->
 <footer class="rpt-footer">
     <span>&copy; 2025 · <span th:text="${nombreNegocio}">Negocio</span>. Todos los derechos reservados.</span>
-    <span>Módulo de Reportes</span>
+    <div class="footer-powered">
+        <span>Powered by</span>
+        <img src="/img/isotipo_icarix.jpg" alt="ICARIX" class="footer-icarix-logo">
+        <span class="footer-icarix-name">ICARIX</span>
+    </div>
 </footer>
 
 <!-- ══ MODAL CONFIRMACIÓN CIERRE ════════════════════════════ -->
@@ -256,25 +244,19 @@
     <div class="modal-dialog modal-dialog-centered" style="max-width:460px;">
         <div class="modal-content border-0 shadow-lg" style="border-radius:20px;overflow:hidden;">
 
-            <!-- Header rojo -->
             <div class="modal-header border-0 px-4 pt-4 pb-2"
                  style="background:linear-gradient(135deg,#b91c1c,#ef4444);">
                 <div class="d-flex align-items-center gap-3">
                     <span style="font-size:32px;">🔴</span>
                     <div>
-                        <h5 class="modal-title fw-bold text-white mb-0">
-                            Confirmar cierre del día
-                        </h5>
+                        <h5 class="modal-title fw-bold text-white mb-0">Confirmar cierre del día</h5>
                         <small class="text-white opacity-75">Esta acción no se puede deshacer</small>
                     </div>
                 </div>
             </div>
 
-            <!-- Body -->
             <div class="modal-body px-4 py-3">
-                <p class="text-muted small mb-3">
-                    Se archivarán las siguientes órdenes cerradas:
-                </p>
+                <p class="text-muted small mb-3">Se archivarán las siguientes órdenes cerradas:</p>
                 <div id="resumenPreCierre" class="mb-3">
                     <div class="d-flex justify-content-center py-2">
                         <div class="spinner-border spinner-border-sm text-danger"></div>
@@ -285,8 +267,7 @@
                         Observaciones <span class="fw-normal">(opcional)</span>
                     </label>
                     <textarea id="inputObservaciones" class="form-control form-control-sm"
-                              rows="2"
-                              placeholder="Ej: Cierre normal, sin incidencias"
+                              rows="2" placeholder="Ej: Cierre normal, sin incidencias"
                               style="border-radius:10px;"></textarea>
                 </div>
                 <div class="alert py-2 small mb-0"
@@ -296,26 +277,22 @@
                 </div>
             </div>
 
-            <!-- Footer -->
             <div class="modal-footer border-0 px-4 pb-4 pt-2">
                 <button class="btn btn-outline-secondary btn-sm rounded-pill px-4"
-                        data-bs-dismiss="modal">
-                    Cancelar
-                </button>
+                        data-bs-dismiss="modal">Cancelar</button>
                 <button id="btnConfirmarCierreFinal"
                         class="btn btn-danger btn-sm rounded-pill px-4 fw-bold"
                         onclick="ejecutarCierre()">
-                    <span id="spinnerCierre"
-                          class="spinner-border spinner-border-sm me-1"
+                    <span id="spinnerCierre" class="spinner-border spinner-border-sm me-1"
                           style="display:none;"></span>
-                    <i class="bi bi-door-closed-fill me-1"></i>
-                    Sí, ejecutar cierre
+                    <i class="bi bi-door-closed-fill me-1"></i> Sí, ejecutar cierre
                 </button>
             </div>
 
         </div>
     </div>
 </div>
+
 <div th:replace="~{admin/Generales :: modalConfirmacion}"></div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

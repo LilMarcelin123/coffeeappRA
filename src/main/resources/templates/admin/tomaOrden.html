@@ -155,11 +155,12 @@
 
 <!-- ── FOOTER ─────────────────────────────────────────────────── -->
 <footer class="footer-custom">
-    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div class="footer-inner">
         <span>&copy; 2025 · <span th:text="${nombreNegocio}">Negocio</span>. Todos los derechos reservados.</span>
-        <span>Soporte: <a href="mailto:contactcheatcoder@gmail.com">Escríbenos</a></span>
-        <div class="footer-logo">
-            <img th:src="@{/img/arboledasLogo.jpg}" alt="Logo">
+        <div class="footer-powered">
+            <span>Powered by</span>
+            <img src="/img/isotipo_icarix.jpg" alt="ICARIX" class="footer-icarix-logo">
+            <span class="footer-icarix-name">ICARIX</span>
         </div>
     </div>
 </footer>
