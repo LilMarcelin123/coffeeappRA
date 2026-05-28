@@ -545,3 +545,150 @@ body {
     .table thead th, .table tbody td { padding: 10px 12px; font-size: .80rem; }
     .info-bar { padding: 12px 14px; }
 }
+
+/* ── ALERTA STOCK BAJO ───────────────────────────────────── */
+
+
+
+
+.alerta-stock-badge {
+    background: rgba(255,255,255,.25);
+    border: 1px solid rgba(255,255,255,.4);
+    border-radius: 20px;
+    padding: 2px 12px;
+    font-size: .75rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.alerta-stock-lista {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 14px 20px;
+}
+
+.alerta-stock-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border: 1.5px solid #FED7AA;
+    border-radius: var(--radius-md);
+    padding: 7px 14px;
+    font-family: 'Poppins', sans-serif;
+    font-size: .82rem;
+    color: #9A3412;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(249,115,22,.08);
+}
+
+.alerta-stock-item i {
+    color: #F97316;
+    font-size: .9rem;
+}
+
+.alerta-stock-item .stock-num {
+    background: #FEF3C7;
+    border: 1px solid #FCD34D;
+    border-radius: 8px;
+    padding: 1px 8px;
+    font-size: .75rem;
+    font-weight: 800;
+    color: #92400E;
+    margin-left: 2px;
+}
+
+/* ── ALERTA STOCK BAJO — naranja suave ───────────────────── */
+.alerta-stock-wrap {
+    border: 2px solid #E8924A;
+    border-radius: var(--radius-lg);
+    background: #FDF3EB;
+    overflow: hidden;
+    box-shadow: 0 4px 18px rgba(232,146,74,.18);
+    animation: fadeUp .4s ease both;
+}
+
+.alerta-stock-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    background: linear-gradient(135deg, #D97B3A, #C4622A);
+    color: #fff;
+    padding: 11px 20px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: .85rem;
+}
+
+.alerta-stock-badge {
+    background: rgba(255,255,255,.22);
+    border: 1px solid rgba(255,255,255,.38);
+    border-radius: 20px;
+    padding: 2px 12px;
+    font-size: .75rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.alerta-stock-lista {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 14px 20px;
+}
+
+.alerta-stock-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border: 1.5px solid #F0C9A0;
+    border-radius: var(--radius-md);
+    padding: 7px 14px;
+    font-family: 'Poppins', sans-serif;
+    font-size: .82rem;
+    color: #7C3A10;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(232,146,74,.10);
+}
+
+.alerta-stock-item i {
+    color: #D97B3A;
+    font-size: .9rem;
+}
+
+.alerta-stock-item .stock-num {
+    background: #FEF0E0;
+    border: 1px solid #F5C98A;
+    border-radius: 8px;
+    padding: 1px 8px;
+    font-size: .75rem;
+    font-weight: 800;
+    color: #7C3A10;
+    margin-left: 2px;
+}
+
+/* ── PULSO icono inventario ──────────────────────────────── */
+.modulo-card.inventario-alerta {
+    border-color: #E8924A;
+    box-shadow: 0 0 0 0 rgba(217,123,58,.5);
+    animation: pulsoInventario 2s ease-in-out infinite;
+}
+
+.modulo-card.inventario-alerta .modulo-icon-wrap {
+    animation: brilloIcono 2s ease-in-out infinite;
+}
+
+@keyframes pulsoInventario {
+    0%   { box-shadow: 0 0 0 0   rgba(217,123,58,.45); }
+    50%  { box-shadow: 0 0 0 10px rgba(217,123,58,.0);  }
+    100% { box-shadow: 0 0 0 0   rgba(217,123,58,.45); }
+}
+
+@keyframes brilloIcono {
+    0%, 100% { filter: brightness(1);    }
+    50%       { filter: brightness(1.35); }
+}

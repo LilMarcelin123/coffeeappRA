@@ -3,6 +3,7 @@ import { mensajesAlert, mostrarConfirmacion2 } from '../FuncionesGenerales.js';
 let modalConfirmCerrar  = null;
 let modalConfirmReabrir = null;
 
+let _alertaSonidoJugado = false; // para no repetir el sonido en cada refresco
 // ── Estado modal acceso ───────────────────────────────────────
 var _accesoModal     = null;
 var _moduloActual    = "";
@@ -210,11 +211,113 @@ $(document).ready(function () {
         reabrirOrdenes(ids);
     });
 
+	// ── Alerta de stock bajo ──────────────────────────────────
+	cargarAlertaStock();
+	setInterval(cargarAlertaStock, 60000); // refresca cada 60 seg
 });
 
 // ════════════════════════════════════════════════════════════
 // MODAL ACCESO — funciones
 // ════════════════════════════════════════════════════════════
+
+
+
+// ════════════════════════════════════════════════════════════
+// ALERTA STOCK BAJO
+// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════
+// ALERTA STOCK BAJO
+// ════════════════════════════════════════════════════════════
+
+
+function cargarAlertaStock() {
+    $.ajax({
+        url: "/admin/inventario/gestionar",
+        type: "GET",
+        data: { tipoProceso: 1 },
+        success: function (data) {
+            const bajos  = (data || []).filter(r => r.alerta_stock_bajo == 1 && r.f_activo == 1);
+            const $wrap  = $("#alertaStockBajo");
+            const $modulo = $(".modulo-card[data-modulo='inventario']");
+
+            if (bajos.length === 0) {
+                $wrap.fadeOut(300);
+                $modulo.removeClass("inventario-alerta");
+                _alertaSonidoJugado = false; // resetear para próxima alerta
+                return;
+            }
+
+            // ── Sonido (solo la primera vez que aparecen alertas) ──
+            if (!_alertaSonidoJugado) {
+                _tocarSonidoAlerta();
+                _alertaSonidoJugado = true;
+            }
+
+            // ── Pulso en tarjeta de inventario ─────────────────
+            $modulo.addClass("inventario-alerta");
+
+            // ── Construir items ────────────────────────────────
+            const itemsHtml = bajos.map(r => `
+                <div class="alerta-stock-item">
+                    <i class="bi bi-box-seam-fill"></i>
+                    ${escHtmlAdmin(r.n_nombre)}
+                    <span class="stock-num">${r.stock_actual} ${r.abreviacion}</span>
+                </div>
+            `).join("");
+
+            $("#alertaStockLista").html(itemsHtml);
+            $("#alertaStockConteo").text(
+                bajos.length === 1 ? "1 insumo" : `${bajos.length} insumos`
+            );
+
+            $wrap.fadeIn(300);
+        },
+        error: function () {
+            $("#alertaStockBajo").hide();
+        }
+    });
+}
+
+function _tocarSonidoAlerta() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+        // Dos tonos suaves: beep doble tipo notificación
+        function beep(frecuencia, inicio, duracion) {
+            const osc  = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            osc.type            = "sine";
+            osc.frequency.value = frecuencia;
+
+            gain.gain.setValueAtTime(0, ctx.currentTime + inicio);
+            gain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + inicio + 0.02);
+            gain.gain.linearRampToValueAtTime(0,    ctx.currentTime + inicio + duracion);
+
+            osc.start(ctx.currentTime + inicio);
+            osc.stop (ctx.currentTime + inicio + duracion + 0.05);
+        }
+
+        beep(780, 0.0,  0.18); // primer tono
+        beep(980, 0.22, 0.18); // segundo tono más agudo
+
+    } catch (e) {
+        // Si el navegador bloquea AudioContext, simplemente no suena
+        console.warn("[Stock] AudioContext no disponible:", e);
+    }
+}
+
+
+
+function escHtmlAdmin(s) {
+    return $("<span>").text(s ?? "").html();
+}
+
+
+
 
 function _abrirAcceso(modulo) {
     if (_accesoBloqueado) return;
