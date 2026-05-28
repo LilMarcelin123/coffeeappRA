@@ -57,6 +57,13 @@ public class OrdenesController {
 
         return "admin/gestionCatalogo"; 
     }
+    
+    @GetMapping("/admin/gestionInventario")
+    public String mostrarGestionInventario(Model model, jakarta.servlet.http.HttpSession session) {
+        model.addAttribute("nombreUsuario", session.getAttribute("nombreUsuario"));
+        model.addAttribute("nombreNegocio", session.getAttribute("nombreNegocio"));
+        return "admin/GestionInventario";
+    }
 
     
     @GetMapping("/admin/GeneracionReportes")

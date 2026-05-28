@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -865,6 +866,359 @@ public List<Map<String, Object>> spListarCierres() {
 
 
 	
-	
+
+
+
+
+
+
+
+
+
+private List<Map<String, Object>> ejecutarSpInventario(
+        int tipoProceso,
+        Integer idInsumo, String nombre,
+        Integer idCategoria, Integer idUnidad,
+        BigDecimal stockInicial, BigDecimal stockMinimo,
+        BigDecimal cantidadEntrada, String descripcion,
+        String usuario) {
+ 
+    final String SQL = "{CALL sp_gestion_inventario(?,?,?,?,?,?,?,?,?,?)}";
+ 
+    try (Connection conn = conexionJDBC.getConexion2();
+         CallableStatement cs = conn.prepareCall(SQL)) {
+ 
+        cs.setInt(1, tipoProceso);
+        setIntOrNull(cs, 2, idInsumo);
+        setStrOrNull(cs, 3, nombre);
+        setIntOrNull(cs, 4, idCategoria);
+        setIntOrNull(cs, 5, idUnidad);
+        setBdOrNull (cs, 6, stockInicial);
+        setBdOrNull (cs, 7, stockMinimo);
+        setBdOrNull (cs, 8, cantidadEntrada);
+        setStrOrNull(cs, 9, descripcion);
+        setStrOrNull(cs, 10, usuario);
+ 
+        try (ResultSet rs = cs.executeQuery()) {
+            return mapResultSet(rs);
+        }
+ 
+    } catch (SQLException | ClassNotFoundException e) {
+        log.error("sp_gestion_inventario proceso {}: {}", tipoProceso, e.getMessage());
+        return Collections.emptyList();
+    }
+}
+ 
+// ────────────────────────────────────────────────────────────────
+// HELPER PRIVADO — ejecuta sp_gestion_inventario (escrituras)
+// Retorna Map con resultado/mensaje del SP
+// ────────────────────────────────────────────────────────────────
+private Map<String, Object> ejecutarSpInventarioEscritura(
+        int tipoProceso,
+        Integer idInsumo, String nombre,
+        Integer idCategoria, Integer idUnidad,
+        BigDecimal stockInicial, BigDecimal stockMinimo,
+        BigDecimal cantidadEntrada, String descripcion,
+        String usuario) {
+ 
+    List<Map<String, Object>> rows = ejecutarSpInventario(
+            tipoProceso, idInsumo, nombre,
+            idCategoria, idUnidad,
+            stockInicial, stockMinimo,
+            cantidadEntrada, descripcion, usuario);
+ 
+    if (!rows.isEmpty()) return rows.get(0);
+    return Map.of("resultado", -1, "mensaje", "Sin respuesta del servidor");
+}
+ 
+// ────────────────────────────────────────────────────────────────
+// HELPER PRIVADO — ejecuta sp_gestion_recetas
+// ────────────────────────────────────────────────────────────────
+private List<Map<String, Object>> ejecutarSpRecetas(
+        int tipoProceso,
+        Integer idProducto, Integer idInsumo,
+        BigDecimal cantidadRequerida, Integer idProductoInsumo) {
+ 
+    final String SQL = "{CALL sp_gestion_recetas(?,?,?,?,?)}";
+ 
+    try (Connection conn = conexionJDBC.getConexion2();
+         CallableStatement cs = conn.prepareCall(SQL)) {
+ 
+        cs.setInt(1, tipoProceso);
+        setIntOrNull(cs, 2, idProducto);
+        setIntOrNull(cs, 3, idInsumo);
+        setBdOrNull (cs, 4, cantidadRequerida);
+        setIntOrNull(cs, 5, idProductoInsumo);
+ 
+        try (ResultSet rs = cs.executeQuery()) {
+            return mapResultSet(rs);
+        }
+ 
+    } catch (SQLException | ClassNotFoundException e) {
+        log.error("sp_gestion_recetas proceso {}: {}", tipoProceso, e.getMessage());
+        return Collections.emptyList();
+    }
+}
+ 
+private Map<String, Object> ejecutarSpRecetasEscritura(
+        int tipoProceso,
+        Integer idProducto, Integer idInsumo,
+        BigDecimal cantidadRequerida, Integer idProductoInsumo) {
+ 
+    List<Map<String, Object>> rows = ejecutarSpRecetas(
+            tipoProceso, idProducto, idInsumo, cantidadRequerida, idProductoInsumo);
+ 
+    if (!rows.isEmpty()) return rows.get(0);
+    return Map.of("resultado", -1, "mensaje", "Sin respuesta del servidor");
+}
+ 
+// ────────────────────────────────────────────────────────────────
+// HELPER PRIVADO — mapea ResultSet a List<Map>
+// Convierte Timestamp a hora México automáticamente
+// ────────────────────────────────────────────────────────────────
+private List<Map<String, Object>> mapResultSet(ResultSet rs) throws SQLException {
+    List<Map<String, Object>> lista = new ArrayList<>();
+    ResultSetMetaData meta = rs.getMetaData();
+    int cols = meta.getColumnCount();
+ 
+    while (rs.next()) {
+        Map<String, Object> row = new LinkedHashMap<>();
+        for (int i = 1; i <= cols; i++) {
+            Object val = rs.getObject(i);
+            if (val instanceof java.sql.Timestamp) {
+                val = ((java.sql.Timestamp) val).toInstant()
+                        .atZone(java.time.ZoneId.of("America/Mexico_City"))
+                        .toLocalDateTime().toString();
+            } else if (val instanceof java.sql.Date) {
+                val = val.toString();
+            }
+            row.put(meta.getColumnLabel(i), val);
+        }
+        lista.add(row);
+    }
+    return lista;
+}
+ 
+// ────────────────────────────────────────────────────────────────
+// HELPERS PRIVADOS — setters null-safe para CallableStatement
+// ────────────────────────────────────────────────────────────────
+private void setIntOrNull(CallableStatement cs, int idx, Integer val) throws SQLException {
+    if (val != null) cs.setInt(idx, val); else cs.setNull(idx, Types.INTEGER);
+}
+private void setStrOrNull(CallableStatement cs, int idx, String val) throws SQLException {
+    if (val != null && !val.isBlank()) cs.setString(idx, val); else cs.setNull(idx, Types.VARCHAR);
+}
+private void setBdOrNull(CallableStatement cs, int idx, BigDecimal val) throws SQLException {
+    if (val != null) cs.setBigDecimal(idx, val); else cs.setNull(idx, Types.DECIMAL);
+}
+ 
+// ════════════════════════════════════════════════════════════════
+// MÉTODOS PÚBLICOS — sp_gestion_inventario
+// ════════════════════════════════════════════════════════════════
+ 
+/** Proceso 1: Lista todos los insumos activos con joins */
+public List<Map<String, Object>> spListarInsumos() {
+    return ejecutarSpInventario(1, null, null, null, null,
+            null, null, null, null, null);
+}
+ 
+/** Proceso 2: Crea un nuevo insumo */
+public Map<String, Object> spCrearInsumo(String nombre, Integer idCategoria,
+        Integer idUnidad, BigDecimal stockInicial, BigDecimal stockMinimo, String usuario) {
+    return ejecutarSpInventarioEscritura(2, null, nombre, idCategoria, idUnidad,
+            stockInicial, stockMinimo, null, null, usuario);
+}
+ 
+/** Proceso 3: Edita nombre, categoría, unidad y stock mínimo */
+public Map<String, Object> spEditarInsumo(Integer idInsumo, String nombre,
+        Integer idCategoria, Integer idUnidad, BigDecimal stockMinimo, String usuario) {
+    return ejecutarSpInventarioEscritura(3, idInsumo, nombre, idCategoria, idUnidad,
+            null, stockMinimo, null, null, usuario);
+}
+ 
+/** Proceso 4: Desactiva un insumo (soft delete) */
+public Map<String, Object> spDesactivarInsumo(Integer idInsumo, String usuario) {
+    return ejecutarSpInventarioEscritura(4, idInsumo, null, null, null,
+            null, null, null, null, usuario);
+}
+ 
+/** Proceso 5: Registra una entrada de stock */
+public Map<String, Object> spEntradaStock(Integer idInsumo,
+        BigDecimal cantidad, String descripcion, String usuario) {
+    return ejecutarSpInventarioEscritura(5, idInsumo, null, null, null,
+            null, null, cantidad, descripcion, usuario);
+}
+ 
+/** Proceso 6: Lista categorías de insumo activas */
+public List<Map<String, Object>> spListarCategoriasInsumo() {
+    return ejecutarSpInventario(6, null, null, null, null,
+            null, null, null, null, null);
+}
+ 
+/** Proceso 7: Lista unidades de medida activas */
+public List<Map<String, Object>> spListarUnidadesMedida() {
+    return ejecutarSpInventario(7, null, null, null, null,
+            null, null, null, null, null);
+}
+ 
+/** Proceso 8: Crea una categoría de insumo */
+public Map<String, Object> spCrearCategoriaInsumo(String nombre, String descripcion) {
+    return ejecutarSpInventarioEscritura(8, null, nombre, null, null,
+            null, null, null, descripcion, null);
+}
+ 
+/** Proceso 9: Crea una unidad de medida (descripcion = abreviacion) */
+public Map<String, Object> spCrearUnidadMedida(String nombre, String abreviacion) {
+    return ejecutarSpInventarioEscritura(9, null, nombre, null, null,
+            null, null, null, abreviacion, null);
+}
+ 
+/** Proceso 10: Últimos 200 movimientos del log */
+public List<Map<String, Object>> spLogInventario() {
+    return ejecutarSpInventario(10, null, null, null, null,
+            null, null, null, null, null);
+}
+ 
+// ════════════════════════════════════════════════════════════════
+// MÉTODOS PÚBLICOS — sp_gestion_recetas (Productos)
+// ════════════════════════════════════════════════════════════════
+ 
+/** Proceso 1: Receta completa de un producto */
+public List<Map<String, Object>> spListarRecetaProducto(Integer idProducto) {
+    return ejecutarSpRecetas(1, idProducto, null, null, null);
+}
+ 
+/** Proceso 2: Agrega un insumo a la receta de un producto */
+public Map<String, Object> spAgregarInsumoReceta(Integer idProducto,
+        Integer idInsumo, BigDecimal cantidadRequerida) {
+    return ejecutarSpRecetasEscritura(2, idProducto, idInsumo, cantidadRequerida, null);
+}
+ 
+/** Proceso 3: Edita la cantidad de un insumo en una receta */
+public Map<String, Object> spEditarCantidadReceta(Integer idProductoInsumo,
+        BigDecimal cantidadRequerida) {
+    return ejecutarSpRecetasEscritura(3, null, null, cantidadRequerida, idProductoInsumo);
+}
+ 
+/** Proceso 4: Elimina (desactiva) un insumo de una receta */
+public Map<String, Object> spEliminarInsumoReceta(Integer idProductoInsumo) {
+    return ejecutarSpRecetasEscritura(4, null, null, null, idProductoInsumo);
+}
+ 
+/** Proceso 5: Lista todos los productos con conteo de insumos en receta */
+public List<Map<String, Object>> spListarProductosConReceta() {
+    return ejecutarSpRecetas(5, null, null, null, null);
+}
+ 
+// ════════════════════════════════════════════════════════════════
+// MÉTODOS PÚBLICOS — sp_gestion_recetas (Extras / Opciones)
+// Reutiliza el mismo SP con procesos distintos:
+//   6  = listar receta de una opción
+//   7  = agregar insumo a receta de opción
+//   8  = editar cantidad en receta de opción
+//   9  = eliminar insumo de receta de opción
+//   10 = listar todas las opciones con conteo
+// idProducto se usa como id_subcategoria_opcion en estos procesos
+// ════════════════════════════════════════════════════════════════
+ 
+/** Proceso 10: Lista todas las opciones/extras con conteo de insumos */
+public List<Map<String, Object>> spListarOpcionesConReceta() {
+    return ejecutarSpRecetas(10, null, null, null, null);
+}
+ 
+/** Proceso 6: Receta de una opción/extra específica */
+public List<Map<String, Object>> spListarRecetaOpcion(Integer idSubcategoriaOpcion) {
+    return ejecutarSpRecetas(6, idSubcategoriaOpcion, null, null, null);
+}
+ 
+/** Proceso 7: Agrega un insumo a la receta de una opción */
+public Map<String, Object> spAgregarInsumoRecetaOpcion(Integer idSubcategoriaOpcion,
+        Integer idInsumo, BigDecimal cantidadRequerida) {
+    return ejecutarSpRecetasEscritura(7, idSubcategoriaOpcion, idInsumo, cantidadRequerida, null);
+}
+ 
+/** Proceso 8: Edita la cantidad de un insumo en receta de opción */
+public Map<String, Object> spEditarCantidadRecetaOpcion(Integer idOpcionInsumo,
+        BigDecimal cantidadRequerida) {
+    return ejecutarSpRecetasEscritura(8, null, null, cantidadRequerida, idOpcionInsumo);
+}
+ 
+/** Proceso 9: Elimina un insumo de la receta de una opción */
+public Map<String, Object> spEliminarInsumoRecetaOpcion(Integer idOpcionInsumo) {
+    return ejecutarSpRecetasEscritura(9, null, null, null, idOpcionInsumo);
+}
+ 
+//════════════════════════════════════════════════════════════════════════════
+//AGREGAR A ProcedimientosAlmacenados.java (Service)
+//
+//El controller usa estos nombres genéricos para unificar GET y POST.
+//Internamente delegan a los métodos privados que ya tienes.
+//════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Wrapper público para lecturas de sp_gestion_inventario.
+ * Delega directamente a ejecutarSpInventario(...) que ya existe en el service.
+ */
+public List<Map<String, Object>> spInvGestionar(
+        int tipoProceso,
+        Integer idInsumo, String nombre,
+        Integer idCategoria, Integer idUnidad,
+        BigDecimal stockInicial, BigDecimal stockMinimo,
+        BigDecimal cantidadEntrada, String descripcion,
+        String usuario) {
+
+    return ejecutarSpInventario(
+            tipoProceso, idInsumo, nombre,
+            idCategoria, idUnidad,
+            stockInicial, stockMinimo,
+            cantidadEntrada, descripcion, usuario);
+}
+
+/**
+ * Wrapper público para escrituras de sp_gestion_inventario.
+ * Delega a ejecutarSpInventarioEscritura(...) que ya existe en el service.
+ */
+public Map<String, Object> spInvGestionarEscritura(
+        int tipoProceso,
+        Integer idInsumo, String nombre,
+        Integer idCategoria, Integer idUnidad,
+        BigDecimal stockInicial, BigDecimal stockMinimo,
+        BigDecimal cantidadEntrada, String descripcion,
+        String usuario) {
+
+    return ejecutarSpInventarioEscritura(
+            tipoProceso, idInsumo, nombre,
+            idCategoria, idUnidad,
+            stockInicial, stockMinimo,
+            cantidadEntrada, descripcion, usuario);
+}
+
+/**
+ * Wrapper público para lecturas de sp_gestion_recetas.
+ * Delega a ejecutarSpRecetas(...) que ya existe en el service.
+ */
+public List<Map<String, Object>> spRecetasGestionar(
+        int tipoProceso,
+        Integer idProducto, Integer idInsumo,
+        BigDecimal cantidadRequerida, Integer idProductoInsumo) {
+
+    return ejecutarSpRecetas(
+            tipoProceso, idProducto, idInsumo,
+            cantidadRequerida, idProductoInsumo);
+}
+
+/**
+ * Wrapper público para escrituras de sp_gestion_recetas.
+ * Delega a ejecutarSpRecetasEscritura(...) que ya existe en el service.
+ */
+public Map<String, Object> spRecetasGestionarEscritura(
+        int tipoProceso,
+        Integer idProducto, Integer idInsumo,
+        BigDecimal cantidadRequerida, Integer idProductoInsumo) {
+
+    return ejecutarSpRecetasEscritura(
+            tipoProceso, idProducto, idInsumo,
+            cantidadRequerida, idProductoInsumo);
+}
 
 }

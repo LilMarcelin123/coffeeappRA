@@ -4,21 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <title>Panel Operador</title>
+    <title>Panel Operador — Rincón Arboledas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" th:href="@{/css/styleOperador.css}">
 </head>
 
 <body>
 
-<!-- BLOBS FONDO -->
-<div class="blob blob-1" aria-hidden="true"></div>
-<div class="blob blob-2" aria-hidden="true"></div>
-<div class="blob blob-3" aria-hidden="true"></div>
-
-<!-- HEADER -->
+<!-- ── HEADER ────────────────────────────────────────────────── -->
 <header class="op-header">
     <div class="op-header-inner">
 
@@ -63,7 +58,7 @@
     <i class="bi bi-arrow-clockwise"></i> Refresh en <strong id="countdownMobile">10s</strong>
 </div>
 
-<!-- HERO -->
+<!-- ── HERO ──────────────────────────────────────────────────── -->
 <section class="op-hero">
     <div class="op-hero-inner">
         <div class="op-hero-text">
@@ -71,7 +66,6 @@
             <h1 class="op-hero-title">Hola, <span th:text="${nombreUsuario}">Operador</span></h1>
             <p class="op-hero-sub">Órdenes activas en tiempo real. Color e ícono por área.</p>
         </div>
-
         <div class="op-stats-row">
             <div class="op-stat-chip">
                 <div class="op-stat-icon"><i class="bi bi-receipt"></i></div>
@@ -98,13 +92,10 @@
     </div>
 </section>
 
-<!-- MAIN -->
+<!-- ── MAIN ──────────────────────────────────────────────────── -->
 <main class="op-main">
 
-    <!-- Barra de filtros completa -->
     <div class="op-filtros">
-
-        <!-- Botones de cocina -->
         <div class="op-cocinas">
             <button class="btn-cocina cocina-atras" data-cocina="atras">
                 <i class="bi bi-fire"></i> Cocina de Atrás
@@ -113,11 +104,7 @@
                 <i class="bi bi-stars"></i> Cocina de Adelante
             </button>
         </div>
-
-        <!-- Separador visual -->
         <div class="filtros-sep"></div>
-
-        <!-- Chips individuales por área -->
         <div class="op-leyenda">
             <span class="leyenda-title"><i class="bi bi-grid-fill"></i> Áreas:</span>
             <span class="leyenda-chip area-salados"    data-rol="2"><i class="bi bi-egg-fried"></i> Salados</span>
@@ -126,10 +113,8 @@
             <span class="leyenda-chip area-bfrias"     data-rol="5"><i class="bi bi-cup-straw"></i> Beb. Frías</span>
             <span class="leyenda-chip area-fitness"    data-rol="6"><i class="bi bi-apple"></i> Fitness</span>
         </div>
-
     </div>
 
-    <!-- Grid de órdenes -->
     <div class="op-grid" id="ordenesGrid">
         <div class="op-empty-state" id="estadoInicial">
             <div class="op-empty-icon"><i class="bi bi-arrow-repeat"></i></div>
@@ -139,13 +124,17 @@
 
 </main>
 
-<!-- FOOTER -->
+<!-- ── FOOTER ─────────────────────────────────────────────────── -->
 <footer class="op-footer">
     <span>&copy; 2025 · <span th:text="${nombreNegocio}">Negocio</span>. Todos los derechos reservados.</span>
-    <span>Panel Operador</span>
+    <div class="footer-powered">
+        <span>Powered by</span>
+        <img src="/img/isotipo_icarix.jpg" alt="ICARIX" class="footer-icarix-logo">
+        <span class="footer-icarix-name">ICARIX</span>
+    </div>
 </footer>
 
-<!-- TEMPLATES -->
+<!-- ── TEMPLATES ──────────────────────────────────────────────── -->
 <template id="tplOrdenCard">
     <div class="orden-card">
         <div class="orden-card-header">
@@ -167,7 +156,6 @@
         <div class="item-area-dot"></div>
         <div class="item-body">
             <div class="item-top">
-                <!-- Badge cantidad PRIMERO, luego ícono y nombre -->
                 <span class="item-badge-cantidad"></span>
                 <span class="item-icono"></span>
                 <span class="item-nombre"></span>

@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Inventario — Rincón Arboledas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/Styleinventario.css}">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════
+     HERO — mismo patrón que admin (hero-left / hero-right)
+     ══════════════════════════════════════════════════════════ -->
+<header>
+    <div class="hero-section">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="hero-left">
+                <span class="hero-badge">
+                    <i class="bi bi-box-seam-fill"></i> Gestión de Inventario
+                </span>
+                <h1 class="hero-title">Inventario <em>&amp; Recetas</em></h1>
+                <p class="hero-subtitle">Control de insumos, recetas y movimientos de stock</p>
+            </div>
+            <div class="hero-right">
+                <div class="hero-logo-wrap">
+                    <img th:src="@{/img/arboledasLogo.jpg}" alt="Logo">
+                </div>
+                <p class="hero-negocio">Rincón Arboledas</p>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════════════
+     MAIN
+     ══════════════════════════════════════════════════════════ -->
+<main class="page-main">
+
+    <!-- ── TABS PRINCIPALES ────────────────────────────────── -->
+    <div class="panel-card mb-3">
+        <div class="panel-card-body" style="padding:10px 14px;">
+            <div class="inv-tabs">
+                <button class="inv-tab activo" data-tab="insumos">
+                    <i class="bi bi-box-seam-fill"></i> Insumos
+                </button>
+                <button class="inv-tab" data-tab="recetas">
+                    <i class="bi bi-journal-richtext"></i> Recetas
+                </button>
+                <button class="inv-tab" data-tab="log">
+                    <i class="bi bi-clock-history"></i> Movimientos
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         TAB 1: INSUMOS
+         ══════════════════════════════════════════════════════ -->
+    <div id="tab-insumos" class="tab-pane-inv">
+
+        <!-- Catálogos rápidos (2 columnas) -->
+        <div class="row g-3 mb-3">
+
+            <!-- Categorías -->
+            <div class="col-md-6">
+                <div class="panel-card h-100">
+                    <div class="panel-card-header">
+                        <div class="panel-card-title">
+                            <span class="icon-badge"><i class="bi bi-tags-fill"></i></span>
+                            Categorías de Insumo
+                        </div>
+                    </div>
+                    <div class="panel-card-body" style="padding-bottom:0;">
+                        <div class="table-wrap">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th style="width:50px;">ID</th>
+                                        <th>Nombre</th>
+                                        <th>Descripción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bodyCategorias">
+                                    <tr><td colspan="3" class="tabla-empty">
+                                        <i class="bi bi-arrow-repeat spin"></i>
+                                        <p>Cargando...</p>
+                                    </td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="panel-card-footer">
+                        <button class="btn-accion btn-ins btn-sm-inv" id="btnNuevaCategoria">
+                            <i class="bi bi-plus-circle-fill"></i> Nueva categoría
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Unidades de Medida -->
+            <div class="col-md-6">
+                <div class="panel-card h-100">
+                    <div class="panel-card-header">
+                        <div class="panel-card-title">
+                            <span class="icon-badge"><i class="bi bi-rulers"></i></span>
+                            Unidades de Medida
+                        </div>
+                    </div>
+                    <div class="panel-card-body" style="padding-bottom:0;">
+                        <div class="table-wrap">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th style="width:50px;">ID</th>
+                                        <th>Nombre</th>
+                                        <th style="width:90px;">Abrev.</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bodyUnidades">
+                                    <tr><td colspan="3" class="tabla-empty">
+                                        <i class="bi bi-arrow-repeat spin"></i>
+                                        <p>Cargando...</p>
+                                    </td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="panel-card-footer">
+                        <button class="btn-accion btn-ins btn-sm-inv" id="btnNuevaUnidad">
+                            <i class="bi bi-plus-circle-fill"></i> Nueva unidad
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stock de Insumos -->
+        <div class="panel-card">
+            <div class="panel-card-header">
+                <div class="panel-card-title">
+                    <span class="icon-badge"><i class="bi bi-archive-fill"></i></span>
+                    Stock de Insumos
+                </div>
+                <button class="btn-accion btn-ins" id="btnNuevoInsumo">
+                    <i class="bi bi-plus-circle-fill"></i> Nuevo insumo
+                </button>
+            </div>
+
+            <div class="panel-card-body" style="padding-bottom:0;">
+                <div class="table-wrap">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th style="width:44px;"></th>
+                                <th style="width:50px;">ID</th>
+                                <th>Nombre</th>
+                                <th>Categoría</th>
+                                <th>Stock actual</th>
+                                <th>Stock mínimo</th>
+                                <th>Unidad</th>
+                                <th style="width:90px;">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyInsumos">
+                            <tr><td colspan="8" class="tabla-empty">
+                                <i class="bi bi-arrow-repeat spin"></i>
+                                <p>Cargando insumos...</p>
+                            </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Panel acciones (slide) -->
+            <div class="acciones-panel" id="accionesPanelInsumos">
+                <div class="acciones-inner">
+                    <div class="seleccion-info">
+                        <i class="bi bi-check-circle-fill text-cafe"></i>
+                        Seleccionado: <strong id="infoSeleccionInsumo">—</strong>
+                    </div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button id="btnEntradaStock"     class="btn-accion btn-stock btn-sm-inv">
+                            <i class="bi bi-arrow-down-circle-fill"></i> Entrada de stock
+                        </button>
+                        <button id="btnEditarInsumo"     class="btn-accion btn-edit btn-sm-inv">
+                            <i class="bi bi-pencil-fill"></i> Editar
+                        </button>
+                        <button id="btnDesactivarInsumo" class="btn-accion btn-del btn-sm-inv">
+                            <i class="bi bi-trash3-fill"></i> Desactivar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div style="height:20px;"></div><!-- espaciado inferior -->
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         TAB 2: RECETAS
+         ══════════════════════════════════════════════════════ -->
+    <div id="tab-recetas" class="tab-pane-inv" style="display:none;">
+
+        <!-- Sub-tabs -->
+        <div class="panel-card mb-3">
+            <div class="panel-card-body" style="padding:10px 14px;">
+                <div class="inv-tabs">
+                    <button class="inv-sub-tab activo" data-subtab="productos">
+                        <i class="bi bi-cup-hot-fill"></i> Productos
+                    </button>
+                    <button class="inv-sub-tab" data-subtab="extras">
+                        <i class="bi bi-stars"></i> Extras
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-tab: Productos -->
+        <div id="subtab-productos">
+            <div class="panel-card">
+                <div class="panel-card-header">
+                    <div class="panel-card-title">
+                        <span class="icon-badge"><i class="bi bi-journal-richtext"></i></span>
+                        Recetas por Producto
+                    </div>
+                </div>
+                <div class="panel-card-body">
+                    <p class="text-muted small mb-3">Selecciona un producto para ver o editar sus insumos requeridos.</p>
+                    <div class="receta-layout" style="padding:0;">
+                        <div class="receta-lista">
+                            <div class="table-wrap">
+                                <table class="table table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Categoría</th>
+                                            <th style="width:42px;">#</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="bodyProductosReceta">
+                                        <tr><td colspan="3" class="tabla-empty">
+                                            <i class="bi bi-arrow-repeat spin"></i>
+                                            <p>Cargando...</p>
+                                        </td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="receta-detalle">
+                            <div id="panelReceta" style="display:none;">
+                                <div class="receta-detalle-header">
+                                    <div>
+                                        <div class="header-eyebrow" style="margin-bottom:2px;">Receta de:</div>
+                                        <h5 class="receta-titulo" id="tituloReceta">—</h5>
+                                    </div>
+                                    <button class="btn-accion btn-ins btn-sm-inv" id="btnAgregarInsumoReceta">
+                                        <i class="bi bi-plus-circle-fill"></i> Agregar insumo
+                                    </button>
+                                </div>
+                                <div class="table-wrap">
+                                    <table class="table table-hover align-middle">
+                                        <thead>
+                                            <tr>
+                                                <th>Insumo</th>
+                                                <th>Cat.</th>
+                                                <th>Cantidad</th>
+                                                <th>Unidad</th>
+                                                <th>Stock</th>
+                                                <th style="width:70px;"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="bodyReceta">
+                                            <tr><td colspan="6" class="tabla-empty">
+                                                <i class="bi bi-info-circle"></i>
+                                                <p>Sin insumos asignados</p>
+                                            </td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div id="panelRecetaVacio" class="tabla-empty" style="padding:60px 24px;">
+                                <i class="bi bi-hand-index-thumb" style="font-size:2.5rem;display:block;margin-bottom:12px;opacity:.3;"></i>
+                                <p>Selecciona un producto de la lista</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-tab: Extras -->
+        <div id="subtab-extras" style="display:none;">
+            <div class="panel-card">
+                <div class="panel-card-header">
+                    <div class="panel-card-title">
+                        <span class="icon-badge"><i class="bi bi-stars"></i></span>
+                        Recetas por Extra / Opción
+                    </div>
+                </div>
+                <div class="panel-card-body">
+                    <p class="text-muted small mb-3">Selecciona un extra para ver o editar los insumos que consume.</p>
+                    <div class="receta-layout" style="padding:0;">
+                        <div class="receta-lista">
+                            <div class="table-wrap">
+                                <table class="table table-hover align-middle" style="table-layout:fixed;width:100%;">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:38%;">Extra</th>
+                                            <th style="width:47%;">Subcategoría</th>
+                                            <th style="width:15%;">#</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="bodyExtrasReceta">
+                                        <tr><td colspan="3" class="tabla-empty">
+                                            <i class="bi bi-arrow-repeat spin"></i>
+                                            <p>Cargando...</p>
+                                        </td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="receta-detalle">
+                            <div id="panelRecetaExtra" style="display:none;">
+                                <div class="receta-detalle-header">
+                                    <div>
+                                        <div class="header-eyebrow" style="margin-bottom:2px;">Insumos del extra:</div>
+                                        <h5 class="receta-titulo" id="tituloRecetaExtra">—</h5>
+                                    </div>
+                                    <button class="btn-accion btn-ins btn-sm-inv" id="btnAgregarInsumoExtra">
+                                        <i class="bi bi-plus-circle-fill"></i> Agregar insumo
+                                    </button>
+                                </div>
+                                <div class="table-wrap">
+                                    <table class="table table-hover align-middle">
+                                        <thead>
+                                            <tr>
+                                                <th>Insumo</th>
+                                                <th>Cat.</th>
+                                                <th>Cantidad</th>
+                                                <th>Unidad</th>
+                                                <th>Stock</th>
+                                                <th style="width:70px;"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="bodyRecetaExtra">
+                                            <tr><td colspan="6" class="tabla-empty">
+                                                <i class="bi bi-info-circle"></i>
+                                                <p>Sin insumos asignados</p>
+                                            </td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div id="panelRecetaExtraVacio" class="tabla-empty" style="padding:60px 24px;">
+                                <i class="bi bi-hand-index-thumb" style="font-size:2.5rem;display:block;margin-bottom:12px;opacity:.3;"></i>
+                                <p>Selecciona un extra de la lista</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         TAB 3: MOVIMIENTOS
+         ══════════════════════════════════════════════════════ -->
+    <div id="tab-log" class="tab-pane-inv" style="display:none;">
+        <div class="panel-card">
+            <div class="panel-card-header">
+                <div class="panel-card-title">
+                    <span class="icon-badge"><i class="bi bi-clock-history"></i></span>
+                    Historial de Movimientos
+                </div>
+            </div>
+            <div class="panel-card-body" style="padding-bottom:4px;">
+                <div class="table-wrap table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Insumo</th>
+                                <th>Tipo</th>
+                                <th>Anterior</th>
+                                <th>Nuevo</th>
+                                <th>Diferencia</th>
+                                <th>Unidad</th>
+                                <th>Descripción</th>
+                                <th>Usuario</th>
+                                <th>Orden</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyLog">
+                            <tr><td colspan="10" class="tabla-empty">
+                                <i class="bi bi-arrow-repeat spin"></i>
+                                <p>Cargando movimientos...</p>
+                            </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div style="height:4px;"></div>
+        </div>
+    </div>
+
+    <!-- Regresar -->
+    <div class="d-flex justify-content-start mt-2 mb-4">
+        <a href="/admin/inicio" class="btn-back">
+            <i class="bi bi-arrow-left"></i> Regresar al inicio
+        </a>
+    </div>
+
+</main>
+
+<!-- ══════════════════════════════════════════════════════════
+     FOOTER — idéntico al admin
+     ══════════════════════════════════════════════════════════ -->
+<footer class="footer-custom">
+    <div class="footer-inner">
+        <span>&copy; 2025 · Rincón Arboledas &mdash; Gestión de Inventario.</span>
+        <div class="footer-powered">
+            <span>Powered by</span>
+            <img th:src="@{/img/isotipo_icarix.jpg}" alt="ICARIX" class="footer-icarix-logo">
+            <span class="footer-icarix-name">ICARIX</span>
+        </div>
+    </div>
+</footer>
+
+<!-- ══════════════════════════════════════════════════════════
+     MODALES (sin cambios funcionales, solo estructura limpia)
+     ══════════════════════════════════════════════════════════ -->
+
+<!-- Nuevo Insumo -->
+<div class="modal fade" id="modalNuevoInsumo" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-box-seam-fill me-2"></i>Nuevo Insumo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Nombre *</label>
+                    <input type="text" class="form-control" id="insumoNombre" placeholder="Ej: Café molido">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Categoría *</label>
+                    <select class="form-select" id="insumoCategoria"><option value="">Seleccione</option></select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Unidad de medida *</label>
+                    <select class="form-select" id="insumoUnidad"><option value="">Seleccione</option></select>
+                </div>
+                <div class="row g-3">
+                    <div class="col-6">
+                        <label class="form-label">Stock inicial</label>
+                        <input type="number" class="form-control" id="insumoStockInicial" placeholder="0" min="0" step="0.001">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Stock mínimo (alerta)</label>
+                        <input type="number" class="form-control" id="insumoStockMinimo" placeholder="0" min="0" step="0.001">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-modal-cancel" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-modal-save" id="btnGuardarNuevoInsumo">
+                    <i class="bi bi-check-circle-fill me-1"></i> Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Editar Insumo -->
+<div class="modal fade" id="modalEditarInsumo" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-pencil-fill me-2"></i>Editar Insumo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editInsumoId">
+                <div class="mb-3">
+                    <label class="form-label">Nombre</label>
+                    <input type="text" class="form-control" id="editInsumoNombre">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Categoría</label>
+                    <select class="form-select" id="editInsumoCategoria"></select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Unidad de medida</label>
+                    <select class="form-select" id="editInsumoUnidad"></select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Stock mínimo (alerta)</label>
+                    <input type="number" class="form-control" id="editInsumoStockMinimo" min="0" step="0.001">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-modal-cancel" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-modal-save" id="btnGuardarEditarInsumo">
+                    <i class="bi bi-check-circle-fill me-1"></i> Guardar cambios
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Entrada de Stock -->
+<div class="modal fade" id="modalEntradaStock" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-arrow-down-circle-fill me-2"></i>Entrada de Stock</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="entradaInsumoId">
+                <div class="info-row mb-3">
+                    <span class="info-label">Insumo:</span>
+                    <strong id="entradaInsumoNombre">—</strong>
+                </div>
+                <div class="info-row mb-3">
+                    <span class="info-label">Stock actual:</span>
+                    <strong id="entradaStockActual">—</strong>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Cantidad a ingresar *</label>
+                    <input type="number" class="form-control" id="entradaCantidad" placeholder="0" min="0.001" step="0.001">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Descripción (opcional)</label>
+                    <input type="text" class="form-control" id="entradaDescripcion" placeholder="Ej: Compra semanal">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-modal-cancel" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-modal-save" id="btnGuardarEntrada">
+                    <i class="bi bi-check-circle-fill me-1"></i> Registrar entrada
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Nueva Categoría -->
+<div class="modal fade" id="modalNuevaCategoria" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-tags-fill me-2"></i>Nueva Categoría</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Nombre *</label>
+                    <input type="text" class="form-control" id="catNombre" placeholder="Ej: ORGANICO">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Descripción</label>
+                    <input type="text" class="form-control" id="catDescripcion">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-modal-cancel" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-modal-save" id="btnGuardarCategoria">
+                    <i class="bi bi-check-circle-fill me-1"></i> Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Nueva Unidad -->
+<div class="modal fade" id="modalNuevaUnidad" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-rulers me-2"></i>Nueva Unidad de Medida</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Nombre *</label>
+                    <input type="text" class="form-control" id="unidadNombre" placeholder="Ej: Kilogramos">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Abreviación *</label>
+                    <input type="text" class="form-control" id="unidadAbreviacion" placeholder="Ej: kg" maxlength="10">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-modal-cancel" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-modal-save" id="btnGuardarUnidad">
+                    <i class="bi bi-check-circle-fill me-1"></i> Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Agregar Insumo a Receta (Producto) -->
+<div class="modal fade" id="modalAgregarReceta" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-plus-circle-fill me-2"></i>Agregar Insumo a Receta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="recetaProductoId">
+                <div class="info-row mb-3">
+                    <span class="info-label">Producto:</span>
+                    <strong id="recetaProductoNombre">—</strong>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Insumo *</label>
+                    <select class="form-select" id="recetaInsumoId"><option value="">Seleccione un insumo</option></select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Cantidad por 1 unidad del producto *</label>
+                    <input type="number" class="form-control" id="recetaCantidad" placeholder="Ej: 20" min="0.001" step="0.001">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-modal-cancel" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-modal-save" id="btnGuardarReceta">
+                    <i class="bi bi-check-circle-fill me-1"></i> Agregar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Editar cantidad Receta (Producto) -->
+<div class="modal fade" id="modalEditarReceta" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-pencil-fill me-2"></i>Editar cantidad</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editRecetaId">
+                <div class="info-row mb-3">
+                    <span class="info-label">Insumo:</span>
+                    <strong id="editRecetaInsumoNombre">—</strong>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Nueva cantidad *</label>
+                    <input type="number" class="form-control" id="editRecetaCantidad" min="0.001" step="0.001">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-modal-cancel" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-modal-save" id="btnGuardarEditarReceta">
+                    <i class="bi bi-check-circle-fill me-1"></i> Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Agregar Insumo a Extra -->
+<div class="modal fade" id="modalAgregarRecetaExtra" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-plus-circle-fill me-2"></i>Agregar Insumo a Extra</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="recetaExtraId">
+                <div class="info-row mb-3">
+                    <span class="info-label">Extra:</span>
+                    <strong id="recetaExtraNombre">—</strong>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Insumo *</label>
+                    <select class="form-select" id="recetaExtraInsumoId"><option value="">Seleccione un insumo</option></select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Cantidad por 1 unidad del extra *</label>
+                    <input type="number" class="form-control" id="recetaExtraCantidad" placeholder="Ej: 5" min="0.001" step="0.001">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-modal-cancel" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-modal-save" id="btnGuardarRecetaExtra">
+                    <i class="bi bi-check-circle-fill me-1"></i> Agregar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Editar cantidad Extra -->
+<div class="modal fade" id="modalEditarRecetaExtra" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-pencil-fill me-2"></i>Editar cantidad</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editRecetaExtraId">
+                <div class="info-row mb-3">
+                    <span class="info-label">Insumo:</span>
+                    <strong id="editRecetaExtraInsumoNombre">—</strong>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Nueva cantidad *</label>
+                    <input type="number" class="form-control" id="editRecetaExtraCantidad" min="0.001" step="0.001">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-modal-cancel" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-modal-save" id="btnGuardarEditarRecetaExtra">
+                    <i class="bi bi-check-circle-fill me-1"></i> Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{admin/Generales :: modalAlertas}"></div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module" th:src="@{/js/Inventario/GestionInventario.js}"></script>
+
+</body>
+</html>

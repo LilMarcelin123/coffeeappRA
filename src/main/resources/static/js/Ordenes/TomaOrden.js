@@ -84,31 +84,37 @@ $(document).ready(function () {
                 );
                 break;
 
-            // ── Gestion catalogo — SIN contrasena ────────────
-            case "catalogo":
-                mostrarConfirmacion2(
-                    "¿Seguro que quieres modificar el catálogo?",
-                    () => { window.location.href = "/admin/gestionCatalogo"; },
-                    () => { console.log("cancelado"); }
-                );
-                break;
+			// ── Gestion catalogo — SIN contrasena ────────────
+			case "catalogo":
+				mostrarConfirmacion2(
+					"¿Seguro que quieres modificar el catálogo?",
+					() => { window.location.href = "/admin/gestionCatalogo"; },
+					() => { console.log("cancelado"); }
+				);
+				break;
 
-            // ── Inventario — deshabilitado (guarda JS extra) ─
-            case "inventario":
-                // No hace nada; CSS ya bloquea pointer-events
-                break;
 
-            // ── Reportes — CON contrasena maestra ────────────
-            case "reportes":
-                _abrirAcceso("reportes");
-                break;
+			// ── Inventario — SIN contrasena ──────────────────────────
+			case "inventario":
+				mostrarConfirmacion2(
+					"¿Seguro que quieres ir a Gestión de Inventario?",
+					() => { window.location.href = "/admin/gestionInventario"; },
+					() => { console.log("cancelado"); }
+				);
+				break;
 
-            // ── Gestion usuarios — CON contrasena maestra ────
-            case "usuarios":
-                _abrirAcceso("usuarios");
-                break;
 
-            default:
+			// ── Reportes — CON contrasena maestra ────────────
+			case "reportes":
+				_abrirAcceso("reportes");
+				break;
+
+			// ── Gestion usuarios — CON contrasena maestra ────
+			case "usuarios":
+				_abrirAcceso("usuarios");
+				break;
+
+			default:
                 console.warn("[Modulos] modulo desconocido:", modulo);
         }
     });

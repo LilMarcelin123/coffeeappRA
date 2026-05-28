@@ -540,4 +540,158 @@ public class ProcedimientosAlmacenadosController {
 	        if (resultado == 0)  return ResponseEntity.status(400).body(res);
 	        return ResponseEntity.status(500).body(res);
 	    }
+	    
+	    
+	    
+	
+
+	    // ════════════════════════════════════════════════════════════════════════
+	    //  /admin/inventario/gestionar  — sp_gestion_inventario
+	    //  Procesos de lectura (GET) y escritura (POST)
+	    // ════════════════════════════════════════════════════════════════════════
+
+	    /**
+	     * GET /admin/inventario/gestionar?tipoProceso=N[&idInsumo=X&...]
+	     *
+	     * Procesos de solo lectura:
+	     *   1  → listar insumos activos
+	     *   6  → listar categorías de insumo
+	     *   7  → listar unidades de medida
+	     *   10 → log de movimientos (últimos 200)
+	     */
+	    @GetMapping("/admin/inventario/gestionar")
+	    @ResponseBody
+	    public ResponseEntity<List<Map<String, Object>>> gestionInventarioGet(
+	            @RequestParam("tipoProceso")                          Integer    tipoProceso,
+	            @RequestParam(value = "idInsumo",       required = false) Integer idInsumo,
+	            @RequestParam(value = "nombre",         required = false) String  nombre,
+	            @RequestParam(value = "idCategoria",    required = false) Integer idCategoria,
+	            @RequestParam(value = "idUnidad",       required = false) Integer idUnidad,
+	            @RequestParam(value = "stockInicial",   required = false) BigDecimal stockInicial,
+	            @RequestParam(value = "stockMinimo",    required = false) BigDecimal stockMinimo,
+	            @RequestParam(value = "cantidadEntrada",required = false) BigDecimal cantidadEntrada,
+	            @RequestParam(value = "descripcion",    required = false) String  descripcion,
+	            HttpSession session) {
+
+	        String usuario = (String) session.getAttribute("nombreUsuario");
+
+	        List<Map<String, Object>> resultado = procedimientosAlmacenados.spInvGestionar(
+	                tipoProceso, idInsumo, nombre, idCategoria, idUnidad,
+	                stockInicial, stockMinimo, cantidadEntrada, descripcion, usuario);
+
+	        return ResponseEntity.ok(resultado);
+	    }
+
+
+	    /**
+	     * POST /admin/inventario/gestionar
+	     *
+	     * Procesos de escritura:
+	     *   2  → crear insumo
+	     *   3  → editar insumo
+	     *   4  → desactivar insumo (soft delete)
+	     *   5  → entrada de stock
+	     *   8  → crear categoría de insumo
+	     *   9  → crear unidad de medida
+	     */
+	    @PostMapping("/admin/inventario/gestionar")
+	    @ResponseBody
+	    public ResponseEntity<Map<String, Object>> gestionInventarioPost(
+	            @RequestParam("tipoProceso")                              Integer    tipoProceso,
+	            @RequestParam(value = "idInsumo",        required = false) Integer  idInsumo,
+	            @RequestParam(value = "nombre",          required = false) String   nombre,
+	            @RequestParam(value = "idCategoria",     required = false) Integer  idCategoria,
+	            @RequestParam(value = "idUnidad",        required = false) Integer  idUnidad,
+	            @RequestParam(value = "stockInicial",    required = false) BigDecimal stockInicial,
+	            @RequestParam(value = "stockMinimo",     required = false) BigDecimal stockMinimo,
+	            @RequestParam(value = "cantidadEntrada", required = false) BigDecimal cantidadEntrada,
+	            @RequestParam(value = "descripcion",     required = false) String   descripcion,
+	            HttpSession session) {
+
+	        String usuario = (String) session.getAttribute("nombreUsuario");
+
+	        Map<String, Object> resultado = procedimientosAlmacenados.spInvGestionarEscritura(
+	                tipoProceso, idInsumo, nombre, idCategoria, idUnidad,
+	                stockInicial, stockMinimo, cantidadEntrada, descripcion, usuario);
+
+	        int res = resultado.containsKey("resultado")
+	                ? ((Number) resultado.get("resultado")).intValue() : 1;
+
+	        HttpStatus status = (res == 1 || res == 0) ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR;
+	        return ResponseEntity.status(status).body(resultado);
+	    }
+
+
+	    // ════════════════════════════════════════════════════════════════════════
+	    //  /admin/inventario/recetas  — sp_gestion_recetas
+	    //  Procesos de lectura (GET) y escritura (POST)
+	    // ════════════════════════════════════════════════════════════════════════
+
+	    /**
+	     * GET /admin/inventario/recetas?tipoProceso=N[&idProducto=X&idInsumo=Y&...]
+	     *
+	     * Procesos de solo lectura:
+	     *   1  → receta de un producto        (idProducto requerido)
+	     *   5  → lista productos con receta
+	     *   6  → receta de una opción/extra   (idProducto = id_subcategoria_opcion)
+	     *   10 → lista opciones/extras con receta
+	     */
+	    @GetMapping("/admin/inventario/recetas")
+	    @ResponseBody
+	    public ResponseEntity<List<Map<String, Object>>> recetasGet(
+	            @RequestParam("tipoProceso")                                Integer    tipoProceso,
+	            @RequestParam(value = "idProducto",       required = false) Integer    idProducto,
+	            @RequestParam(value = "idInsumo",         required = false) Integer    idInsumo,
+	            @RequestParam(value = "cantidadRequerida",required = false) BigDecimal cantidadRequerida,
+	            @RequestParam(value = "idProductoInsumo", required = false) Integer    idProductoInsumo) {
+
+	        List<Map<String, Object>> resultado = procedimientosAlmacenados.spRecetasGestionar(
+	                tipoProceso, idProducto, idInsumo, cantidadRequerida, idProductoInsumo);
+
+	        return ResponseEntity.ok(resultado);
+	    }
+
+
+	    /**
+	     * POST /admin/inventario/recetas
+	     *
+	     * Procesos de escritura:
+	     *   2  → agregar insumo a receta de producto
+	     *   3  → editar cantidad en receta de producto
+	     *   4  → eliminar insumo de receta de producto
+	     *   7  → agregar insumo a receta de opción/extra
+	     *   8  → editar cantidad en receta de opción
+	     *   9  → eliminar insumo de receta de opción
+	     *
+	     * Nota: el JS reutiliza los mismos parámetros para producto y opción.
+	     *   - Para opciones, "idProductoInsumo" se mapea a idOpcionInsumo en el SP.
+	     *   - El SP distingue el contexto por tipoProceso.
+	     */
+	    @PostMapping("/admin/inventario/recetas")
+	    @ResponseBody
+	    public ResponseEntity<Map<String, Object>> recetasPost(
+	            @RequestParam("tipoProceso")                                Integer    tipoProceso,
+	            @RequestParam(value = "idProducto",       required = false) Integer    idProducto,
+	            @RequestParam(value = "idInsumo",         required = false) Integer    idInsumo,
+	            @RequestParam(value = "cantidadRequerida",required = false) BigDecimal cantidadRequerida,
+	            @RequestParam(value = "idProductoInsumo", required = false) Integer    idProductoInsumo,
+	            @RequestParam(value = "idOpcionInsumo",   required = false) Integer    idOpcionInsumo) {
+
+	        // Para procesos 7-9 (extras), el JS envía idOpcionInsumo.
+	        // Lo unificamos en idProductoInsumo para que el SP lo reciba en param 5.
+	        Integer idItem = (idProductoInsumo != null) ? idProductoInsumo : idOpcionInsumo;
+
+	        Map<String, Object> resultado = procedimientosAlmacenados.spRecetasGestionarEscritura(
+	                tipoProceso, idProducto, idInsumo, cantidadRequerida, idItem);
+
+	        int res = resultado.containsKey("resultado")
+	                ? ((Number) resultado.get("resultado")).intValue() : 1;
+
+	        // resultado=0 puede ser "ya existe" (warning) pero HTTP 200 igual
+	        HttpStatus status = (res >= 0) ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR;
+	        return ResponseEntity.status(status).body(resultado);
+	    }
+	    
+	    
+	    
 }
