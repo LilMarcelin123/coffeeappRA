@@ -62,7 +62,7 @@ public class OrdenesController {
     public String mostrarGestionInventario(Model model, jakarta.servlet.http.HttpSession session) {
         model.addAttribute("nombreUsuario", session.getAttribute("nombreUsuario"));
         model.addAttribute("nombreNegocio", session.getAttribute("nombreNegocio"));
-        return "admin/GestionInventario";
+        return "admin/Gestioninventario";
     }
 
     
