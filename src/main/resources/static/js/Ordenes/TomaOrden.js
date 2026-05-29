@@ -464,6 +464,7 @@ function renderPendientes(lista) {
 
         tr.dataset.idOrden = idOrden;
         node.querySelector(".col-id").textContent      = idOrden ?? "";
+		node.querySelector(".col-nombre").textContent  = o.n_nombre_cliente ?? "—";  
         node.querySelector(".col-hora").textContent    = o.t_hora_creacion ?? "";
         node.querySelector(".col-total").textContent   = (o.p_total != null) ? `$${Number(o.p_total).toFixed(2)}` : "$0.00";
         node.querySelector(".col-resumen").textContent = o.resumen ?? "";

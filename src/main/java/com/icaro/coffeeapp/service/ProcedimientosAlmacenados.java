@@ -2,6 +2,7 @@ package com.icaro.coffeeapp.service;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -871,7 +872,23 @@ public List<Map<String, Object>> spListarCierres() {
 
 
 
+public void spGuardarNombreCliente(Integer idOrden, String nombreCliente) {
+    final String SQL = "UPDATE orden SET n_nombre_cliente = ? WHERE id_orden = ?";
+    try (Connection conn = conexionJDBC.getConexion2();
+         PreparedStatement ps = conn.prepareStatement(SQL)) {
 
+        if (nombreCliente != null && !nombreCliente.isBlank()) {
+            ps.setString(1, nombreCliente.trim());
+        } else {
+            ps.setNull(1, Types.VARCHAR);
+        }
+        ps.setInt(2, idOrden);
+        ps.executeUpdate();
+
+    } catch (SQLException | ClassNotFoundException e) {
+        log.error("spGuardarNombreCliente error: {}", e.getMessage());
+    }
+}
 
 
 

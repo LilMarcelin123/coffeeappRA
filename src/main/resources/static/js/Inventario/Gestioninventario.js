@@ -5,6 +5,15 @@
 // ================================================================
 
 import { mensajesAlert } from "../FuncionesGenerales.js";
+// ── Modal acceso (mismo que admin) ───────────────────────
+var _accesoModalInv  = null;
+var _accesoBloqueadoInv = false;
+
+var MODULOS_ACCESO_INV = {
+    "salida_stock": { label: "Salida Manual de Stock" }
+};
+
+function _elAcc(id) { return document.getElementById(id); }
 
 // ── Constantes de rutas ──────────────────────────────────────
 const URL_GESTIONAR = "/admin/inventario/gestionar";
@@ -29,6 +38,99 @@ function initModal(id) {
     return new bootstrap.Modal(document.getElementById(id), { backdrop: "static", keyboard: false });
 }
 
+
+// ════════════════════════════════════════════════════════
+// MODAL ACCESO — Inventario
+// ════════════════════════════════════════════════════════
+
+function _abrirAccesoInv(modulo) {
+    if (_accesoBloqueadoInv || !_accesoModalInv) return;
+    const info  = MODULOS_ACCESO_INV[modulo];
+    const label = _elAcc("labelNombreModulo");
+    if (label) label.textContent = info ? info.label : modulo;
+    _resetAccesoInv();
+    _accesoModalInv.show();
+    setTimeout(() => { const i = _elAcc("inputAccesoPassword"); if (i) i.focus(); }, 400);
+}
+
+function _validarAccesoInv() {
+    const inp  = _elAcc("inputAccesoPassword");
+    const pass = inp ? inp.value.trim() : "";
+    if (!pass) { _mostrarErrorInv("Ingresa la contraseña.", "warning"); return; }
+
+    _setLoadingInv(true);
+
+    const params = new URLSearchParams();
+    params.append("password", pass);
+    params.append("modulo", "salida_stock");
+
+    fetch("/api/acceso-modulo", { method: "POST", body: params })
+        .then(res => res.json())
+        .then(data => {
+            if (data.acceso) {
+                // ── Acceso concedido ──────────────────────────
+                const btn = _elAcc("btnConfirmarAcceso");
+                if (btn) {
+                    btn.style.background = "#198754";
+                    btn.innerHTML = "<i class='bi bi-check-lg'></i> Acceso concedido";
+                }
+                setTimeout(() => {
+                    _accesoModalInv.hide();
+                    // Abrir modal de salida
+                    const r = insumoSeleccionado;
+                    setVal("#salidaInsumoId", r.id_insumo);
+                    $("#salidaInsumoNombre").text(r.n_nombre);
+                    $("#salidaStockActual").text(`${r.stock_actual} ${r.abreviacion}`);
+                    limpiarCampos("#salidaCantidad, #salidaDescripcion");
+                    $("#salidaAlertaExceso").hide();
+                    setTimeout(() => modales.salidaStock.show(), 300);
+                }, 700);
+
+            } else if (data.bloqueado) {
+                _accesoBloqueadoInv = true;
+                _mostrarErrorInv(data.mensaje, "danger");
+                if (inp) inp.disabled = true;
+                const btn = _elAcc("btnConfirmarAcceso");
+                if (btn) btn.disabled = true;
+                const seg = parseInt((data.mensaje.match(/[0-9]+/) || ["300"])[0]);
+                setTimeout(() => { _accesoBloqueadoInv = false; _resetAccesoInv(); }, seg * 1000);
+
+            } else {
+                _mostrarErrorInv(data.mensaje || "Contraseña incorrecta.", "danger");
+                if (inp) { inp.value = ""; inp.focus(); }
+            }
+        })
+        .catch(() => _mostrarErrorInv("Error de conexión. Intenta de nuevo.", "warning"))
+        .finally(() => _setLoadingInv(false));
+}
+
+function _mostrarErrorInv(msg, tipo) {
+    const el = _elAcc("mensajeAccesoError");
+    if (!el) return;
+    el.textContent = msg;
+    el.className   = "alert alert-" + tipo + " py-2 small mb-0";
+    el.style.display = "block";
+}
+
+function _setLoadingInv(on) {
+    const spinner = _elAcc("spinnerAcceso");
+    if (spinner) spinner.style.display = on ? "inline-block" : "none";
+    ["btnConfirmarAcceso", "btnCancelarAcceso", "inputAccesoPassword"].forEach(id => {
+        const el = _elAcc(id);
+        if (el) el.disabled = on;
+    });
+}
+
+function _resetAccesoInv() {
+    const input = _elAcc("inputAccesoPassword");
+    const btn   = _elAcc("btnConfirmarAcceso");
+    if (input) { input.value = ""; input.type = "password"; input.disabled = false; }
+    if (btn)   { btn.disabled = false; btn.style.background = "#48392D"; btn.innerHTML = "Ingresar"; }
+    if (_elAcc("iconoOjoAcceso"))     _elAcc("iconoOjoAcceso").className         = "bi bi-eye";
+    if (_elAcc("mensajeAccesoError")) _elAcc("mensajeAccesoError").style.display = "none";
+    if (_elAcc("spinnerAcceso"))      _elAcc("spinnerAcceso").style.display      = "none";
+}
+
 $(document).ready(function () {
 
     // ── Registro de modales ──────────────────────────────────
@@ -43,6 +145,9 @@ $(document).ready(function () {
         agregarRecetaExtra: initModal("modalAgregarRecetaExtra"),
         editarRecetaExtra:  initModal("modalEditarRecetaExtra"),
     };
+	
+	
+	
 
     // ────────────────────────────────────────────────────────
     // NAVEGACIÓN — TABS PRINCIPALES
@@ -673,6 +778,46 @@ $(document).ready(function () {
     const limpiarCampos = sel => $(sel).val("");
     const escHtml    = s => $("<span>").text(s ?? "").html();
     const escAttr    = s => (s ?? "").toString().replace(/"/g, "&quot;");
+	
+	
+	// ── Inicializar modal acceso ──────────────────────────────
+	const _modalAccEl = _elAcc("modalAccesoModulo");
+	if (_modalAccEl) {
+	    _accesoModalInv = bootstrap.Modal.getOrCreateInstance(_modalAccEl, {
+	        backdrop: "static", keyboard: false
+	    });
+	    _modalAccEl.addEventListener("hidden.bs.modal", function () {
+	        _resetAccesoInv();
+	        document.querySelectorAll(".modal-backdrop").forEach(b => b.remove());
+	        document.body.classList.remove("modal-open");
+	        document.body.style.removeProperty("overflow");
+	        document.body.style.removeProperty("padding-right");
+	    });
+	}
+
+	$("#btnConfirmarAcceso").on("click", function () { _validarAccesoInv(); });
+	$("#btnCancelarAcceso").on("click",  function () { if (_accesoModalInv) _accesoModalInv.hide(); });
+	$("#btnToggleAccesoPass").on("click", function () {
+	    const input = _elAcc("inputAccesoPassword");
+	    const icono = _elAcc("iconoOjoAcceso");
+	    if (!input || !icono) return;
+	    const esPass = input.type === "password";
+	    input.type = esPass ? "text" : "password";
+	    icono.className = esPass ? "bi bi-eye-slash" : "bi bi-eye";
+	});
+	$("#inputAccesoPassword").on("keydown", function (e) {
+	    if (e.key === "Enter" && !_accesoBloqueadoInv) _validarAccesoInv();
+	});
+	
+	
+	
+	
+	// ── Salida Stock — con contraseña maestra ────────────────
+	$("#btnSalidaStock").on("click", function () {
+	    if (!insumoSeleccionado) return;
+	    _abrirAccesoInv("salida_stock");
+	});
+	
 });
 
 

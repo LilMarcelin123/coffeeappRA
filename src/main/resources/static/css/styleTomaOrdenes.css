@@ -490,3 +490,119 @@ body {
     from { opacity: 0; transform: translateY(-8px); }
     to   { opacity: 1; transform: translateY(0); }
 }
+
+
+
+
+.cliente-wrap {
+    background: linear-gradient(135deg, rgba(212,184,150,.10), rgba(184,147,106,.06));
+    border: 1.5px solid rgba(212,184,150,.40);
+    border-radius: var(--radius-lg);
+    padding: 16px 18px;
+}
+
+.cliente-wrap-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: .72rem;
+    font-weight: 700;
+    color: var(--cafe-dark);
+    text-transform: uppercase;
+    letter-spacing: .10em;
+    margin-bottom: 10px;
+}
+
+.cliente-opcional {
+    font-size: .65rem;
+    font-weight: 600;
+    background: rgba(184,147,106,.18);
+    color: var(--cafe-mid);
+    border-radius: 20px;
+    padding: 2px 8px;
+    text-transform: none;
+    letter-spacing: 0;
+    margin-left: 2px;
+}
+
+.cliente-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.cliente-icon {
+    position: absolute;
+    left: 13px;
+    color: var(--cafe-mid);
+    font-size: .95rem;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.cliente-input {
+    width: 100%;
+    padding: 11px 40px 11px 36px;
+    border: 1.5px solid rgba(212,184,150,.45);
+    border-radius: var(--radius-md);
+    font-family: 'Poppins', sans-serif;
+    font-size: .92rem;
+    color: var(--text-primary);
+    background: rgba(255,255,255,.92);
+    transition: border-color .2s, box-shadow .2s;
+    outline: none;
+}
+
+.cliente-input:focus {
+    border-color: var(--cafe-mid);
+    box-shadow: 0 0 0 3px rgba(184,147,106,.18);
+}
+
+.cliente-input::placeholder { color: var(--cafe-light); }
+
+.cliente-clear {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: .88rem;
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    border-radius: 50%;
+    transition: color .2s, background .2s;
+}
+.cliente-clear:hover {
+    color: var(--cafe-dark);
+    background: rgba(212,184,150,.2);
+}
+
+.cliente-hint {
+    font-size: .68rem;
+    color: var(--text-muted);
+    margin: 7px 0 0;
+    line-height: 1.4;
+}
+
+/* ── Chip nombre en panel resumen ─────────────────────────── */
+.resumen-cliente-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, rgba(212,184,150,.18), rgba(184,147,106,.10));
+    border: 1.5px solid rgba(212,184,150,.40);
+    border-radius: var(--radius-md);
+    padding: 9px 14px;
+    margin-bottom: 14px;
+    font-size: .84rem;
+    font-weight: 600;
+    color: var(--cafe-deep);
+    animation: fadeUp .3s ease both;
+}
+.resumen-cliente-chip i {
+    color: var(--cafe-mid);
+    font-size: 1rem;
+    flex-shrink: 0;
+}

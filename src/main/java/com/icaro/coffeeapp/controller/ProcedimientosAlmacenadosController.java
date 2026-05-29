@@ -112,6 +112,18 @@ public class ProcedimientosAlmacenadosController {
 	}
 	
 	
+	// ── Guardar nombre del cliente en la orden ────────────────────
+	@PostMapping("/admin/orden/nombreCliente")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> guardarNombreCliente(
+	        @RequestParam("idOrden")       Integer idOrden,
+	        @RequestParam(value = "nombreCliente", required = false) String nombreCliente) {
+
+	    procedimientosAlmacenados.spGuardarNombreCliente(idOrden, nombreCliente);
+	    return ResponseEntity.ok(Map.of("ok", true));
+	}
+	
+	
 
 	@GetMapping("/admin/orden/pendientes")
 	@ResponseBody
@@ -458,10 +470,11 @@ public class ProcedimientosAlmacenadosController {
 
 	            // Determinar ruta de redirección según módulo
 	            String redirect = switch (modulo.toLowerCase()) {
-	                case "usuarios"  -> "/admin/GestionUsuarios";
-	                case "reportes"  -> "/admin/GeneracionReportes";
-	                default          -> "/admin/inicio";
-	            };
+	            case "usuarios"     -> "/admin/GestionUsuarios";
+	            case "reportes"     -> "/admin/GeneracionReportes";
+	            case "salida_stock" -> "";
+	            default             -> "/admin/inicio";
+	        };
 
 	            System.out.println(">>> Acceso a modulo [" + modulo + "] por usuario: " + session.getAttribute("nombreUsuario"));
 
@@ -500,6 +513,9 @@ public class ProcedimientosAlmacenadosController {
 	            ));
 	        }
 	    }
+	    
+	    
+	    
 	    
 	    @GetMapping("/util/generarHash")
 	    @ResponseBody
