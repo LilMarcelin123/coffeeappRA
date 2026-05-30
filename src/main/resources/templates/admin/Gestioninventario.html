@@ -56,149 +56,148 @@
             </div>
         </div>
     </div>
+	
+	
+	
 
-    <!-- ══════════════════════════════════════════════════════
-         TAB 1: INSUMOS
-         ══════════════════════════════════════════════════════ -->
-    <div id="tab-insumos" class="tab-pane-inv">
+	<!-- ══════════════════════════════════════════════════════
+	     TAB 1: INSUMOS
+	     ══════════════════════════════════════════════════════ -->
+	<div id="tab-insumos" class="tab-pane-inv">
 
-        <!-- Catálogos rápidos (2 columnas) -->
-        <div class="row g-3 mb-3">
+	    <!-- Categorías de Insumo — ancho completo -->
+	    <div class="panel-card">
+	        <div class="panel-card-header">
+	            <div class="panel-card-title">
+	                <span class="icon-badge"><i class="bi bi-tags-fill"></i></span>
+	                Categorías de Insumo
+	            </div>
+	        </div>
+	        <div class="panel-card-body" style="padding-bottom:0;">
+	            <div class="table-wrap">
+	                <table class="table table-hover align-middle">
+	                    <thead>
+	                        <tr>
+	                            <th style="width:50px;">ID</th>
+	                            <th>Nombre</th>
+	                            <th>Descripción</th>
+	                        </tr>
+	                    </thead>
+	                    <tbody id="bodyCategorias">
+	                        <tr><td colspan="3" class="tabla-empty">
+	                            <i class="bi bi-arrow-repeat spin"></i>
+	                            <p>Cargando...</p>
+	                        </td></tr>
+	                    </tbody>
+	                </table>
+	            </div>
+	        </div>
+	        <div class="panel-card-footer">
+	            <button class="btn-accion btn-ins btn-sm-inv" id="btnNuevaCategoria">
+	                <i class="bi bi-plus-circle-fill"></i> Nueva categoría
+	            </button>
+	        </div>
+	    </div>
 
-            <!-- Categorías -->
-            <div class="col-md-6">
-                <div class="panel-card h-100">
-                    <div class="panel-card-header">
-                        <div class="panel-card-title">
-                            <span class="icon-badge"><i class="bi bi-tags-fill"></i></span>
-                            Categorías de Insumo
-                        </div>
-                    </div>
-                    <div class="panel-card-body" style="padding-bottom:0;">
-                        <div class="table-wrap">
-                            <table class="table table-hover align-middle">
-                                <thead>
-                                    <tr>
-                                        <th style="width:50px;">ID</th>
-                                        <th>Nombre</th>
-                                        <th>Descripción</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="bodyCategorias">
-                                    <tr><td colspan="3" class="tabla-empty">
-                                        <i class="bi bi-arrow-repeat spin"></i>
-                                        <p>Cargando...</p>
-                                    </td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="panel-card-footer">
-                        <button class="btn-accion btn-ins btn-sm-inv" id="btnNuevaCategoria">
-                            <i class="bi bi-plus-circle-fill"></i> Nueva categoría
-                        </button>
-                    </div>
-                </div>
-            </div>
+	    <!-- Unidades de Medida — ancho completo -->
+	    <div class="panel-card">
+	        <div class="panel-card-header">
+	            <div class="panel-card-title">
+	                <span class="icon-badge"><i class="bi bi-rulers"></i></span>
+	                Unidades de Medida
+	            </div>
+	        </div>
+	        <div class="panel-card-body" style="padding-bottom:0;">
+	            <div class="table-wrap">
+	                <table class="table table-hover align-middle">
+	                    <thead>
+	                        <tr>
+	                            <th style="width:50px;">ID</th>
+	                            <th>Nombre</th>
+	                            <th style="width:90px;">Abrev.</th>
+	                        </tr>
+	                    </thead>
+	                    <tbody id="bodyUnidades">
+	                        <tr><td colspan="3" class="tabla-empty">
+	                            <i class="bi bi-arrow-repeat spin"></i>
+	                            <p>Cargando...</p>
+	                        </td></tr>
+	                    </tbody>
+	                </table>
+	            </div>
+	        </div>
+	        <div class="panel-card-footer">
+	            <button class="btn-accion btn-ins btn-sm-inv" id="btnNuevaUnidad">
+	                <i class="bi bi-plus-circle-fill"></i> Nueva unidad
+	            </button>
+	        </div>
+	    </div>
 
-            <!-- Unidades de Medida -->
-            <div class="col-md-6">
-                <div class="panel-card h-100">
-                    <div class="panel-card-header">
-                        <div class="panel-card-title">
-                            <span class="icon-badge"><i class="bi bi-rulers"></i></span>
-                            Unidades de Medida
-                        </div>
-                    </div>
-                    <div class="panel-card-body" style="padding-bottom:0;">
-                        <div class="table-wrap">
-                            <table class="table table-hover align-middle">
-                                <thead>
-                                    <tr>
-                                        <th style="width:50px;">ID</th>
-                                        <th>Nombre</th>
-                                        <th style="width:90px;">Abrev.</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="bodyUnidades">
-                                    <tr><td colspan="3" class="tabla-empty">
-                                        <i class="bi bi-arrow-repeat spin"></i>
-                                        <p>Cargando...</p>
-                                    </td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="panel-card-footer">
-                        <button class="btn-accion btn-ins btn-sm-inv" id="btnNuevaUnidad">
-                            <i class="bi bi-plus-circle-fill"></i> Nueva unidad
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+	    <!-- Stock de Insumos — ancho completo -->
+	    <div class="panel-card">
+	        <div class="panel-card-header">
+	            <div class="panel-card-title">
+	                <span class="icon-badge"><i class="bi bi-archive-fill"></i></span>
+	                Stock de Insumos
+	            </div>
+	            <button class="btn-accion btn-ins" id="btnNuevoInsumo">
+	                <i class="bi bi-plus-circle-fill"></i> Nuevo insumo
+	            </button>
+	        </div>
 
-        <!-- Stock de Insumos -->
-        <div class="panel-card">
-            <div class="panel-card-header">
-                <div class="panel-card-title">
-                    <span class="icon-badge"><i class="bi bi-archive-fill"></i></span>
-                    Stock de Insumos
-                </div>
-                <button class="btn-accion btn-ins" id="btnNuevoInsumo">
-                    <i class="bi bi-plus-circle-fill"></i> Nuevo insumo
-                </button>
-            </div>
+	        <div class="panel-card-body" style="padding-bottom:0;">
+	            <div class="table-wrap">
+	                <table class="table table-hover align-middle">
+	                    <thead>
+	                        <tr>
+	                            <th style="width:44px;"></th>
+	                            <th style="width:50px;">ID</th>
+	                            <th>Nombre</th>
+	                            <th>Categoría</th>
+	                            <th>Stock actual</th>
+	                            <th>Stock mínimo</th>
+	                            <th>Unidad</th>
+	                            <th style="width:90px;">Estado</th>
+	                        </tr>
+	                    </thead>
+	                    <tbody id="bodyInsumos">
+	                        <tr><td colspan="8" class="tabla-empty">
+	                            <i class="bi bi-arrow-repeat spin"></i>
+	                            <p>Cargando insumos...</p>
+	                        </td></tr>
+	                    </tbody>
+	                </table>
+	            </div>
+	        </div>
 
-            <div class="panel-card-body" style="padding-bottom:0;">
-                <div class="table-wrap">
-                    <table class="table table-hover align-middle">
-                        <thead>
-                            <tr>
-                                <th style="width:44px;"></th>
-                                <th style="width:50px;">ID</th>
-                                <th>Nombre</th>
-                                <th>Categoría</th>
-                                <th>Stock actual</th>
-                                <th>Stock mínimo</th>
-                                <th>Unidad</th>
-                                <th style="width:90px;">Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody id="bodyInsumos">
-                            <tr><td colspan="8" class="tabla-empty">
-                                <i class="bi bi-arrow-repeat spin"></i>
-                                <p>Cargando insumos...</p>
-                            </td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+	        <!-- Panel acciones (slide) -->
+	        <div class="acciones-panel" id="accionesPanelInsumos">
+	            <div class="acciones-inner">
+	                <div class="seleccion-info">
+	                    <i class="bi bi-check-circle-fill text-cafe"></i>
+	                    Seleccionado: <strong id="infoSeleccionInsumo">—</strong>
+	                </div>
+	                <div class="d-flex gap-2 flex-wrap">
+	                    <button id="btnEntradaStock" class="btn-accion btn-stock btn-sm-inv">
+	                        <i class="bi bi-arrow-down-circle-fill"></i> Entrada de stock
+	                    </button>
+	                    <button id="btnSalidaStock" class="btn-accion btn-del btn-sm-inv">
+	                        <i class="bi bi-arrow-up-circle-fill"></i> Salida de stock
+	                    </button>
+	                    <button id="btnEditarInsumo" class="btn-accion btn-edit btn-sm-inv">
+	                        <i class="bi bi-pencil-fill"></i> Editar
+	                    </button>
+	                    <button id="btnDesactivarInsumo" class="btn-accion btn-del btn-sm-inv">
+	                        <i class="bi bi-trash3-fill"></i> Desactivar
+	                    </button>
+	                </div>
+	            </div>
+	        </div>
 
-            <!-- Panel acciones (slide) -->
-            <div class="acciones-panel" id="accionesPanelInsumos">
-                <div class="acciones-inner">
-                    <div class="seleccion-info">
-                        <i class="bi bi-check-circle-fill text-cafe"></i>
-                        Seleccionado: <strong id="infoSeleccionInsumo">—</strong>
-                    </div>
-                    <div class="d-flex gap-2 flex-wrap">
-                        <button id="btnEntradaStock"     class="btn-accion btn-stock btn-sm-inv">
-                            <i class="bi bi-arrow-down-circle-fill"></i> Entrada de stock
-                        </button>
-                        <button id="btnEditarInsumo"     class="btn-accion btn-edit btn-sm-inv">
-                            <i class="bi bi-pencil-fill"></i> Editar
-                        </button>
-                        <button id="btnDesactivarInsumo" class="btn-accion btn-del btn-sm-inv">
-                            <i class="bi bi-trash3-fill"></i> Desactivar
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div style="height:20px;"></div><!-- espaciado inferior -->
-        </div>
-    </div>
+	        <div style="height:20px;"></div>
+	    </div>
+	</div>
+	
 
     <!-- ══════════════════════════════════════════════════════
          TAB 2: RECETAS
@@ -234,13 +233,13 @@
                         <div class="receta-lista">
                             <div class="table-wrap">
                                 <table class="table table-hover align-middle">
-                                    <thead>
-                                        <tr>
-                                            <th>Producto</th>
-                                            <th>Categoría</th>
-                                            <th style="width:42px;">#</th>
-                                        </tr>
-                                    </thead>
+									<thead>
+									    <tr>
+									        <th style="width:50%;">Producto</th>
+									        <th style="width:40%;">Categoría</th>
+									        <th style="width:10%; text-align:center;">#</th>
+									    </tr>
+									</thead>
                                     <tbody id="bodyProductosReceta">
                                         <tr><td colspan="3" class="tabla-empty">
                                             <i class="bi bi-arrow-repeat spin"></i>
@@ -306,14 +305,15 @@
                     <div class="receta-layout" style="padding:0;">
                         <div class="receta-lista">
                             <div class="table-wrap">
-                                <table class="table table-hover align-middle" style="table-layout:fixed;width:100%;">
-                                    <thead>
-                                        <tr>
-                                            <th style="width:38%;">Extra</th>
-                                            <th style="width:47%;">Subcategoría</th>
-                                            <th style="width:15%;">#</th>
-                                        </tr>
-                                    </thead>
+								
+									<table class="table table-hover align-middle" style="table-layout:fixed;width:100%;">
+									    <thead>
+									        <tr>
+									            <th style="width:30%;">Extra</th>
+									            <th style="width:60%;">Subcategoría</th>
+									            <th style="width:10%; text-align:center;">#</th>
+									        </tr>
+									    </thead>
                                     <tbody id="bodyExtrasReceta">
                                         <tr><td colspan="3" class="tabla-empty">
                                             <i class="bi bi-arrow-repeat spin"></i>
@@ -544,6 +544,51 @@
                 <button type="button" class="btn btn-modal-cancel" data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-modal-save" id="btnGuardarEntrada">
                     <i class="bi bi-check-circle-fill me-1"></i> Registrar entrada
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Salida Manual de Stock -->
+<div class="modal fade" id="modalSalidaStock" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-arrow-up-circle-fill me-2"></i>Salida Manual de Stock</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="salidaInsumoId">
+                <div class="info-row mb-3">
+                    <span class="info-label">Insumo:</span>
+                    <strong id="salidaInsumoNombre">—</strong>
+                </div>
+                <div class="info-row mb-3">
+                    <span class="info-label">Stock actual:</span>
+                    <strong id="salidaStockActual">—</strong>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Cantidad a restar *</label>
+                    <input type="number" class="form-control" id="salidaCantidad"
+                           placeholder="0" min="0.001" step="0.001">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Motivo (opcional)</label>
+                    <input type="text" class="form-control" id="salidaDescripcion"
+                           placeholder="Ej: Merma, ajuste de inventario...">
+                </div>
+                <div id="salidaAlertaExceso" class="alert alert-warning py-2 small mb-0" style="display:none;">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                    La cantidad supera el stock disponible.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-modal-cancel" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-modal-save" id="btnGuardarSalida">
+                    <i class="bi bi-check-circle-fill me-1"></i> Registrar salida
                 </button>
             </div>
         </div>

@@ -467,15 +467,17 @@ body {
 /* ══════════════════════════════════════════════════════════════
    LAYOUT RECETA (lista izq + detalle der)
    ══════════════════════════════════════════════════════════════ */
-.receta-layout {
-    display: flex;
-    gap: 20px;
-    align-items: flex-start;
-    padding: 0 24px 24px;
-}
-.receta-lista   { width: 300px; flex-shrink: 0; }
-.receta-detalle { flex: 1; min-width: 0; }
-
+   .receta-layout {
+       display: flex;
+       gap: 20px;
+       align-items: flex-start;
+       padding: 0 24px 24px;
+   }
+   .receta-lista   { width: 340px; flex-shrink: 0; min-width: 0; }
+   .receta-detalle { flex: 1; min-width: 0; }
+   .receta-detalle .table-wrap { overflow-x: auto; }
+   
+   
 .receta-detalle-header {
     display: flex;
     align-items: center;

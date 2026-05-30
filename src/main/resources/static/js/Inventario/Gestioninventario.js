@@ -5,8 +5,9 @@
 // ================================================================
 
 import { mensajesAlert } from "../FuncionesGenerales.js";
-// ── Modal acceso (mismo que admin) ───────────────────────
-var _accesoModalInv  = null;
+
+// ── Modal acceso (mismo que admin) ───────────────────────────
+var _accesoModalInv     = null;
 var _accesoBloqueadoInv = false;
 
 var MODULOS_ACCESO_INV = {
@@ -24,7 +25,7 @@ let insumoSeleccionado   = null;
 let productoSeleccionado = null;
 let extraSeleccionado    = null;
 
-// ── Helpers AJAX ────────────────────────────────────────────
+// ── Helpers AJAX ─────────────────────────────────────────────
 function ajaxGet(url, data) {
     return $.ajax({ url, type: "GET", data, dataType: "json" });
 }
@@ -38,10 +39,9 @@ function initModal(id) {
     return new bootstrap.Modal(document.getElementById(id), { backdrop: "static", keyboard: false });
 }
 
-
-// ════════════════════════════════════════════════════════
-// MODAL ACCESO — Inventario
-// ════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════
+// MODAL ACCESO — Inventario (contraseña maestra)
+// ════════════════════════════════════════════════════════════
 
 function _abrirAccesoInv(modulo) {
     if (_accesoBloqueadoInv || !_accesoModalInv) return;
@@ -68,7 +68,6 @@ function _validarAccesoInv() {
         .then(res => res.json())
         .then(data => {
             if (data.acceso) {
-                // ── Acceso concedido ──────────────────────────
                 const btn = _elAcc("btnConfirmarAcceso");
                 if (btn) {
                     btn.style.background = "#198754";
@@ -76,14 +75,20 @@ function _validarAccesoInv() {
                 }
                 setTimeout(() => {
                     _accesoModalInv.hide();
-                    // Abrir modal de salida
                     const r = insumoSeleccionado;
-                    setVal("#salidaInsumoId", r.id_insumo);
+                    $("#salidaInsumoId").val(r.id_insumo);
                     $("#salidaInsumoNombre").text(r.n_nombre);
                     $("#salidaStockActual").text(`${r.stock_actual} ${r.abreviacion}`);
-                    limpiarCampos("#salidaCantidad, #salidaDescripcion");
+                    $("#salidaCantidad").val("");
+                    $("#salidaDescripcion").val("");
                     $("#salidaAlertaExceso").hide();
-                    setTimeout(() => modales.salidaStock.show(), 300);
+                    setTimeout(() => {
+                        const modal = bootstrap.Modal.getOrCreateInstance(
+                            document.getElementById("modalSalidaStock"),
+                            { backdrop: "static", keyboard: false }
+                        );
+                        modal.show();
+                    }, 300);
                 }, 700);
 
             } else if (data.bloqueado) {
@@ -107,8 +112,8 @@ function _validarAccesoInv() {
 function _mostrarErrorInv(msg, tipo) {
     const el = _elAcc("mensajeAccesoError");
     if (!el) return;
-    el.textContent = msg;
-    el.className   = "alert alert-" + tipo + " py-2 small mb-0";
+    el.textContent   = msg;
+    el.className     = "alert alert-" + tipo + " py-2 small mb-0";
     el.style.display = "block";
 }
 
@@ -131,6 +136,10 @@ function _resetAccesoInv() {
     if (_elAcc("spinnerAcceso"))      _elAcc("spinnerAcceso").style.display      = "none";
 }
 
+// ════════════════════════════════════════════════════════════
+// DOCUMENT READY
+// ════════════════════════════════════════════════════════════
+
 $(document).ready(function () {
 
     // ── Registro de modales ──────────────────────────────────
@@ -138,6 +147,7 @@ $(document).ready(function () {
         nuevoInsumo:        initModal("modalNuevoInsumo"),
         editarInsumo:       initModal("modalEditarInsumo"),
         entradaStock:       initModal("modalEntradaStock"),
+        salidaStock:        initModal("modalSalidaStock"),
         nuevaCategoria:     initModal("modalNuevaCategoria"),
         nuevaUnidad:        initModal("modalNuevaUnidad"),
         agregarReceta:      initModal("modalAgregarReceta"),
@@ -145,9 +155,35 @@ $(document).ready(function () {
         agregarRecetaExtra: initModal("modalAgregarRecetaExtra"),
         editarRecetaExtra:  initModal("modalEditarRecetaExtra"),
     };
-	
-	
-	
+
+    // ── Inicializar modal acceso ──────────────────────────────
+    const _modalAccEl = _elAcc("modalAccesoModulo");
+    if (_modalAccEl) {
+        _accesoModalInv = bootstrap.Modal.getOrCreateInstance(_modalAccEl, {
+            backdrop: "static", keyboard: false
+        });
+        _modalAccEl.addEventListener("hidden.bs.modal", function () {
+            _resetAccesoInv();
+            document.querySelectorAll(".modal-backdrop").forEach(b => b.remove());
+            document.body.classList.remove("modal-open");
+            document.body.style.removeProperty("overflow");
+            document.body.style.removeProperty("padding-right");
+        });
+    }
+
+    $("#btnConfirmarAcceso").on("click", function () { _validarAccesoInv(); });
+    $("#btnCancelarAcceso").on("click",  function () { if (_accesoModalInv) _accesoModalInv.hide(); });
+    $("#btnToggleAccesoPass").on("click", function () {
+        const input = _elAcc("inputAccesoPassword");
+        const icono = _elAcc("iconoOjoAcceso");
+        if (!input || !icono) return;
+        const esPass = input.type === "password";
+        input.type = esPass ? "text" : "password";
+        icono.className = esPass ? "bi bi-eye-slash" : "bi bi-eye";
+    });
+    $("#inputAccesoPassword").on("keydown", function (e) {
+        if (e.key === "Enter" && !_accesoBloqueadoInv) _validarAccesoInv();
+    });
 
     // ────────────────────────────────────────────────────────
     // NAVEGACIÓN — TABS PRINCIPALES
@@ -191,9 +227,7 @@ $(document).ready(function () {
         ajaxGet(URL_GESTIONAR, { tipoProceso: 6 })
             .done(function (data) {
                 const $tb = $("#bodyCategorias").empty();
-                if (!data?.length) {
-                    return $tb.html(emptyRow(3, "Sin categorías registradas"));
-                }
+                if (!data?.length) return $tb.html(emptyRow(3, "Sin categorías registradas"));
                 data.forEach(r => $tb.append(
                     `<tr><td>${r.id}</td><td>${r.nombre}</td><td>${r.n_descripcion ?? "—"}</td></tr>`
                 ));
@@ -201,35 +235,24 @@ $(document).ready(function () {
             .fail(() => $("#bodyCategorias").html(errorRow(3)));
     }
 
-
-	function cargarUnidades() {
-	    ajaxGet(URL_GESTIONAR, { tipoProceso: 7 })
-	        .done(function (data) {
-	            const $tb = $("#bodyUnidades").empty();
-	            if (!data?.length) return $tb.html(emptyRow(3, "Sin unidades registradas"));
-
-	            data.forEach(r => {
-	                // El campo puede llamarse abreviacion, abreviatura,
-	                // n_abreviacion, abbreviation o simbolo según tu API.
-	                const abrev = r.abreviacion
-	                            ?? r.abreviatura
-	                            ?? r.n_abreviacion
-	                            ?? r.abbreviation
-	                            ?? r.simbolo
-	                            ?? "—";
-
-	                $tb.append(
-	                    `<tr>
-	                        <td>${r.id}</td>
-	                        <td>${escHtml(r.nombre)}</td>
-	                        <td><span class="badge-unidad">${escHtml(abrev)}</span></td>
-	                     </tr>`
-	                );
-	            });
-	        })
-	        .fail(() => $("#bodyUnidades").html(errorRow(3)));
-	}
-	
+    function cargarUnidades() {
+        ajaxGet(URL_GESTIONAR, { tipoProceso: 7 })
+            .done(function (data) {
+                const $tb = $("#bodyUnidades").empty();
+                if (!data?.length) return $tb.html(emptyRow(3, "Sin unidades registradas"));
+                data.forEach(r => {
+                    const abrev = r.abreviacion ?? r.abreviatura ?? r.n_abreviacion ?? r.abbreviation ?? r.simbolo ?? "—";
+                    $tb.append(
+                        `<tr>
+                            <td>${r.id}</td>
+                            <td>${escHtml(r.nombre)}</td>
+                            <td><span class="badge-unidad">${escHtml(abrev)}</span></td>
+                        </tr>`
+                    );
+                });
+            })
+            .fail(() => $("#bodyUnidades").html(errorRow(3)));
+    }
 
     function cargarInsumos() {
         $("#bodyInsumos").html(loadingRow(8));
@@ -297,9 +320,9 @@ $(document).ready(function () {
         const stockIni = numVal("#insumoStockInicial");
         const stockMin = numVal("#insumoStockMinimo");
 
-        if (!nombre || !catId || !unidadId) {
+        if (!nombre || !catId || !unidadId)
             return mensajesAlert("Nombre, categoría y unidad son obligatorios|bg-danger");
-        }
+
         ajaxPost(URL_GESTIONAR, {
             tipoProceso: 2, nombre, idCategoria: catId, idUnidad: unidadId,
             stockInicial: stockIni, stockMinimo: stockMin
@@ -375,6 +398,42 @@ $(document).ready(function () {
         .fail(() => mensajesAlert("Error al actualizar stock|bg-danger"));
     });
 
+    // ── Salida Manual de Stock — con contraseña maestra ──────
+    $("#btnSalidaStock").on("click", function () {
+        if (!insumoSeleccionado) return;
+        _abrirAccesoInv("salida_stock");
+    });
+
+    $("#salidaCantidad").on("input", function () {
+        const cantidad    = parseFloat($(this).val()) || 0;
+        const stockActual = parseFloat(insumoSeleccionado?.stock_actual) || 0;
+        $("#salidaAlertaExceso").toggle(cantidad > stockActual);
+    });
+
+    $("#btnGuardarSalida").on("click", function () {
+        const id          = val("#salidaInsumoId");
+        const cantidad    = numVal("#salidaCantidad");
+        const desc        = trim("#salidaDescripcion");
+        const stockActual = parseFloat(insumoSeleccionado?.stock_actual) || 0;
+
+        if (!cantidad || cantidad <= 0)
+            return mensajesAlert("La cantidad debe ser mayor a 0|bg-danger");
+        if (cantidad > stockActual)
+            return mensajesAlert("No puedes restar más stock del disponible|bg-danger");
+
+        ajaxPost(URL_GESTIONAR, {
+            tipoProceso: 11, idInsumo: id,
+            cantidadEntrada: cantidad, descripcion: desc
+        })
+        .done(function () {
+            modales.salidaStock.hide();
+            mensajesAlert("Salida registrada correctamente|bg-success");
+            cargarInsumos();
+            if ($("#tab-log").is(":visible")) cargarLog();
+        })
+        .fail(() => mensajesAlert("Error al registrar salida|bg-danger"));
+    });
+
     // ── Desactivar Insumo ────────────────────────────────────
     $("#btnDesactivarInsumo").on("click", function () {
         if (!insumoSeleccionado) return;
@@ -448,7 +507,7 @@ $(document).ready(function () {
                     const $tr = $(`<tr class="fila-producto">
                         <td><strong>${escHtml(row.n_nombre_producto)}</strong></td>
                         <td><small>${escHtml(row.categoria)}</small></td>
-                        <td><span class="badge-count">${row.total_insumos_receta ?? 0}</span></td>
+                        <td style="text-align:center;"><span class="badge-count">${row.total_insumos_receta ?? 0}</span></td>
                     </tr>`).data("row", row);
 
                     $tr.on("click", function () {
@@ -483,7 +542,6 @@ $(document).ready(function () {
             .fail(() => $("#bodyReceta").html(errorRow(6)));
     }
 
-    // ── Delegación: acciones tabla receta producto ───────────
     $("#bodyReceta").on("click", ".btn-editar-item", function () {
         setVal("#editRecetaId", $(this).data("id"));
         $("#editRecetaInsumoNombre").text($(this).data("nombre"));
@@ -519,7 +577,6 @@ $(document).ready(function () {
             .fail(() => mensajesAlert("Error al actualizar|bg-danger"));
     });
 
-    // ── Agregar insumo a receta ───────────────────────────────
     $("#btnAgregarInsumoReceta").on("click", function () {
         if (!productoSeleccionado) return;
         setVal("#recetaProductoId", productoSeleccionado.id_producto);
@@ -563,9 +620,11 @@ $(document).ready(function () {
 
                 data.forEach(row => {
                     const $tr = $(`<tr class="fila-extra">
-                        <td><strong>${escHtml(row.nombre_opcion)}</strong></td>
-                        <td class="td-truncate"><small>${escHtml(row.subcategoria)}</small></td>
-                        <td><span class="badge-count">${row.total_insumos_receta ?? 0}</span></td>
+                        <td style="white-space:nowrap;"><strong>${escHtml(row.nombre_opcion)}</strong></td>
+                        <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:0;">
+                            <small title="${escAttr(row.subcategoria)}">${escHtml(row.subcategoria)}</small>
+                        </td>
+                        <td style="text-align:center;"><span class="badge-count">${row.total_insumos_receta ?? 0}</span></td>
                     </tr>`).data("row", row);
 
                     $tr.on("click", function () {
@@ -600,7 +659,6 @@ $(document).ready(function () {
             .fail(() => $("#bodyRecetaExtra").html(errorRow(6)));
     }
 
-    // ── Delegación: acciones tabla receta extra ──────────────
     $("#bodyRecetaExtra").on("click", ".btn-editar-item", function () {
         setVal("#editRecetaExtraId", $(this).data("id"));
         $("#editRecetaExtraInsumoNombre").text($(this).data("nombre"));
@@ -636,7 +694,6 @@ $(document).ready(function () {
             .fail(() => mensajesAlert("Error al actualizar|bg-danger"));
     });
 
-    // ── Agregar insumo a extra ────────────────────────────────
     $("#btnAgregarInsumoExtra").on("click", function () {
         if (!extraSeleccionado) return;
         setVal("#recetaExtraId", extraSeleccionado.id_subcategoria_opcion);
@@ -678,8 +735,8 @@ $(document).ready(function () {
 
                 const TIPO_CSS = {
                     ENTRADA: "badge-entrada", SALIDA: "badge-salida",
-                    ALTA: "badge-alta", EDICION: "badge-edicion",
-                    BAJA: "badge-baja", AJUSTE: "badge-ajuste"
+                    ALTA:    "badge-alta",    EDICION: "badge-edicion",
+                    BAJA:    "badge-baja",    AJUSTE:  "badge-ajuste"
                 };
 
                 data.forEach(row => {
@@ -722,7 +779,7 @@ $(document).ready(function () {
         ajaxGet(URL_GESTIONAR, { tipoProceso: 7 }).done(data => {
             const $s = $(selector).empty().append('<option value="">Seleccione</option>');
             (data || []).forEach(r => {
-                $s.append(`<option value="${r.id}" ${selected == r.id ? "selected" : ""}>${escHtml(r.nombre)} (${r.abreviacion})</option>`);
+                $s.append(`<option value="${r.id}" ${selected == r.id ? "selected" : ""}>${escHtml(r.nombre)} (${r.n_abreviacion ?? r.abreviacion ?? ""})</option>`);
             });
         });
     }
@@ -766,72 +823,17 @@ $(document).ready(function () {
         </tr>`;
     }
 
-    function loadingRow(cols)      { return `<tr><td colspan="${cols}" class="tabla-empty"><i class="bi bi-arrow-repeat spin"></i><p>Cargando...</p></td></tr>`; }
-    function emptyRow(cols, msg)   { return `<tr><td colspan="${cols}" class="tabla-empty"><i class="bi bi-inbox"></i><p>${msg}</p></td></tr>`; }
-    function errorRow(cols)        { return `<tr><td colspan="${cols}" class="tabla-empty text-danger"><i class="bi bi-exclamation-triangle"></i><p>Error al cargar datos</p></td></tr>`; }
+    function loadingRow(cols)    { return `<tr><td colspan="${cols}" class="tabla-empty"><i class="bi bi-arrow-repeat spin"></i><p>Cargando...</p></td></tr>`; }
+    function emptyRow(cols, msg) { return `<tr><td colspan="${cols}" class="tabla-empty"><i class="bi bi-inbox"></i><p>${msg}</p></td></tr>`; }
+    function errorRow(cols)      { return `<tr><td colspan="${cols}" class="tabla-empty text-danger"><i class="bi bi-exclamation-triangle"></i><p>Error al cargar datos</p></td></tr>`; }
 
     // ── DOM helpers ───────────────────────────────────────────
-    const val        = sel => $(sel).val();
-    const trim       = sel => $(sel).val()?.trim() || "";
-    const numVal     = sel => parseFloat($(sel).val()) || 0;
-    const setVal     = (sel, v) => $(sel).val(v);
+    const val           = sel => $(sel).val();
+    const trim          = sel => $(sel).val()?.trim() || "";
+    const numVal        = sel => parseFloat($(sel).val()) || 0;
+    const setVal        = (sel, v) => $(sel).val(v);
     const limpiarCampos = sel => $(sel).val("");
-    const escHtml    = s => $("<span>").text(s ?? "").html();
-    const escAttr    = s => (s ?? "").toString().replace(/"/g, "&quot;");
-	
-	
-	// ── Inicializar modal acceso ──────────────────────────────
-	const _modalAccEl = _elAcc("modalAccesoModulo");
-	if (_modalAccEl) {
-	    _accesoModalInv = bootstrap.Modal.getOrCreateInstance(_modalAccEl, {
-	        backdrop: "static", keyboard: false
-	    });
-	    _modalAccEl.addEventListener("hidden.bs.modal", function () {
-	        _resetAccesoInv();
-	        document.querySelectorAll(".modal-backdrop").forEach(b => b.remove());
-	        document.body.classList.remove("modal-open");
-	        document.body.style.removeProperty("overflow");
-	        document.body.style.removeProperty("padding-right");
-	    });
-	}
+    const escHtml       = s => $("<span>").text(s ?? "").html();
+    const escAttr       = s => (s ?? "").toString().replace(/"/g, "&quot;");
 
-	$("#btnConfirmarAcceso").on("click", function () { _validarAccesoInv(); });
-	$("#btnCancelarAcceso").on("click",  function () { if (_accesoModalInv) _accesoModalInv.hide(); });
-	$("#btnToggleAccesoPass").on("click", function () {
-	    const input = _elAcc("inputAccesoPassword");
-	    const icono = _elAcc("iconoOjoAcceso");
-	    if (!input || !icono) return;
-	    const esPass = input.type === "password";
-	    input.type = esPass ? "text" : "password";
-	    icono.className = esPass ? "bi bi-eye-slash" : "bi bi-eye";
-	});
-	$("#inputAccesoPassword").on("keydown", function (e) {
-	    if (e.key === "Enter" && !_accesoBloqueadoInv) _validarAccesoInv();
-	});
-	
-	
-	
-	
-	// ── Salida Stock — con contraseña maestra ────────────────
-	$("#btnSalidaStock").on("click", function () {
-	    if (!insumoSeleccionado) return;
-	    _abrirAccesoInv("salida_stock");
-	});
-	
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

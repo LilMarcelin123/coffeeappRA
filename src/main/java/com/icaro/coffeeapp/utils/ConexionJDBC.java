@@ -1,37 +1,26 @@
 package com.icaro.coffeeapp.utils;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import org.springframework.beans.factory.annotation.Value;
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ConexionJDBC {
-	
-	@Value("${spring.datasource.username}")
-	private String user;
-	@Value("${spring.datasource.password}")
-	private String password;
-	@Value("${spring.datasource.url}")
-	private String url;
-	
-	public static Connection conn = null;
-	
-	public void getConexion() throws ClassNotFoundException, SQLException {
-		Class.forName("com.mysql.cj.jdbc.Driver");
-		conn = DriverManager.getConnection(url, user, password);
-	}
-	
-	public Connection getConexion2() throws ClassNotFoundException, SQLException {
-		Class.forName("com.mysql.cj.jdbc.Driver");
-		conn = DriverManager.getConnection(url, user, password);
-		return conn;
-	}
-	
-	public void cerrarConexion() throws SQLException {
-		conn.close();
-	}
-	
+
+    @Autowired
+    private DataSource dataSource;
+
+    public Connection getConexion2() throws SQLException {
+        return dataSource.getConnection();
+    }
+
+    public void cerrarConexion(Connection conn) throws SQLException {
+        if (conn != null && !conn.isClosed()) {
+            conn.close(); // devuelve la conexión al pool
+        }
+    }
 }
