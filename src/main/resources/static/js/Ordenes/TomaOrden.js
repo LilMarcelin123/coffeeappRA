@@ -10,8 +10,9 @@ var _moduloActual    = "";
 var _accesoBloqueado = false;
 
 var MODULOS_ACCESO = {
-    "usuarios": { label: "Gestion de Usuarios",    redirect: "/admin/GestionUsuarios"   },
-    "reportes": { label: "Generacion de Reportes", redirect: "/admin/GeneracionReportes" }
+    "usuarios":   { label: "Gestion de Usuarios",    redirect: "/admin/GestionUsuarios"   },
+    "reportes":   { label: "Generacion de Reportes", redirect: "/admin/GeneracionReportes" },
+    "inventario": { label: "Gestion de Inventario",  redirect: "/admin/gestionInventario"  } // ← AGREGAR
 };
 
 function _elAcceso(id) {
@@ -97,12 +98,8 @@ $(document).ready(function () {
 
 			// ── Inventario — SIN contrasena ──────────────────────────
 			case "inventario":
-				mostrarConfirmacion2(
-					"¿Seguro que quieres ir a Gestión de Inventario?",
-					() => { window.location.href = "/admin/gestionInventario"; },
-					() => { console.log("cancelado"); }
-				);
-				break;
+			    _abrirAcceso("inventario");
+			    break;
 
 
 			// ── Reportes — CON contrasena maestra ────────────

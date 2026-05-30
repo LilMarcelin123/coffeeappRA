@@ -472,6 +472,7 @@ public class ProcedimientosAlmacenadosController {
 	            String redirect = switch (modulo.toLowerCase()) {
 	            case "usuarios"     -> "/admin/GestionUsuarios";
 	            case "reportes"     -> "/admin/GeneracionReportes";
+	            case "inventario"   -> "/admin/gestionInventario";  // ← AGREGAR
 	            case "salida_stock" -> "";
 	            default             -> "/admin/inicio";
 	        };
