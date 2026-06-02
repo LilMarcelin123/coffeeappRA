@@ -30,7 +30,6 @@
 
 <main class="page-main">
 
-    <!-- TABS PRINCIPALES -->
     <div class="panel-card mb-3">
         <div class="panel-card-body" style="padding:10px 14px;">
             <div class="inv-tabs">
@@ -41,7 +40,7 @@
         </div>
     </div>
 
-    <!-- ══ TAB 1: INSUMOS ══════════════════════════════════════ -->
+    <!-- TAB 1: INSUMOS -->
     <div id="tab-insumos" class="tab-pane-inv">
 
         <div class="panel-card">
@@ -153,45 +152,49 @@
             </div>
             <div style="height:20px;"></div>
         </div>
-    </div>
-	
-	<!-- Insumos Desactivados -->
-	<div class="panel-card" id="panelDesactivados" style="display:none;">
-	    <div class="panel-card-header">
-	        <div class="panel-card-title">
-	            <span class="icon-badge" style="background:linear-gradient(135deg,#6B7280,#374151);">
-	                <i class="bi bi-archive"></i>
-	            </span>
-	            Insumos Desactivados
-	        </div>
-	    </div>
-	    <div class="panel-card-body" style="padding-bottom:0;">
-	        <div class="table-wrap">
-	            <table class="table table-hover align-middle">
-	                <thead>
-	                    <tr>
-	                        <th style="width:44px;"></th>
-	                        <th style="width:50px;">ID</th>
-	                        <th>Nombre</th>
-	                        <th>Categoria</th>
-	                        <th>Ultimo stock</th>
-	                        <th>Unidad</th>
-	                        <th style="width:160px;">Acciones</th>
-	                    </tr>
-	                </thead>
-	                <tbody id="bodyDesactivados">
-	                    <tr><td colspan="7" class="tabla-empty">
-	                        <i class="bi bi-inbox"></i>
-	                        <p>Sin insumos desactivados</p>
-	                    </td></tr>
-	                </tbody>
-	            </table>
-	        </div>
-	    </div>
-	    <div style="height:20px;"></div>
-	</div>
 
-    <!-- ══ TAB 2: RECETAS ══════════════════════════════════════ -->
+        <!-- Insumos Desactivados — DENTRO del tab-insumos -->
+        <div class="panel-card" id="panelDesactivados" style="display:none;">
+            <div class="panel-card-header">
+                <div class="panel-card-title">
+                    <span class="icon-badge" style="background:linear-gradient(135deg,#6B7280,#374151);">
+                        <i class="bi bi-archive"></i>
+                    </span>
+                    Insumos Desactivados
+                </div>
+            </div>
+            <div class="panel-card-body" style="padding-bottom:0;">
+                <div class="alert alert-warning py-2 small mb-3" style="border-radius:10px;">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                    Estos insumos estan desactivados y no afectan al inventario activo. Puedes reactivarlos o eliminarlos definitivamente.
+                </div>
+                <div class="table-wrap">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th style="width:50px;">ID</th>
+                                <th>Nombre</th>
+                                <th>Categoria</th>
+                                <th>Ultimo stock</th>
+                                <th>Unidad</th>
+                                <th style="width:200px;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyDesactivados">
+                            <tr><td colspan="6" class="tabla-empty">
+                                <i class="bi bi-inbox"></i>
+                                <p>Sin insumos desactivados</p>
+                            </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div style="height:20px;"></div>
+        </div>
+
+    </div><!-- fin tab-insumos -->
+
+    <!-- TAB 2: RECETAS -->
     <div id="tab-recetas" class="tab-pane-inv" style="display:none;">
 
         <div class="panel-card mb-3">
@@ -207,7 +210,6 @@
             </div>
         </div>
 
-        <!-- Sub-tab: Productos -->
         <div id="subtab-productos">
             <div class="panel-card">
                 <div class="panel-card-header">
@@ -219,8 +221,6 @@
                 <div class="panel-card-body">
                     <p class="text-muted small mb-3">Selecciona un producto para ver o editar sus insumos requeridos.</p>
                     <div class="receta-layout">
-
-                        <!-- Lista de productos -->
                         <div class="receta-lista">
                             <div class="table-wrap">
                                 <table class="table table-hover align-middle" style="table-layout:auto;width:100%;">
@@ -235,8 +235,6 @@
                                 </table>
                             </div>
                         </div>
-
-                        <!-- Detalle de receta -->
                         <div class="receta-detalle">
                             <div id="panelReceta" style="display:none;">
                                 <div class="receta-detalle-header">
@@ -269,7 +267,6 @@
             </div>
         </div>
 
-        <!-- Sub-tab: Extras -->
         <div id="subtab-extras" style="display:none;">
             <div class="panel-card">
                 <div class="panel-card-header">
@@ -281,8 +278,6 @@
                 <div class="panel-card-body">
                     <p class="text-muted small mb-3">Selecciona un extra para ver o editar los insumos que consume.</p>
                     <div class="receta-layout">
-
-                        <!-- Lista de extras -->
                         <div class="receta-lista">
                             <div class="table-wrap">
                                 <table class="table table-hover align-middle" style="table-layout:auto;width:100%;">
@@ -297,8 +292,6 @@
                                 </table>
                             </div>
                         </div>
-
-                        <!-- Detalle de receta extra -->
                         <div class="receta-detalle">
                             <div id="panelRecetaExtra" style="display:none;">
                                 <div class="receta-detalle-header">
@@ -332,7 +325,7 @@
         </div>
     </div>
 
-    <!-- ══ TAB 3: MOVIMIENTOS ══════════════════════════════════ -->
+    <!-- TAB 3: MOVIMIENTOS -->
     <div id="tab-log" class="tab-pane-inv" style="display:none;">
         <div class="panel-card">
             <div class="panel-card-header">
@@ -376,7 +369,7 @@
     </div>
 </footer>
 
-<!-- ══ MODALES ══════════════════════════════════════════════════ -->
+<!-- MODALES -->
 
 <div class="modal fade" id="modalNuevoInsumo" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
