@@ -4,7 +4,7 @@
 // Módulo de Inventario — El Rincón en las Arboledas
 // ================================================================
 
-import { mensajesAlert } from "../FuncionesGenerales.js";
+import {mensajesAlert, mostrarConfirmacion2} from "../FuncionesGenerales.js";
 
 // ── Modal acceso (mismo que admin) ───────────────────────────
 var _accesoModalInv     = null;
@@ -435,19 +435,27 @@ $(document).ready(function () {
     });
 
     // ── Desactivar Insumo ────────────────────────────────────
-    $("#btnDesactivarInsumo").on("click", function () {
-        if (!insumoSeleccionado) return;
-        if (!confirm(`¿Desactivar "${insumoSeleccionado.n_nombre}"? El historial se conserva.`)) return;
-
-        ajaxPost(URL_GESTIONAR, { tipoProceso: 4, idInsumo: insumoSeleccionado.id_insumo })
-            .done(function () {
-                mensajesAlert("Insumo desactivado|bg-warning");
-                insumoSeleccionado = null;
-                ocultarAccionesInsumos();
-                cargarInsumos();
-            })
-            .fail(() => mensajesAlert("Error al desactivar|bg-danger"));
-    });
+	$("#btnDesactivarInsumo").on("click", function () {
+	    if (!insumoSeleccionado) return;
+	    mostrarConfirmacion2(
+	        `¿Desactivar "${insumoSeleccionado.n_nombre}"? Verifica que no esté en ninguna receta activa antes de continuar.`,
+	        function () {
+	            ajaxPost(URL_GESTIONAR, { tipoProceso: 4, idInsumo: insumoSeleccionado.id_insumo })
+	                .done(function (resp) {
+	                    if (resp?.resultado === -2) {
+	                        mensajesAlert(resp.mensaje + "|bg-danger");
+	                        return;
+	                    }
+	                    mensajesAlert("Insumo desactivado. Ya no aparecerá en el stock activo.|bg-warning");
+	                    insumoSeleccionado = null;
+	                    ocultarAccionesInsumos();
+	                    cargarInsumos();
+	                })
+	                .fail(() => mensajesAlert("Error al desactivar|bg-danger"));
+	        },
+	        function () {}
+	    );
+	});
 
     // ── Nueva Categoría ──────────────────────────────────────
     $("#btnNuevaCategoria").on("click", function () {
