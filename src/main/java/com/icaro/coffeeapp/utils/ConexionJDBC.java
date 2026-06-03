@@ -20,7 +20,7 @@ public class ConexionJDBC {
 
     public void cerrarConexion(Connection conn) throws SQLException {
         if (conn != null && !conn.isClosed()) {
-            conn.close(); // devuelve la conexión al pool
+            conn.close();
         }
     }
 }

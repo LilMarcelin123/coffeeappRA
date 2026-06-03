@@ -284,15 +284,6 @@ public class ProcedimientosAlmacenadosController {
 	    
 	    
 	    
-	    
-	    
-	    
-	 // ════════════════════════════════════════════════════════════════════════════
-	//  PEGAR ESTOS MÉTODOS DENTRO DE LA CLASE ProcedimientosAlmacenadosController
-	//  Agregar estos imports al inicio del archivo si no los tienes:
-//	    import org.springframework.web.bind.annotation.*;
-//	    import org.springframework.http.HttpStatus;
-	// ════════════════════════════════════════════════════════════════════════════
 
 
 	    // ═════════════════════════════════════════════════════════════════════════
@@ -560,7 +551,7 @@ public class ProcedimientosAlmacenadosController {
 	    
 	    
 	    
-	
+
 
 	    // ════════════════════════════════════════════════════════════════════════
 	    //  /admin/inventario/gestionar  — sp_gestion_inventario
@@ -708,7 +699,9 @@ public class ProcedimientosAlmacenadosController {
 	        HttpStatus status = (res >= 0) ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR;
 	        return ResponseEntity.status(status).body(resultado);
 	    }
+
 	    
+	
 	    
 	    
 }
