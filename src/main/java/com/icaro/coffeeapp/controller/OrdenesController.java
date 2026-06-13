@@ -82,14 +82,6 @@ public class OrdenesController {
     
     
     
-    @GetMapping("/admin/gestionInventario")
-    public String mostrarGestionInventario(Model model) {
-
-        return "inventario/gestionInventario"; 
-    }
-
-    
-    
     
     @GetMapping("/api/productosPorCategoria/{idCategoria}")
     @ResponseBody

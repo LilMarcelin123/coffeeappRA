@@ -33,15 +33,50 @@ public class EvolutionApiClient {
         textMessage.put("text", texto);
 
         Map<String, Object> body = new HashMap<>();
-        body.put("number", numeroDestino);
+        body.put("number", numeroDestino.contains("@") ? numeroDestino : numeroDestino + "@s.whatsapp.net");
         body.put("textMessage", textMessage);
+
+        System.out.println("📤 Body enviado: " + body);
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
         try {
-            restTemplate.postForEntity(url, request, String.class);
+            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+            System.out.println("✅ Respuesta Evolution: " + response.getBody());
         } catch (Exception e) {
             System.err.println("Error enviando mensaje WhatsApp: " + e.getMessage());
         }
     }
+    
+    
+    public void enviarDocumento(String numeroDestino, String urlDocumento, String nombreArchivo, String caption) {
+        String url = evolutionApiUrl + "/message/sendMedia/" + instanceName;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("apikey", evolutionApiKey);
+
+        Map<String, Object> mediaMessage = new HashMap<>();
+        mediaMessage.put("mediatype", "document");
+        mediaMessage.put("mimetype", "application/pdf");
+        mediaMessage.put("media", urlDocumento);
+        mediaMessage.put("fileName", nombreArchivo);
+        mediaMessage.put("caption", caption);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("number", numeroDestino.contains("@") ? numeroDestino : numeroDestino + "@s.whatsapp.net");
+        body.put("mediaMessage", mediaMessage);
+
+        System.out.println("📤 Body PDF: " + body);
+
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+            System.out.println("✅ PDF enviado: " + response.getBody());
+        } catch (Exception e) {
+            System.err.println("Error enviando PDF: " + e.getMessage());
+        }
+    }
+    
 }

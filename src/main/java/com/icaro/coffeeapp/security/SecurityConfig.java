@@ -24,9 +24,11 @@ public class SecurityConfig {
                 headers.frameOptions(frameOptions -> frameOptions.sameOrigin())
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/postLogin",
-                                 "/img/**", "/css/**", "/js/**", "/webjars/**",
-                                 "/webhook/whatsapp").permitAll()  // ← AGREGADO
+            		.requestMatchers("/login", "/postLogin",
+                            "/img/**", "/css/**", "/js/**", "/webjars/**",
+                            "/pdf/**",
+                            "/webhook/whatsapp",
+                            "/webhook/whatsapp/**").permitAll()
 
                 .requestMatchers("/admin/**").hasRole("ADMINISTRADOR")
                 .requestMatchers("/tomaOrden/**").hasRole("ADMINISTRADOR")

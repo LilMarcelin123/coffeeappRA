@@ -34,7 +34,7 @@ public class AiClient {
             Map<String, Object> body = Map.of(
                 "model", model,
                 "messages", prepararMensajes(messages, systemPrompt),
-                "max_tokens", 500,
+                "max_tokens", 4096,
                 "temperature", 0.7
             );
 
@@ -42,7 +42,10 @@ public class AiClient {
             ResponseEntity<String> response = restTemplate.postForEntity(apiUrl, request, String.class);
 
             JsonNode root = objectMapper.readTree(response.getBody());
-            return root.path("choices").get(0).path("message").path("content").asText();
+            JsonNode choice = root.path("choices").get(0);
+            System.out.println("🔍 finish_reason: " + choice.path("finish_reason").asText());
+            System.out.println("🔍 usage: " + root.path("usage").toString());
+            return choice.path("message").path("content").asText();
 
         } catch (Exception e) {
             System.err.println("Error llamando IA: " + e.getMessage());

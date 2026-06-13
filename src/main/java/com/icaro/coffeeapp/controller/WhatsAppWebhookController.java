@@ -12,7 +12,7 @@ public class WhatsAppWebhookController {
     @Autowired
     private WhatsAppService whatsAppService;
 
-    @PostMapping
+    @PostMapping({"", "/", "/**"})
     public ResponseEntity<String> recibirMensaje(@RequestBody String payload) {
         try {
             whatsAppService.procesarMensaje(payload);
