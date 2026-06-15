@@ -830,4 +830,93 @@ public class ProcedimientosAlmacenados {
     private void setBdOrNull(CallableStatement cs, int idx, BigDecimal val) throws SQLException {
         if (val != null) cs.setBigDecimal(idx, val); else cs.setNull(idx, Types.DECIMAL);
     }
+
+    // ════════════════════════════════════════════════════════════
+    // ACTUALIZACIÓN DE ESTATUS WHATSAPP
+    // ════════════════════════════════════════════════════════════
+
+    public Integer spSetOrdenWhatsapp(Integer idOrden, String waPhone) {
+        final String SQL = "{call sp_set_orden_whatsapp(?, ?)}";
+        try (Connection conn = conexionJDBC.getConexion2();
+             CallableStatement cs = conn.prepareCall(SQL)) {
+            cs.setInt(1, idOrden);
+            if (waPhone == null || waPhone.isBlank()) cs.setNull(2, Types.VARCHAR);
+            else                                      cs.setString(2, waPhone);
+            boolean rs = cs.execute();
+            if (rs) { try (ResultSet r = cs.getResultSet()) { if (r.next()) return r.getInt("filas"); } }
+        } catch (SQLException e) {
+            log.error("spSetOrdenWhatsapp error: {}", e.getMessage());
+        }
+        return 0;
+    }
+
+    public Integer spRegistrarActualizacion(Integer idOrden, String estatus, String mensaje,
+            String tiempoEstimado, String telefonoRepartidor, String usuarioAdmin, boolean enviado) {
+        final String SQL = "{call sp_actualizacion_orden(?, ?, ?, ?, ?, ?, ?, ?)}";
+        try (Connection conn = conexionJDBC.getConexion2();
+             CallableStatement cs = conn.prepareCall(SQL)) {
+            cs.setInt(1, 1);
+            cs.setInt(2, idOrden);
+            cs.setString(3, estatus);
+            cs.setString(4, mensaje);
+            if (tiempoEstimado == null || tiempoEstimado.isBlank())         cs.setNull(5, Types.VARCHAR); else cs.setString(5, tiempoEstimado);
+            if (telefonoRepartidor == null || telefonoRepartidor.isBlank()) cs.setNull(6, Types.VARCHAR); else cs.setString(6, telefonoRepartidor);
+            if (usuarioAdmin == null || usuarioAdmin.isBlank())             cs.setNull(7, Types.VARCHAR); else cs.setString(7, usuarioAdmin);
+            cs.setInt(8, enviado ? 1 : 0);
+            boolean rs = cs.execute();
+            if (rs) { try (ResultSet r = cs.getResultSet()) { if (r.next()) return r.getInt("id_actualizacion"); } }
+        } catch (SQLException e) {
+            log.error("spRegistrarActualizacion error: {}", e.getMessage());
+        }
+        return null;
+    }
+
+    public List<Map<String, Object>> spHistorialActualizaciones(Integer idOrden) {
+        final String SQL = "{call sp_actualizacion_orden(?, ?, ?, ?, ?, ?, ?, ?)}";
+        try (Connection conn = conexionJDBC.getConexion2();
+             CallableStatement cs = conn.prepareCall(SQL)) {
+            cs.setInt(1, 2);
+            cs.setInt(2, idOrden);
+            cs.setNull(3, Types.VARCHAR); cs.setNull(4, Types.VARCHAR);
+            cs.setNull(5, Types.VARCHAR); cs.setNull(6, Types.VARCHAR);
+            cs.setNull(7, Types.VARCHAR); cs.setNull(8, Types.INTEGER);
+            boolean rs = cs.execute();
+            if (rs) { try (ResultSet r = cs.getResultSet()) { return mapResultSetSimple(r); } }
+        } catch (SQLException e) {
+            log.error("spHistorialActualizaciones error: {}", e.getMessage());
+        }
+        return new ArrayList<>();
+    }
+
+    public Integer spMarcarActualizacionEnviada(Integer idActualizacion) {
+        final String SQL = "{call sp_actualizacion_orden(?, ?, ?, ?, ?, ?, ?, ?)}";
+        try (Connection conn = conexionJDBC.getConexion2();
+             CallableStatement cs = conn.prepareCall(SQL)) {
+            cs.setInt(1, 3);
+            cs.setInt(2, idActualizacion);
+            cs.setNull(3, Types.VARCHAR); cs.setNull(4, Types.VARCHAR);
+            cs.setNull(5, Types.VARCHAR); cs.setNull(6, Types.VARCHAR);
+            cs.setNull(7, Types.VARCHAR); cs.setNull(8, Types.INTEGER);
+            boolean rs = cs.execute();
+            if (rs) { try (ResultSet r = cs.getResultSet()) { if (r.next()) return r.getInt("filas"); } }
+        } catch (SQLException e) {
+            log.error("spMarcarActualizacionEnviada error: {}", e.getMessage());
+        }
+        return 0;
+    }
+
+    public Map<String, Object> spDatosEnvioOrden(Integer idOrden) {
+        final String SQL = "SELECT id_orden, source, wa_phone, n_estatus_orden, n_nombre_cliente FROM orden WHERE id_orden = ?";
+        try (Connection conn = conexionJDBC.getConexion2();
+             PreparedStatement ps = conn.prepareStatement(SQL)) {
+            ps.setInt(1, idOrden);
+            try (ResultSet r = ps.executeQuery()) {
+                List<Map<String, Object>> filas = mapResultSetSimple(r);
+                if (!filas.isEmpty()) return filas.get(0);
+            }
+        } catch (SQLException e) {
+            log.error("spDatosEnvioOrden error: {}", e.getMessage());
+        }
+        return Collections.emptyMap();
+    }
 }

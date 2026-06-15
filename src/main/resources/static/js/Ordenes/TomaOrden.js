@@ -461,10 +461,41 @@ function renderPendientes(lista) {
 
         tr.dataset.idOrden = idOrden;
         node.querySelector(".col-id").textContent      = idOrden ?? "";
-		node.querySelector(".col-nombre").textContent  = o.n_nombre_cliente ?? "—";  
+        node.querySelector(".col-nombre").textContent  = o.n_nombre_cliente ?? "—";
         node.querySelector(".col-hora").textContent    = o.t_hora_creacion ?? "";
         node.querySelector(".col-total").textContent   = (o.p_total != null) ? `$${Number(o.p_total).toFixed(2)}` : "$0.00";
         node.querySelector(".col-resumen").textContent = o.resumen ?? "";
+
+        // ── Distinguir origen y, si es WhatsApp, añadir botón "Actualizar" ──
+        const esWhatsapp = String(o.source || "").toUpperCase() === "WHATSAPP";
+        const tdAccion = document.createElement("td");
+        tdAccion.className = "col-accion-wa text-end";
+
+        if (esWhatsapp) {
+            const colNombre = node.querySelector(".col-nombre");
+            if (colNombre) {
+                const badge = document.createElement("span");
+                badge.className = "badge-origen-wa ms-2";
+                badge.innerHTML = '<i class="bi bi-whatsapp"></i> WhatsApp';
+                colNombre.appendChild(badge);
+            }
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "btn-actualizar-wa";
+            btn.innerHTML = '<i class="bi bi-send"></i> Actualizar';
+            btn.addEventListener("click", function (e) {
+                e.stopPropagation();
+                if (window.ActualizacionEstatus) {
+                    window.ActualizacionEstatus.abrirModal({
+                        idOrden:  idOrden,
+                        cliente:  o.n_nombre_cliente || "—",
+                        telefono: o.wa_phone || "—",
+                    });
+                }
+            });
+            tdAccion.appendChild(btn);
+        }
+        tr.appendChild(tdAccion);
 
         const chk = node.querySelector(".chkRow");
 
@@ -477,7 +508,7 @@ function renderPendientes(lista) {
 
         tr.addEventListener("click", function (e) {
             const tag = e.target.tagName.toLowerCase();
-            if (tag === "input" || tag === "button" || tag === "a") return;
+            if (tag === "input" || tag === "button" || tag === "a" || e.target.closest("button")) return;
             chk.checked = !chk.checked;
             const total    = $("#tbodyPendientes .chkRow").length;
             const marcados = $("#tbodyPendientes .chkRow:checked").length;

@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/actualizacionEstatus.css}">
 </head>
 
 <body>
@@ -266,9 +267,59 @@
 <div th:replace="~{admin/Generales :: modalConfirmacion}"></div>
 <div th:replace="~{admin/Generales :: modalAccesoModulo}"></div>
 
+<!-- Modal: Actualización de estatus WhatsApp -->
+<div class="modal fade" id="modalActualizacionEstatus" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-whatsapp"></i> Enviar actualización al cliente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="ae-orden-meta">
+                    <div>Orden <strong id="aeOrdenId">#—</strong> · Cliente: <strong id="aeOrdenCliente">—</strong></div>
+                    <div>Destino WhatsApp: <strong id="aeOrdenTelefono">—</strong></div>
+                </div>
+                <label class="form-label fw-semibold mb-2" style="font-size:.85rem;">Selecciona el estatus a enviar</label>
+                <div class="ae-estatus-selector" id="aeEstatusSelector">
+                    <div class="ae-estatus-opt" data-estatus="EN_PREPARACION"><i class="bi bi-hourglass-split"></i> En preparación</div>
+                    <div class="ae-estatus-opt" data-estatus="EN_CAMINO"><i class="bi bi-truck"></i> En camino</div>
+                    <div class="ae-estatus-opt" data-estatus="ENTREGADO"><i class="bi bi-check2-circle"></i> Entregado</div>
+                    <div class="ae-estatus-opt" data-estatus="CERRADA"><i class="bi bi-bag-check"></i> Cerrar / Agradecer</div>
+                </div>
+                <div class="ae-campos">
+                    <div class="ae-campo" id="aeCampoTiempo">
+                        <label for="aeInputTiempo">Tiempo estimado</label>
+                        <input type="text" id="aeInputTiempo" placeholder="Ej. 30 minutos" maxlength="40">
+                        <div class="ae-error">Ingresa un tiempo estimado.</div>
+                    </div>
+                    <div class="ae-campo" id="aeCampoTelefono">
+                        <label for="aeInputTelefono">Número del repartidor</label>
+                        <input type="text" id="aeInputTelefono" placeholder="Ej. 5512345678" maxlength="20" inputmode="numeric">
+                        <div class="ae-error">Ingresa un número válido (10 dígitos).</div>
+                    </div>
+                </div>
+                <div class="ae-preview" id="aePreview">
+                    <div class="ae-preview-label"><i class="bi bi-eye"></i> Vista previa</div>
+                    <span id="aePreviewTexto"></span>
+                </div>
+                <div class="ae-timeline-wrap">
+                    <div class="ae-timeline-title"><i class="bi bi-clock-history"></i> Historial de actualizaciones</div>
+                    <div class="ae-timeline" id="aeTimeline"><div class="ae-timeline-empty">Cargando…</div></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-success ae-btn-enviar" id="aeBtnEnviar" disabled><i class="bi bi-send"></i> Enviar actualización</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script type="module" th:src="@{/js/Ordenes/TomaOrden.js}"></script>
+<script th:src="@{/js/Ordenes/ActualizacionEstatus.js}"></script>
 
 </body>
 </html>

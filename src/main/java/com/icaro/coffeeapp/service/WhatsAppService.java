@@ -384,6 +384,7 @@ public class WhatsAppService {
 
             // 3. Guardar nombre del cliente (número de WhatsApp)
             procedimientosAlmacenados.spGuardarNombreCliente(idOrden, "WA:" + numero);
+            procedimientosAlmacenados.spSetOrdenWhatsapp(idOrden, jidParaEnviar); // marca WHATSAPP + guarda JID
 
             // 4. Mandar a pendientes (proceso 2)
             procedimientosAlmacenados.spGestionarOrden(idOrden, 2, null, null);
