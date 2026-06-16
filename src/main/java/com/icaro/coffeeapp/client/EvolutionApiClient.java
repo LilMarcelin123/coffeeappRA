@@ -29,12 +29,10 @@ public class EvolutionApiClient {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("apikey", evolutionApiKey);
 
-        Map<String, Object> textMessage = new HashMap<>();
-        textMessage.put("text", texto);
-
+        // Evolution API v2: campos planos en el body (text directo, no anidado)
         Map<String, Object> body = new HashMap<>();
         body.put("number", numeroDestino.contains("@") ? numeroDestino : numeroDestino + "@s.whatsapp.net");
-        body.put("textMessage", textMessage);
+        body.put("text", texto);
 
         System.out.println("📤 Body enviado: " + body);
 
@@ -47,8 +45,8 @@ public class EvolutionApiClient {
             System.err.println("Error enviando mensaje WhatsApp: " + e.getMessage());
         }
     }
-    
-    
+
+
     public void enviarDocumento(String numeroDestino, String urlDocumento, String nombreArchivo, String caption) {
         String url = evolutionApiUrl + "/message/sendMedia/" + instanceName;
 
@@ -56,16 +54,14 @@ public class EvolutionApiClient {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("apikey", evolutionApiKey);
 
-        Map<String, Object> mediaMessage = new HashMap<>();
-        mediaMessage.put("mediatype", "document");
-        mediaMessage.put("mimetype", "application/pdf");
-        mediaMessage.put("media", urlDocumento);
-        mediaMessage.put("fileName", nombreArchivo);
-        mediaMessage.put("caption", caption);
-
+        // Evolution API v2: campos planos en el body (no anidados en mediaMessage)
         Map<String, Object> body = new HashMap<>();
         body.put("number", numeroDestino.contains("@") ? numeroDestino : numeroDestino + "@s.whatsapp.net");
-        body.put("mediaMessage", mediaMessage);
+        body.put("mediatype", "document");
+        body.put("mimetype", "application/pdf");
+        body.put("media", urlDocumento);
+        body.put("fileName", nombreArchivo);
+        body.put("caption", caption);
 
         System.out.println("📤 Body PDF: " + body);
 
@@ -78,5 +74,5 @@ public class EvolutionApiClient {
             System.err.println("Error enviando PDF: " + e.getMessage());
         }
     }
-    
+
 }
