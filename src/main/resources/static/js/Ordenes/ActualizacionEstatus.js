@@ -17,6 +17,21 @@
     const $el = (id) => document.getElementById(id);
     function esc(s) { return $("<span>").text(s ?? "").html(); }
 
+    function formatearFecha(valor) {
+        if (!valor) return "";
+        let d;
+        if (typeof valor === "number" || /^\d+$/.test(String(valor))) {
+            d = new Date(Number(valor));
+        } else {
+            d = new Date(String(valor).replace(" ", "T"));
+        }
+        if (isNaN(d.getTime())) return String(valor);
+        const meses = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+        const hh = String(d.getHours()).padStart(2, "0");
+        const mm = String(d.getMinutes()).padStart(2, "0");
+        return `${d.getDate()}/${meses[d.getMonth()]} ${hh}:${mm}`;
+    }
+
     function construirPreview(estatus, tiempo, telefono) {
         const t = (tiempo || "").trim(), tel = (telefono || "").trim();
         switch (estatus) {
@@ -133,7 +148,7 @@
             const label = (ESTATUS[estatus] && ESTATUS[estatus].label) || estatus;
             const enviado = String(item.b_enviado) === "1";
             const meta = [];
-            meta.push(esc(item.t_fecha_hora || ""));
+            meta.push(esc(formatearFecha(item.t_fecha_hora)));
             if (item.n_usuario_admin) meta.push("por " + esc(item.n_usuario_admin));
             if (!enviado) meta.push('<span class="ae-timeline-noenviado">no entregado</span>');
             cont.insertAdjacentHTML("beforeend", `
