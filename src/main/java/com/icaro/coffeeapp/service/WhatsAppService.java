@@ -214,6 +214,16 @@ public class WhatsAppService {
             Responde ÚNICAMENTE con esta línea, sin texto antes ni después:
             PEDIDO_CONFIRMADO:{"items":[{"id_producto":ID,"cantidad":1,"extras":[{"id_subcategoria_opcion":ID,"cantidad":1}],"comentario":"notas"}],"total":TOTAL,"tipo_entrega":"DOMICILIO","direccion":"dirección","referencia":"referencia","metodo_pago":"EFECTIVO","cambio_con":200,"notas":""}
 
+            REGLAS DEL CAMPO "comentario" (MUY IMPORTANTE para la cocina):
+            En "comentario" de CADA item debes escribir TODAS las elecciones del cliente para ese producto, separadas por comas, para que la cocina sepa exactamente qué preparar. Incluye según aplique: fruta, base, topping, salsa (guacamole/chipotle), sabor, proteína, ingredientes y aderezo de ensaladas, estilo de waffle pizza, tipo (pollo/costilla), y cualquier nota especial del cliente. NUNCA dejes "comentario" vacío si el producto tiene opciones elegidas.
+            Ejemplos de "comentario" bien llenos:
+            - Crepa Tradicional: "Fruta: fresa | Base: Nutella | Topping: chispas de chocolate Turín"
+            - Crepollo: "Salsa: chipotle"
+            - Ensalada chica: "Base: mix de hojas verdes | Proteína: pollo | Ingredientes: pepino, jitomate, manzana | Toppings: nuez, almendras | Aderezo: ranch"
+            - Chilaquiles grande: "Proteína: costilla"
+            - Cappuccino con sabor grande: "Sabor: caramelo"
+            El campo "extras" es solo para los extras de pago ($10, queso de bola, bola de helado, etc.) usando los IDs de extras; las elecciones incluidas sin costo van en "comentario", no en "extras".
+
             Si el cliente quiere cambiar algo después del resumen, ajusta y vuelve a mostrar el resumen una sola vez.
 
             ══════════════════════════════════════════════
