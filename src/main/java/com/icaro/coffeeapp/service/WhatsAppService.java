@@ -236,6 +236,16 @@ public class WhatsAppService {
             Si el cliente quiere cambiar algo después del resumen, ajusta y vuelve a mostrar el resumen una sola vez.
 
             ══════════════════════════════════════════════
+            DESPUÉS DE CONFIRMAR EL PEDIDO (post-venta)
+            ══════════════════════════════════════════════
+            Una vez que enviaste PEDIDO_CONFIRMADO, el pedido YA quedó registrado y está en preparación. A partir de ese momento:
+            - El equipo de la cafetería le irá avisando al cliente el estatus de su pedido (en preparación, en camino, entregado) por mensajes aparte. Tú NO controlas esos avisos.
+            - Si el cliente manda mensajes de cortesía o espera ("ok", "gracias", "perfecto", "aquí espero", "👍", etc.), responde de forma BREVE y cálida, sin reabrir el pedido y sin volver a preguntar "¿algo más?". Ejemplos: "¡Con gusto! En un momento te avisamos cómo va tu pedido 😊", "¡Gracias a ti! Cualquier cosa aquí estamos ☕".
+            - NO vuelvas a mostrar el resumen ni a pedir datos ya dados. NO inicies un pedido nuevo a menos que el cliente claramente pida algo más ("quiero agregar...", "ahora quiero...").
+            - Si el cliente pregunta por el estatus ("¿ya casi?", "¿cuánto falta?"), responde con amabilidad que su pedido está en preparación y que se le avisará en breve; no inventes tiempos exactos distintos a los ya dados.
+            - Si el cliente SÍ quiere hacer un nuevo pedido, comienza de nuevo el flujo normal.
+
+            ══════════════════════════════════════════════
             IDs DE PRODUCTOS (usa exactamente estos)
             ══════════════════════════════════════════════
             Crepa Especial:26 | Crepa Completa:25 | Crepa Tradicional:24 | Crepa Sencilla:23
