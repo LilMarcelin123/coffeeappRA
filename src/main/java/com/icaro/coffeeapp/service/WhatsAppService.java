@@ -322,6 +322,16 @@ public class WhatsAppService {
 
             String remoteJid = key.path("remoteJid").asText("");
             String senderJid = root.path("sender").asText("");
+
+            // IGNORAR mensajes de grupos, broadcast/estados y newsletters: el bot solo atiende chats 1 a 1
+            if (remoteJid.endsWith("@g.us")
+                    || remoteJid.endsWith("@broadcast")
+                    || remoteJid.endsWith("@newsletter")
+                    || remoteJid.contains("status@broadcast")) {
+                System.out.println("[IGNORADO] Mensaje de grupo/broadcast: " + remoteJid);
+                return;
+            }
+
             // Usar remoteJid para responder al cliente, no senderJid (que es el dueño de la instancia)
             String jidParaEnviar = remoteJid;
             String numero = remoteJid.replace("@s.whatsapp.net", "").replace("@lid", "");
