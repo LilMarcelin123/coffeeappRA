@@ -399,8 +399,8 @@ public class WhatsAppService {
             mensajes.add(mensajeUsuario);
 
             // Limitar historial
-            if (mensajes.size() > 20) {
-                mensajes = mensajes.subList(mensajes.size() - 20, mensajes.size());
+            if (mensajes.size() > 50) {
+                mensajes = mensajes.subList(mensajes.size() - 50, mensajes.size());
                 historial.put(numero, new ArrayList<>(mensajes));
             }
 
