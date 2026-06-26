@@ -472,7 +472,17 @@ public class WhatsAppService {
 
             // 3. Guardar nombre del cliente (número de WhatsApp)
             procedimientosAlmacenados.spGuardarNombreCliente(idOrden, "WA:" + numero);
-            procedimientosAlmacenados.spSetOrdenWhatsapp(idOrden, jidParaEnviar); // marca WHATSAPP + guarda JID
+
+            // Leer datos de entrega/pago del JSON
+            String waDireccion   = pedido.path("direccion").asText("");
+            String waReferencia  = pedido.path("referencia").asText("");
+            String waMetodoPago  = pedido.path("metodo_pago").asText("");
+            String waTipoEntrega = pedido.path("tipo_entrega").asText("");
+            Double waCambioCon   = pedido.has("cambio_con") && !pedido.path("cambio_con").isNull()
+                                   ? pedido.path("cambio_con").asDouble() : null;
+
+            procedimientosAlmacenados.spSetOrdenWhatsapp(idOrden, jidParaEnviar,
+                waDireccion, waReferencia, waMetodoPago, waCambioCon, waTipoEntrega); // marca WHATSAPP + datos entrega/pago
 
             // 4. Mandar a pendientes (proceso 2)
             procedimientosAlmacenados.spGestionarOrden(idOrden, 2, null, null);

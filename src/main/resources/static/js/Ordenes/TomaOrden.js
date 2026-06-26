@@ -494,6 +494,17 @@ function renderPendientes(lista) {
                 }
             });
             tdAccion.appendChild(btn);
+
+            // Boton "Info" — muestra datos de entrega/pago del cliente
+            const btnInfo = document.createElement("button");
+            btnInfo.type = "button";
+            btnInfo.className = "btn-info-wa ms-1";
+            btnInfo.innerHTML = '<i class="bi bi-info-circle"></i> Info';
+            btnInfo.addEventListener("click", function (e) {
+                e.stopPropagation();
+                abrirModalInfoWa(idOrden);
+            });
+            tdAccion.appendChild(btnInfo);
         }
         tr.appendChild(tdAccion);
 
@@ -586,6 +597,80 @@ function reabrirOrdenes(ids) {
             $("#btnConfirmarReabrir").prop("disabled", false);
             console.error("Error reabriendo:", xhr.responseText);
             alert("No se pudo reabrir la orden.");
+        }
+    });
+}
+// ════════════════════════════════════════════════════════════
+// MODAL INFO WHATSAPP (datos de entrega/pago del cliente)
+// ════════════════════════════════════════════════════════════
+function abrirModalInfoWa(idOrden) {
+    const set = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
+    set("infoWaOrdenId", "#" + idOrden);
+    set("infoWaCliente", "Cargando…");
+    set("infoWaTelefono", "—");
+    set("infoWaTipoEntrega", "—");
+    set("infoWaDireccion", "—");
+    set("infoWaReferencia", "—");
+    set("infoWaPago", "—");
+    set("infoWaCambio", "—");
+
+    const modalEl = document.getElementById("modalInfoWa");
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl, { backdrop: true, keyboard: true });
+    modal.show();
+
+    $.ajax({
+        url: "/admin/orden/" + idOrden + "/info-whatsapp",
+        type: "GET",
+        success: function (d) {
+            if (!d || !d.ok) {
+                set("infoWaCliente", "Sin datos");
+                return;
+            }
+            const tel = (d.telefono || "").replace("@s.whatsapp.net", "");
+            set("infoWaCliente", d.cliente ? String(d.cliente).replace("WA:", "") : "—");
+            set("infoWaTelefono", tel || "—");
+            set("infoWaTipoEntrega", d.tipoEntrega || "—");
+            set("infoWaDireccion", d.direccion || "—");
+            set("infoWaReferencia", d.referencia || "—");
+
+            // Metodo de pago + cambio
+            const pago = (d.metodoPago || "").toUpperCase();
+            let pagoTexto = d.metodoPago || "—";
+            let cambioTexto = "—";
+            if (pago === "EFECTIVO") {
+                pagoTexto = "Efectivo";
+                if (d.cambioCon != null && Number(d.cambioCon) > 0) {
+                    const total = Number(d.total || 0);
+                    const billete = Number(d.cambioCon);
+                    const cambio = billete - total;
+                    cambioTexto = "Paga con $" + billete.toFixed(2) +
+                                  (cambio >= 0 ? " (lleva cambio de $" + cambio.toFixed(2) + ")" : "");
+                } else {
+                    cambioTexto = "Importe exacto";
+                }
+            } else if (pago === "TRANSFERENCIA") {
+                pagoTexto = "Transferencia";
+                cambioTexto = "Verificar comprobante";
+            }
+            set("infoWaPago", pagoTexto);
+            set("infoWaCambio", cambioTexto);
+
+            // Boton de Google Maps si la direccion trae coordenadas
+            const linkMaps = document.getElementById("infoWaMapsLink");
+            if (linkMaps) {
+                const dir = d.direccion || "";
+                const m = dir.match(/(-?\d+\.\d+)[,\s]+(-?\d+\.\d+)/);
+                if (m) {
+                    linkMaps.href = "https://maps.google.com/?q=" + m[1] + "," + m[2];
+                    linkMaps.style.display = "inline-block";
+                } else {
+                    linkMaps.style.display = "none";
+                }
+            }
+        },
+        error: function (xhr) {
+            console.error("Error info-whatsapp:", xhr.responseText);
+            set("infoWaCliente", "Error al cargar");
         }
     });
 }

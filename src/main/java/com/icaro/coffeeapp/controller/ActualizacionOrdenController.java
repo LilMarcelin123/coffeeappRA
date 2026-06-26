@@ -34,6 +34,22 @@ public class ActualizacionOrdenController {
         this.sp = sp;
     }
 
+    /** Devuelve los datos de entrega/pago de una orden WhatsApp para mostrar en pantalla. */
+    @GetMapping("/admin/orden/{idOrden}/info-whatsapp")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> infoWhatsapp(
+            @org.springframework.web.bind.annotation.PathVariable("idOrden") Integer idOrden) {
+        if (idOrden == null) {
+            return ResponseEntity.badRequest().body(Map.of("ok", false, "mensaje", "Falta idOrden."));
+        }
+        Map<String, Object> info = sp.obtenerInfoWhatsapp(idOrden);
+        if (info == null || info.isEmpty()) {
+            return ResponseEntity.ok(Map.of("ok", false, "mensaje", "Orden no encontrada."));
+        }
+        info.put("ok", true);
+        return ResponseEntity.ok(info);
+    }
+
     @PostMapping("/admin/orden/actualizacion/enviar")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> enviarActualizacion(

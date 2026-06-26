@@ -835,19 +835,59 @@ public class ProcedimientosAlmacenados {
     // ACTUALIZACIÓN DE ESTATUS WHATSAPP
     // ════════════════════════════════════════════════════════════
 
-    public Integer spSetOrdenWhatsapp(Integer idOrden, String waPhone) {
-        final String SQL = "{call sp_set_orden_whatsapp(?, ?)}";
+    public Integer spSetOrdenWhatsapp(Integer idOrden, String waPhone,
+            String direccion, String referencia, String metodoPago,
+            Double cambioCon, String tipoEntrega) {
+        final String SQL = "{call sp_set_orden_whatsapp(?, ?, ?, ?, ?, ?, ?)}";
         try (Connection conn = conexionJDBC.getConexion2();
              CallableStatement cs = conn.prepareCall(SQL)) {
             cs.setInt(1, idOrden);
             if (waPhone == null || waPhone.isBlank()) cs.setNull(2, Types.VARCHAR);
             else                                      cs.setString(2, waPhone);
+            if (direccion == null || direccion.isBlank()) cs.setNull(3, Types.VARCHAR);
+            else                                          cs.setString(3, direccion);
+            if (referencia == null || referencia.isBlank()) cs.setNull(4, Types.VARCHAR);
+            else                                            cs.setString(4, referencia);
+            if (metodoPago == null || metodoPago.isBlank()) cs.setNull(5, Types.VARCHAR);
+            else                                            cs.setString(5, metodoPago);
+            if (cambioCon == null) cs.setNull(6, Types.DECIMAL);
+            else                   cs.setDouble(6, cambioCon);
+            if (tipoEntrega == null || tipoEntrega.isBlank()) cs.setNull(7, Types.VARCHAR);
+            else                                              cs.setString(7, tipoEntrega);
             boolean rs = cs.execute();
             if (rs) { try (ResultSet r = cs.getResultSet()) { if (r.next()) return r.getInt("filas"); } }
         } catch (SQLException e) {
             log.error("spSetOrdenWhatsapp error: {}", e.getMessage());
         }
         return 0;
+    }
+
+    /** Lee los datos de entrega/pago WhatsApp de una orden para mostrarlos en pantalla. */
+    public Map<String, Object> obtenerInfoWhatsapp(Integer idOrden) {
+        final String SQL = "SELECT wa_phone, wa_direccion, wa_referencia, wa_metodo_pago, " +
+                           "wa_cambio_con, wa_tipo_entrega, n_nombre_cliente, p_total " +
+                           "FROM orden WHERE id_orden = ?";
+        Map<String, Object> info = new java.util.HashMap<>();
+        try (Connection conn = conexionJDBC.getConexion2();
+             PreparedStatement ps = conn.prepareStatement(SQL)) {
+            ps.setInt(1, idOrden);
+            try (ResultSet r = ps.executeQuery()) {
+                if (r.next()) {
+                    info.put("telefono",     r.getString("wa_phone"));
+                    info.put("direccion",    r.getString("wa_direccion"));
+                    info.put("referencia",   r.getString("wa_referencia"));
+                    info.put("metodoPago",   r.getString("wa_metodo_pago"));
+                    Object cambio = r.getObject("wa_cambio_con");
+                    info.put("cambioCon",    cambio);
+                    info.put("tipoEntrega",  r.getString("wa_tipo_entrega"));
+                    info.put("cliente",      r.getString("n_nombre_cliente"));
+                    info.put("total",        r.getObject("p_total"));
+                }
+            }
+        } catch (SQLException e) {
+            log.error("obtenerInfoWhatsapp error: {}", e.getMessage());
+        }
+        return info;
     }
 
     public Integer spRegistrarActualizacion(Integer idOrden, String estatus, String mensaje,
