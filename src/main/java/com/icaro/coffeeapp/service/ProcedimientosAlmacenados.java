@@ -890,6 +890,22 @@ public class ProcedimientosAlmacenados {
         return info;
     }
 
+    /** Devuelve true si el numero esta en la lista de bloqueados activos (el bot no debe responderle). */
+    public boolean numeroBloqueado(String numero) {
+        if (numero == null || numero.isBlank()) return false;
+        final String SQL = "SELECT 1 FROM wa_numeros_bloqueados WHERE numero = ? AND f_activo = 1 LIMIT 1";
+        try (Connection conn = conexionJDBC.getConexion2();
+             PreparedStatement ps = conn.prepareStatement(SQL)) {
+            ps.setString(1, numero);
+            try (ResultSet r = ps.executeQuery()) {
+                return r.next();
+            }
+        } catch (SQLException e) {
+            log.error("numeroBloqueado error: {}", e.getMessage());
+            return false; // ante error, no bloquear (mejor responder que dejar al cliente sin atencion)
+        }
+    }
+
     public Integer spRegistrarActualizacion(Integer idOrden, String estatus, String mensaje,
             String tiempoEstimado, String telefonoRepartidor, String usuarioAdmin, boolean enviado) {
         final String SQL = "{call sp_actualizacion_orden(?, ?, ?, ?, ?, ?, ?, ?)}";

@@ -335,6 +335,12 @@ public class WhatsAppService {
             // Usar remoteJid para responder al cliente, no senderJid (que es el dueño de la instancia)
             String jidParaEnviar = remoteJid;
             String numero = remoteJid.replace("@s.whatsapp.net", "").replace("@lid", "");
+
+            // IGNORAR numeros en lista de bloqueados (internos, pruebas, etc.)
+            if (procedimientosAlmacenados.numeroBloqueado(numero)) {
+                System.out.println("[BLOQUEADO] Numero en lista de bloqueados: " + numero);
+                return;
+            }
             
             
             JsonNode mensajeNode = data.path("message");
