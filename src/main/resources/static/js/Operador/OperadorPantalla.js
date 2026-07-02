@@ -350,6 +350,24 @@ function actualizarCabeceraCard(card, orden) {
         : "—";
 
     card.querySelector(".orden-hora-val").innerHTML = `<i class="bi bi-clock"></i> ${hora}`;
+
+    // Guardar hora de creacion para el envejecimiento visual
+    if (orden.t_hora_creacion) card.dataset.creacion = String(orden.t_hora_creacion);
+
+    // Badge WhatsApp (pedido a domicilio via bot)
+    const esWa = String(orden.source || "").toUpperCase() === "WHATSAPP";
+    let badgeWa = card.querySelector(".op-badge-wa");
+    if (esWa && !badgeWa) {
+        badgeWa = document.createElement("span");
+        badgeWa.className = "op-badge-wa";
+        badgeWa.innerHTML = '<i class="bi bi-whatsapp"></i>';
+        badgeWa.title = "Pedido por WhatsApp" + (orden.wa_tipo_entrega ? " · " + orden.wa_tipo_entrega : "");
+        card.appendChild(badgeWa);
+    } else if (!esWa && badgeWa) {
+        badgeWa.remove();
+    }
+
+    aplicarEnvejecimiento(card);
 }
 
 function actualizarItemsCard(card, items) {
