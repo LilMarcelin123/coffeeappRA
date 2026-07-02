@@ -108,7 +108,24 @@ public class WhatsAppService {
             Crepa Tradicional: fruta + base + topping ($75) [id:24]
             Crepa Completa: fruta + philadelphia + base + topping ($79) [id:25]
             Crepa Especial: incluye frutos rojos y philadelphia + base + topping ($85) [id:26]
-            DEDUCCIÓN: fruta+base+topping=Tradicional; fruta+philadelphia+base+topping=Completa; frutos rojos+philadelphia+base+topping (o "especial")=Especial; solo base+topping=Sencilla. Ej: "crepa de Nutella, fresa y nuez" = Tradicional (no preguntes el tipo).
+            CÓMO DECIDIR EL TIPO (aplica igual a crepas y waffles dulces). Analiza QUÉ COMPONENTES mencionó el cliente y decide con esta tabla, en este orden:
+            1) ¿Mencionó FRUTOS ROJOS como fruta (no como mermelada) o pidió "la especial"? → ESPECIAL.
+            2) Si no, ¿mencionó PHILADELPHIA (o queso crema)? → COMPLETA (lleva fruta; si no dijo fruta, pregúntala).
+            3) Si no, ¿mencionó una FRUTA (fresa, durazno o plátano)? → TRADICIONAL.
+            4) ¿Solo mencionó base y/o topping, SIN fruta y SIN philadelphia? → SENCILLA.
+            CUIDADO CON ESTAS TRAMPAS:
+            - "Mermelada de frutos rojos" es una BASE, NO cuenta como la fruta frutos rojos. "Crepa de fresa con mermelada de frutos rojos y nuez" = TRADICIONAL (fruta fresa + base mermelada + topping nuez).
+            - Frutos rojos como FRUTA solo existe en la Especial. Si el cliente pide "crepa de frutos rojos con nutella y nuez" → ESPECIAL.
+            - Si pide philadelphia sobre una Tradicional que ya venías armando, cámbiala a COMPLETA (y su precio).
+            - El tipo lo decides TÚ con la tabla; NUNCA preguntes "¿la quieres Tradicional, Completa o Especial?" si ya tienes los componentes. Pregunta SOLO el componente que falte para el tipo decidido.
+            EJEMPLOS:
+            - "Crepa de Nutella, fresa y nuez" → TRADICIONAL (fresa + Nutella + nuez).
+            - "Crepa de plátano con philadelphia, cajeta y almendras" → COMPLETA.
+            - "Crepa de frutos rojos con philadelphia, lechera y oreo" → ESPECIAL.
+            - "Crepa de cajeta con nuez" → SENCILLA (sin fruta).
+            - "Waffle de fresa con miel de maple y coco tostado" → WAFFLE TRADICIONAL.
+            - "Waffle de frutos rojos con nutella y brownie" → WAFFLE ESPECIAL.
+            Al confirmar el item, di el tipo decidido y su precio en una línea natural: "Anoto tu Crepa Tradicional de fresa con Nutella y nuez ($75)".
 
             ── WAFFLES DULCES ── (misma lógica de deducción que crepas)
             Waffle Sencillo: base + topping ($55) [id:28]

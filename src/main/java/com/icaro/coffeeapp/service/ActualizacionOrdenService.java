@@ -69,8 +69,7 @@ public class ActualizacionOrdenService {
 
         boolean enviado = false;
         try {
-            evolutionApiClient.enviarMensaje(waPhone, mensaje);
-            enviado = true;
+            enviado = evolutionApiClient.enviarMensaje(waPhone, mensaje);
         } catch (Exception e) {
             log.error("Error enviando actualización WhatsApp (orden {}): {}", idOrden, e.getMessage());
         }

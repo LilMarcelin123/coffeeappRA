@@ -22,7 +22,7 @@ public class EvolutionApiClient {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public void enviarMensaje(String numeroDestino, String texto) {
+    public boolean enviarMensaje(String numeroDestino, String texto) {
         String url = evolutionApiUrl + "/message/sendText/" + instanceName;
 
         HttpHeaders headers = new HttpHeaders();
@@ -41,8 +41,10 @@ public class EvolutionApiClient {
         try {
             ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
             System.out.println("✅ Respuesta Evolution: " + response.getBody());
+            return response.getStatusCode().is2xxSuccessful();
         } catch (Exception e) {
             System.err.println("Error enviando mensaje WhatsApp: " + e.getMessage());
+            return false;
         }
     }
 

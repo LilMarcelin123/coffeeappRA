@@ -146,7 +146,7 @@
             const estatus = item.n_estatus || "CERRADA";
             const clase = claseEstatus(estatus);
             const label = (ESTATUS[estatus] && ESTATUS[estatus].label) || estatus;
-            const enviado = String(item.b_enviado) === "1";
+            const enviado = item.b_enviado === true || item.b_enviado === 1 || String(item.b_enviado).toLowerCase() === "1" || String(item.b_enviado).toLowerCase() === "true";
             const meta = [];
             meta.push(esc(formatearFecha(item.t_fecha_hora)));
             if (item.n_usuario_admin) meta.push("por " + esc(item.n_usuario_admin));
