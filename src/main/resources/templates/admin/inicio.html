@@ -320,26 +320,38 @@
 <div class="modal fade" id="modalInfoWa" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background:#128C44;color:#fff;">
-                <h5 class="modal-title"><i class="bi bi-info-circle"></i> Información de la orden <span id="infoWaOrdenId">#—</span></h5>
+            <div class="modal-header" style="background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;">
+                <h5 class="modal-title"><i class="bi bi-info-circle"></i> Orden <span id="infoWaOrdenId">#—</span></h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
-                <table class="table table-sm align-middle mb-0">
-                    <tbody>
-                        <tr><th style="width:42%;" class="text-muted">Cliente</th><td id="infoWaCliente">—</td></tr>
-                        <tr><th class="text-muted">Teléfono</th><td id="infoWaTelefono">—</td></tr>
-                        <tr><th class="text-muted">Tipo de entrega</th><td id="infoWaTipoEntrega">—</td></tr>
-                        <tr><th class="text-muted">Dirección</th><td id="infoWaDireccion">—</td></tr>
-                        <tr><th class="text-muted">Referencia</th><td id="infoWaReferencia">—</td></tr>
-                        <tr><th class="text-muted">Método de pago</th><td id="infoWaPago" class="fw-semibold">—</td></tr>
-                        <tr><th class="text-muted">Cambio / Nota</th><td id="infoWaCambio">—</td></tr>
-                    </tbody>
-                </table>
-                <a id="infoWaMapsLink" href="#" target="_blank" rel="noopener"
-                   class="btn btn-sm btn-outline-success mt-2" style="display:none;">
-                   <i class="bi bi-geo-alt-fill"></i> Ver ubicación en Maps
-                </a>
+                <div class="iw-cliente-row">
+                    <div>
+                        <div class="iw-cliente-nombre" id="infoWaCliente">—</div>
+                        <div class="iw-cliente-tel"><i class="bi bi-telephone"></i> <span id="infoWaTelefono">—</span></div>
+                    </div>
+                    <a id="infoWaChatLink" href="#" target="_blank" rel="noopener" class="iw-btn-chat" style="display:none;">
+                        <i class="bi bi-whatsapp"></i> Abrir chat
+                    </a>
+                </div>
+
+                <div class="iw-seccion">
+                    <div class="iw-seccion-titulo"><i class="bi bi-geo-alt-fill"></i> Entrega <span class="iw-tag" id="infoWaTipoEntrega">—</span></div>
+                    <div class="iw-fila"><span class="iw-label">Dirección</span><span class="iw-valor" id="infoWaDireccion">—</span></div>
+                    <div class="iw-fila"><span class="iw-label">Referencia</span><span class="iw-valor" id="infoWaReferencia">—</span></div>
+                    <div class="iw-acciones">
+                        <button type="button" id="infoWaCopyBtn" class="btn btn-sm btn-outline-secondary"><i class="bi bi-clipboard"></i> Copiar dirección</button>
+                        <a id="infoWaMapsLink" href="#" target="_blank" rel="noopener" class="btn btn-sm btn-outline-success" style="display:none;">
+                            <i class="bi bi-map"></i> Ver en Maps
+                        </a>
+                    </div>
+                </div>
+
+                <div class="iw-seccion">
+                    <div class="iw-seccion-titulo"><i class="bi bi-cash-coin"></i> Pago</div>
+                    <div class="iw-fila"><span class="iw-label">Método</span><span class="iw-valor fw-semibold" id="infoWaPago">—</span></div>
+                    <div class="iw-cambio" id="infoWaCambio">—</div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>

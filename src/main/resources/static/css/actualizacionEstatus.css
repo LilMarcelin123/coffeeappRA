@@ -98,3 +98,32 @@
 #modalInfoWa .table th { font-weight:500; }
 #modalInfoWa .modal-content { border:none; border-radius:14px; overflow:hidden; }
 #modalInfoWa .modal-header { border-bottom:none; }
+
+/* ── Modal Info v2 ── */
+.iw-cliente-row { display:flex; align-items:center; justify-content:space-between; gap:.8rem; margin-bottom:1rem; }
+.iw-cliente-nombre { font-weight:700; font-size:1.02rem; color:#3E2C20; }
+.iw-cliente-tel { font-size:.82rem; color:#777; }
+.iw-btn-chat { display:inline-flex; align-items:center; gap:.4rem; text-decoration:none;
+    background:linear-gradient(135deg,#25D366,#128C7E); color:#fff; font-size:.8rem; font-weight:600;
+    padding:.4rem .8rem; border-radius:999px; white-space:nowrap; }
+.iw-btn-chat:hover { color:#fff; filter:brightness(1.06); }
+.iw-seccion { background:#FBF6EF; border:1px solid #EFE2D2; border-radius:12px; padding:.8rem .9rem; margin-bottom:.8rem; }
+.iw-seccion-titulo { display:flex; align-items:center; gap:.45rem; font-weight:700; font-size:.85rem; color:#6F4E37; margin-bottom:.55rem; }
+.iw-tag { margin-left:auto; font-size:.68rem; font-weight:700; background:#6F4E37; color:#fff; padding:.1rem .55rem; border-radius:999px; }
+.iw-fila { display:flex; gap:.7rem; font-size:.86rem; padding:.18rem 0; }
+.iw-label { min-width:86px; color:#999; }
+.iw-valor { color:#2b2b2b; }
+.iw-acciones { display:flex; gap:.5rem; margin-top:.55rem; }
+.iw-cambio { margin-top:.4rem; font-size:.86rem; padding:.5rem .7rem; border-radius:9px; background:#EFEFEF; color:#444; }
+.iw-cambio--efectivo { background:#FDF3E0; color:#8a5a00; border:1px solid #F1DFB8; }
+.iw-cambio--exacto   { background:#E6F6EA; color:#1A7F4B; border:1px solid #CDEBD7; }
+.iw-cambio--transfer { background:#E8F1FE; color:#1D4ED8; border:1px solid #CBDEFC; }
+
+/* ── Modal Actualizar: chips y sugerido ── */
+.ae-chips { display:flex; gap:.4rem; flex-wrap:wrap; margin-top:.45rem; }
+.ae-chip { border:1px solid #D9CDBE; background:#fff; color:#6F4E37; font-size:.74rem; font-weight:600;
+    padding:.2rem .6rem; border-radius:999px; cursor:pointer; transition:all .12s ease; }
+.ae-chip:hover { background:#6F4E37; color:#fff; border-color:#6F4E37; }
+.ae-estatus-opt { position:relative; }
+.ae-tag-sugerido { position:absolute; top:-8px; right:8px; font-size:.6rem; font-weight:800; letter-spacing:.03em;
+    background:#E8A93C; color:#fff; padding:.08rem .45rem; border-radius:999px; box-shadow:0 2px 5px rgba(232,169,60,.4); }

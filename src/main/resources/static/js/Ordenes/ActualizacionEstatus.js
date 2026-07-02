@@ -135,7 +135,18 @@
 
     function claseEstatus(e) { return (ESTATUS[e] && ESTATUS[e].clase) || "cerrada"; }
 
+    function marcarSugerido(lista) {
+        const presentes = new Set((lista || []).map(i => i.n_estatus));
+        const orden = ["EN_PREPARACION", "EN_CAMINO", "ENTREGADO", "CERRADA"];
+        const sugerido = orden.find(e => !presentes.has(e));
+        document.querySelectorAll(".ae-estatus-opt .ae-tag-sugerido").forEach(t => t.remove());
+        if (!sugerido) return;
+        const opt = document.querySelector(`.ae-estatus-opt[data-estatus="${sugerido}"]`);
+        if (opt) opt.insertAdjacentHTML("beforeend", '<span class="ae-tag-sugerido">Sugerido</span>');
+    }
+
     function renderTimeline(lista) {
+        marcarSugerido(lista);
         const cont = $el("aeTimeline");
         cont.innerHTML = "";
         if (!lista || lista.length === 0) {
@@ -169,8 +180,8 @@
     function abrirModal(orden) {
         _ordenActual = orden; _estatusActual = null;
         $el("aeOrdenId").textContent = "#" + orden.idOrden;
-        $el("aeOrdenCliente").textContent = orden.cliente || "—";
-        $el("aeOrdenTelefono").textContent = orden.telefono || "—";
+        $el("aeOrdenCliente").textContent = String(orden.cliente || "—").replace("WA:", "");
+        $el("aeOrdenTelefono").textContent = String(orden.telefono || "—").replace("@s.whatsapp.net", "").replace("@lid", "");
         document.querySelectorAll(".ae-estatus-opt").forEach(o => o.className = "ae-estatus-opt");
         $el("aeCampoTiempo").classList.remove("is-visible", "has-error");
         $el("aeCampoTelefono").classList.remove("is-visible", "has-error");
@@ -189,6 +200,19 @@
         ["aeInputTiempo", "aeInputTelefono"].forEach(id => {
             const e = $el(id); if (e) e.addEventListener("input", actualizarPreview);
         });
+        // Chips rapidos de tiempo estimado
+        const campoTiempo = $el("aeCampoTiempo");
+        if (campoTiempo && !campoTiempo.querySelector(".ae-chips")) {
+            const chips = document.createElement("div");
+            chips.className = "ae-chips";
+            ["15 minutos", "25 minutos", "35 minutos", "45 minutos"].forEach(v => {
+                const b = document.createElement("button");
+                b.type = "button"; b.className = "ae-chip"; b.textContent = v;
+                b.addEventListener("click", () => { $el("aeInputTiempo").value = v; actualizarPreview(); });
+                chips.appendChild(b);
+            });
+            campoTiempo.appendChild(chips);
+        }
         const btn = $el("aeBtnEnviar"); if (btn) btn.addEventListener("click", enviar);
         const el = $el("modalActualizacionEstatus");
         if (el) el.addEventListener("hidden.bs.modal", function () {

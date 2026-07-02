@@ -607,70 +607,69 @@ function abrirModalInfoWa(idOrden) {
     const set = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
     set("infoWaOrdenId", "#" + idOrden);
     set("infoWaCliente", "Cargando…");
-    set("infoWaTelefono", "—");
-    set("infoWaTipoEntrega", "—");
-    set("infoWaDireccion", "—");
-    set("infoWaReferencia", "—");
-    set("infoWaPago", "—");
-    set("infoWaCambio", "—");
+    set("infoWaTelefono", "—"); set("infoWaTipoEntrega", "—");
+    set("infoWaDireccion", "—"); set("infoWaReferencia", "—");
+    set("infoWaPago", "—"); set("infoWaCambio", "—");
+    ["infoWaChatLink", "infoWaMapsLink"].forEach(id => { const e = document.getElementById(id); if (e) e.style.display = "none"; });
 
-    const modalEl = document.getElementById("modalInfoWa");
-    const modal = bootstrap.Modal.getOrCreateInstance(modalEl, { backdrop: true, keyboard: true });
+    const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById("modalInfoWa"), { backdrop: true, keyboard: true });
     modal.show();
 
     $.ajax({
         url: "/admin/orden/" + idOrden + "/info-whatsapp",
         type: "GET",
         success: function (d) {
-            if (!d || !d.ok) {
-                set("infoWaCliente", "Sin datos");
-                return;
-            }
-            const tel = (d.telefono || "").replace("@s.whatsapp.net", "");
-            set("infoWaCliente", d.cliente ? String(d.cliente).replace("WA:", "") : "—");
+            if (!d || !d.ok) { set("infoWaCliente", "Sin datos"); return; }
+            const tel = (d.telefono || "").replace("@s.whatsapp.net", "").replace("@lid", "");
+            set("infoWaCliente", d.cliente ? String(d.cliente).replace("WA:", "") : "Cliente WhatsApp");
             set("infoWaTelefono", tel || "—");
             set("infoWaTipoEntrega", d.tipoEntrega || "—");
             set("infoWaDireccion", d.direccion || "—");
             set("infoWaReferencia", d.referencia || "—");
 
-            // Metodo de pago + cambio
+            const chat = document.getElementById("infoWaChatLink");
+            if (chat && tel) { chat.href = "https://wa.me/" + tel.replace(/\D/g, ""); chat.style.display = "inline-flex"; }
+
+            const copyBtn = document.getElementById("infoWaCopyBtn");
+            if (copyBtn) {
+                copyBtn.onclick = function () {
+                    const texto = (d.direccion || "") + (d.referencia ? " — Ref: " + d.referencia : "");
+                    navigator.clipboard.writeText(texto).then(() => {
+                        copyBtn.innerHTML = '<i class="bi bi-check2"></i> Copiada';
+                        setTimeout(() => copyBtn.innerHTML = '<i class="bi bi-clipboard"></i> Copiar dirección', 1500);
+                    });
+                };
+            }
+
             const pago = (d.metodoPago || "").toUpperCase();
-            let pagoTexto = d.metodoPago || "—";
-            let cambioTexto = "—";
+            const cambioEl = document.getElementById("infoWaCambio");
             if (pago === "EFECTIVO") {
-                pagoTexto = "Efectivo";
+                set("infoWaPago", "💵 Efectivo");
                 if (d.cambioCon != null && Number(d.cambioCon) > 0) {
-                    const total = Number(d.total || 0);
-                    const billete = Number(d.cambioCon);
+                    const billete = Number(d.cambioCon), total = Number(d.total || 0);
                     const cambio = billete - total;
-                    cambioTexto = "Paga con $" + billete.toFixed(2) +
-                                  (cambio >= 0 ? " (lleva cambio de $" + cambio.toFixed(2) + ")" : "");
+                    cambioEl.innerHTML = 'Paga con <strong>$' + billete.toFixed(2) + '</strong>' +
+                        (cambio >= 0 ? ' · llevar cambio de <strong>$' + cambio.toFixed(2) + '</strong>' : '');
+                    cambioEl.className = "iw-cambio iw-cambio--efectivo";
                 } else {
-                    cambioTexto = "Importe exacto";
+                    cambioEl.textContent = "Importe exacto — no requiere cambio";
+                    cambioEl.className = "iw-cambio iw-cambio--exacto";
                 }
             } else if (pago === "TRANSFERENCIA") {
-                pagoTexto = "Transferencia";
-                cambioTexto = "Verificar comprobante";
+                set("infoWaPago", "🏦 Transferencia");
+                cambioEl.textContent = "Verificar comprobante antes de enviar";
+                cambioEl.className = "iw-cambio iw-cambio--transfer";
+            } else {
+                set("infoWaPago", d.metodoPago || "—");
+                cambioEl.textContent = "—";
             }
-            set("infoWaPago", pagoTexto);
-            set("infoWaCambio", cambioTexto);
 
-            // Boton de Google Maps si la direccion trae coordenadas
             const linkMaps = document.getElementById("infoWaMapsLink");
             if (linkMaps) {
-                const dir = d.direccion || "";
-                const m = dir.match(/(-?\d+\.\d+)[,\s]+(-?\d+\.\d+)/);
-                if (m) {
-                    linkMaps.href = "https://maps.google.com/?q=" + m[1] + "," + m[2];
-                    linkMaps.style.display = "inline-block";
-                } else {
-                    linkMaps.style.display = "none";
-                }
+                const m = (d.direccion || "").match(/(-?\d+\.\d+)[,\s]+(-?\d+\.\d+)/);
+                if (m) { linkMaps.href = "https://maps.google.com/?q=" + m[1] + "," + m[2]; linkMaps.style.display = "inline-flex"; }
             }
         },
-        error: function (xhr) {
-            console.error("Error info-whatsapp:", xhr.responseText);
-            set("infoWaCliente", "Error al cargar");
-        }
+        error: function () { set("infoWaCliente", "Error al cargar"); }
     });
 }
