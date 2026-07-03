@@ -9,6 +9,9 @@
 
 const POLLING_INTERVAL_MS = 10_000;
 
+const ENVEJECIMIENTO_ALERTA_MIN  = 60;   // minuto en que aparece el chip de alerta (1 hora)
+const ENVEJECIMIENTO_CRITICO_MIN = 180;  // minuto en que llega a rojo total (3 horas)
+
 const AREA_MAP = {
     2: { clase: "area-salados",    icono: "bi bi-egg-fried",    label: "Salados"          },
     3: { clase: "area-crepas",     icono: "bi bi-layers-fill",  label: "Crepas & Waffles" },
@@ -464,7 +467,7 @@ function aplicarEnvejecimiento(card) {
 
     // Chip de alerta (aparece a los 15 min)
     let chip = card.querySelector(".op-chip-tiempo");
-    if (mins >= 15) {
+    if (mins >= ENVEJECIMIENTO_ALERTA_MIN) {
         if (!chip) {
             chip = document.createElement("span");
             chip.className = "op-chip-tiempo";
@@ -476,7 +479,8 @@ function aplicarEnvejecimiento(card) {
     }
 
     // Degradado: 0-15 min normal; 15→60 min interpola hacia rojo total
-    const t = Math.min(1, Math.max(0, (mins - 15) / 45));
+    const rango = ENVEJECIMIENTO_CRITICO_MIN - ENVEJECIMIENTO_ALERTA_MIN;
+    const t = Math.min(1, Math.max(0, (mins - ENVEJECIMIENTO_ALERTA_MIN) / rango));
     if (t <= 0) {
         card.style.backgroundColor = "";
         card.classList.remove("op-card-critica");
