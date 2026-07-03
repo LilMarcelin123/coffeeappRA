@@ -20,7 +20,16 @@ public class EvolutionApiClient {
     @Value("${evolution.api.instance}")
     private String instanceName;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate = crearRestTemplate();
+
+    private static RestTemplate crearRestTemplate() {
+        org.springframework.http.client.SimpleClientHttpRequestFactory f =
+            new org.springframework.http.client.SimpleClientHttpRequestFactory();
+        f.setConnectTimeout(5000);   // 5s conectar
+        f.setReadTimeout(15000);     // 15s respuesta Evolution
+        return new RestTemplate(f);
+    }
+
 
     public boolean enviarMensaje(String numeroDestino, String texto) {
         String url = evolutionApiUrl + "/message/sendText/" + instanceName;

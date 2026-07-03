@@ -451,7 +451,30 @@ public class WhatsAppService {
             if (respuesta.contains("PEDIDO_CONFIRMADO:")) {
                 procesarPedidoConfirmado(respuesta, jidParaEnviar, numero);
             } else {
-                evolutionApiClient.enviarMensaje(jidParaEnviar, respuesta);
+                // Salvaguarda: cliente confirmo pero la respuesta se trunco sin generar el JSON
+                String txt = texto.trim().toLowerCase();
+                boolean pareceConfirmacion = txt.equals("si") || txt.equals("sí") || txt.equals("confirmo")
+                        || txt.equals("dale") || txt.equals("va") || txt.equals("ok") || txt.equals("listo")
+                        || txt.equals("correcto") || txt.equals("sale") || txt.equals("perfecto")
+                        || txt.startsWith("si,") || txt.startsWith("sí,") || txt.contains("confirmo");
+                if (pareceConfirmacion && "length".equals(aiClient.getUltimoFinishReason())) {
+                    System.out.println("[WARN] Respuesta truncada tras confirmacion. Reintentando solo-JSON...");
+                    List<Map<String, String>> reintento = new ArrayList<>(mensajes);
+                    Map<String, String> instruccion = new HashMap<>();
+                    instruccion.put("role", "user");
+                    instruccion.put("content", "Responde AHORA unicamente con la linea PEDIDO_CONFIRMADO:{...} del pedido, sin ningun texto antes ni despues, sin resumen, sin markdown.");
+                    reintento.add(instruccion);
+                    String respuesta2 = aiClient.chat(reintento, SYSTEM_PROMPT);
+                    System.out.println("[Reintento IA]: " + respuesta2);
+                    if (respuesta2 != null && respuesta2.contains("PEDIDO_CONFIRMADO:")) {
+                        mensajeAsistente.put("content", respuesta2);
+                        procesarPedidoConfirmado(respuesta2, jidParaEnviar, numero);
+                    } else {
+                        evolutionApiClient.enviarMensaje(jidParaEnviar, respuesta);
+                    }
+                } else {
+                    evolutionApiClient.enviarMensaje(jidParaEnviar, respuesta);
+                }
             }
 
         } catch (Exception e) {

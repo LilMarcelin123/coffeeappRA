@@ -22,7 +22,19 @@ public class AiClient {
     @Value("${ai.api.url}")
     private String apiUrl;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate = crearRestTemplate();
+    private volatile String ultimoFinishReason = "";
+
+    private static RestTemplate crearRestTemplate() {
+        org.springframework.http.client.SimpleClientHttpRequestFactory f =
+            new org.springframework.http.client.SimpleClientHttpRequestFactory();
+        f.setConnectTimeout(5000);   // 5s conectar
+        f.setReadTimeout(45000);     // 45s respuesta (la IA puede tardar)
+        return new RestTemplate(f);
+    }
+
+    public String getUltimoFinishReason() { return ultimoFinishReason; }
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public String chat(List<Map<String, String>> messages, String systemPrompt) {
@@ -43,7 +55,8 @@ public class AiClient {
 
             JsonNode root = objectMapper.readTree(response.getBody());
             JsonNode choice = root.path("choices").get(0);
-            System.out.println("🔍 finish_reason: " + choice.path("finish_reason").asText());
+            ultimoFinishReason = choice.path("finish_reason").asText("");
+            System.out.println("🔍 finish_reason: " + ultimoFinishReason);
             System.out.println("🔍 usage: " + root.path("usage").toString());
             return choice.path("message").path("content").asText();
 
