@@ -358,6 +358,38 @@ public class WhatsAppService {
                 System.out.println("[BLOQUEADO] Numero en lista de bloqueados: " + numero);
                 return;
             }
+
+            // Sesion persistente: la BD es la verdad, la memoria es cache
+            Map<String, Object> sesionBd = procedimientosAlmacenados.cargarSesionWa(numero);
+            if (sesionBd != null && "HUMANO".equalsIgnoreCase(String.valueOf(sesionBd.get("modo")))) {
+                System.out.println("[HUMANO] Conversacion atendida por humano, bot en silencio: " + numero);
+                return;
+            }
+            if (!historial.containsKey(numero) && sesionBd != null) {
+                boolean vigente = true;
+                Object ts = sesionBd.get("updated_at");
+                if (ts instanceof java.sql.Timestamp t) {
+                    vigente = (System.currentTimeMillis() - t.getTime()) < 12L * 60 * 60 * 1000; // 12h
+                }
+                if (vigente) {
+                    List<Map<String, String>> cargados = new ArrayList<>();
+                    try {
+                        JsonNode arr = objectMapper.readTree(String.valueOf(sesionBd.get("messages")));
+                        for (JsonNode n : arr) {
+                            Map<String, String> m = new HashMap<>();
+                            m.put("role", n.path("role").asText(""));
+                            m.put("content", n.path("content").asText(""));
+                            cargados.add(m);
+                        }
+                    } catch (Exception ex) { cargados.clear(); }
+                    if (!cargados.isEmpty()) {
+                        historial.put(numero, cargados);
+                        System.out.println("[SESION] Historial restaurado de BD para " + numero + " (" + cargados.size() + " msgs)");
+                    }
+                }
+            }
+            // Evitar crecimiento indefinido del cache en memoria
+            if (historial.size() > 200) historial.clear();
             
             
             JsonNode mensajeNode = data.path("message");
@@ -421,6 +453,7 @@ public class WhatsAppService {
                 saludoAsistente.put("role", "assistant");
                 saludoAsistente.put("content", saludo);
                 mensajes.add(saludoAsistente);
+                guardarSesion(numero, mensajes);
 
                 return;
             }
@@ -477,8 +510,18 @@ public class WhatsAppService {
                 }
             }
 
+            guardarSesion(numero, mensajes);
+
         } catch (Exception e) {
             System.err.println("Error procesando mensaje: " + e.getMessage());
+        }
+    }
+
+    private void guardarSesion(String numero, List<Map<String, String>> mensajes) {
+        try {
+            procedimientosAlmacenados.guardarSesionWa(numero, objectMapper.writeValueAsString(mensajes));
+        } catch (Exception e) {
+            System.err.println("[WARN] No se pudo persistir sesion de " + numero + ": " + e.getMessage());
         }
     }
 
@@ -499,9 +542,11 @@ public class WhatsAppService {
 
             System.out.println("✅ Orden creada con ID: " + idOrden);
 
-            // 2. Agregar items
+            // 2. Agregar items (validando que TODOS se inserten)
             JsonNode items = pedido.path("items");
+            int itemsTotal = 0, itemsOk = 0;
             for (JsonNode item : items) {
+                itemsTotal++;
                 int idProducto = item.path("id_producto").asInt();
                 int cantidad = item.path("cantidad").asInt(1);
                 String comentario = item.path("comentario").asText("");
@@ -521,9 +566,20 @@ public class WhatsAppService {
                 }
                 extrasJson.append("]");
 
-                procedimientosAlmacenados.spAgregarItemConExtras(
+                Integer idItem = procedimientosAlmacenados.spAgregarItemConExtras(
                     idOrden, idProducto, cantidad, extrasJson.toString(), comentario
                 );
+                if (idItem != null) itemsOk++;
+                else System.err.println("[ERROR] Item no insertado. Orden " + idOrden + ", producto " + idProducto);
+            }
+
+            // Validacion todo-o-nada: si algun item fallo, cancelar la orden y avisar
+            if (itemsTotal == 0 || itemsOk != itemsTotal) {
+                System.err.println("[ERROR] Orden " + idOrden + " incompleta (" + itemsOk + "/" + itemsTotal + "). Cancelando.");
+                procedimientosAlmacenados.spGestionarOrden(idOrden, 5, null, null);
+                evolutionApiClient.enviarMensaje(jidParaEnviar,
+                    "Ups, tuvimos un problema al registrar tu pedido 🙏 ¿Me lo puedes confirmar de nuevo por favor?");
+                return;
             }
 
             // 3. Guardar nombre del cliente (número de WhatsApp)

@@ -906,6 +906,41 @@ public class ProcedimientosAlmacenados {
         }
     }
 
+    /** Carga la sesion WhatsApp (historial JSON + modo + updated_at) de un numero. Null si no existe. */
+    public Map<String, Object> cargarSesionWa(String numero) {
+        final String SQL = "SELECT messages, modo, updated_at FROM wa_sessions WHERE phone_number = ?";
+        try (Connection conn = conexionJDBC.getConexion2();
+             PreparedStatement ps = conn.prepareStatement(SQL)) {
+            ps.setString(1, numero);
+            try (ResultSet r = ps.executeQuery()) {
+                if (r.next()) {
+                    Map<String, Object> m = new java.util.HashMap<>();
+                    m.put("messages", r.getString("messages"));
+                    m.put("modo", r.getString("modo"));
+                    m.put("updated_at", r.getTimestamp("updated_at"));
+                    return m;
+                }
+            }
+        } catch (SQLException e) {
+            log.error("cargarSesionWa error: {}", e.getMessage());
+        }
+        return null;
+    }
+
+    /** Inserta o actualiza el historial JSON de la sesion WhatsApp de un numero. */
+    public void guardarSesionWa(String numero, String messagesJson) {
+        final String SQL = "INSERT INTO wa_sessions (phone_number, messages) VALUES (?, ?) " +
+                           "ON DUPLICATE KEY UPDATE messages = VALUES(messages)";
+        try (Connection conn = conexionJDBC.getConexion2();
+             PreparedStatement ps = conn.prepareStatement(SQL)) {
+            ps.setString(1, numero);
+            ps.setString(2, messagesJson);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            log.error("guardarSesionWa error: {}", e.getMessage());
+        }
+    }
+
     public Integer spRegistrarActualizacion(Integer idOrden, String estatus, String mensaje,
             String tiempoEstimado, String telefonoRepartidor, String usuarioAdmin, boolean enviado) {
         final String SQL = "{call sp_actualizacion_orden(?, ?, ?, ?, ?, ?, ?, ?)}";
