@@ -448,3 +448,76 @@ function mostrarError() {
             <p>Error al cargar las órdenes. Reintentando…</p>
         </div>`;
 }
+
+// ════════════════════════════════════════════════════════════
+// ENVEJECIMIENTO VISUAL DE ORDENES (15 min alerta → 60 min rojo)
+// ════════════════════════════════════════════════════════════
+function minutosDesde(tsStr) {
+    if (!tsStr) return 0;
+    const d = new Date(String(tsStr).replace(" ", "T"));
+    if (isNaN(d.getTime())) return 0;
+    return Math.max(0, Math.floor((Date.now() - d.getTime()) / 60000));
+}
+
+function aplicarEnvejecimiento(card) {
+    const mins = minutosDesde(card.dataset.creacion);
+
+    // Chip de alerta (aparece a los 15 min)
+    let chip = card.querySelector(".op-chip-tiempo");
+    if (mins >= 15) {
+        if (!chip) {
+            chip = document.createElement("span");
+            chip.className = "op-chip-tiempo";
+            card.appendChild(chip);
+        }
+        chip.innerHTML = `<i class="bi bi-exclamation-triangle-fill"></i> ${mins} min`;
+    } else if (chip) {
+        chip.remove();
+    }
+
+    // Degradado: 0-15 min normal; 15→60 min interpola hacia rojo total
+    const t = Math.min(1, Math.max(0, (mins - 15) / 45));
+    if (t <= 0) {
+        card.style.backgroundColor = "";
+        card.classList.remove("op-card-critica");
+        return;
+    }
+    // Interpolar de blanco (255,255,255) a rojo (220,53,69)
+    const r = Math.round(255 + (220 - 255) * t);
+    const g = Math.round(255 + (53  - 255) * t);
+    const b = Math.round(255 + (69  - 255) * t);
+    card.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+    card.classList.toggle("op-card-critica", t >= 0.65);
+}
+
+function refrescarEnvejecimiento() {
+    document.querySelectorAll(".orden-card[data-creacion]").forEach(aplicarEnvejecimiento);
+}
+setInterval(refrescarEnvejecimiento, 30000);
+
+// Estilos inyectados (badge WhatsApp, chip de tiempo y estado critico)
+(function () {
+    const st = document.createElement("style");
+    st.textContent = `
+    .orden-card { position: relative; transition: background-color 1.2s ease; }
+    .op-badge-wa {
+        position: absolute; top: 8px; right: 8px;
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 26px; height: 26px; border-radius: 50%;
+        background: linear-gradient(135deg,#25D366,#128C7E); color: #fff;
+        font-size: .85rem; box-shadow: 0 2px 6px rgba(18,140,126,.4); z-index: 2;
+    }
+    .op-chip-tiempo {
+        position: absolute; top: 8px; right: 40px;
+        display: inline-flex; align-items: center; gap: .3rem;
+        padding: .12rem .5rem; border-radius: 999px;
+        background: #DC3545; color: #fff; font-size: .7rem; font-weight: 700;
+        box-shadow: 0 2px 6px rgba(220,53,69,.4); z-index: 2;
+        animation: opChipPulse 1.6s ease-in-out infinite;
+    }
+    .orden-card:not(:has(.op-badge-wa)) .op-chip-tiempo { right: 8px; }
+    .op-card-critica, .op-card-critica * { color: #fff !important; }
+    @keyframes opChipPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+    `;
+    document.head.appendChild(st);
+})();
