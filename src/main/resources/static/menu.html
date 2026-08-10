@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Rincón en las Arboledas — Menú</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --crema:#F6EFE3;
+  --crema-2:#EFE4D2;
+  --beige:#DCCDB4;
+  --espresso:#3E2E22;
+  --espresso-2:#5A4433;
+  --caramelo:#B07D3F;
+  --caramelo-2:#8F6430;
+  --blanco:#FFFDF9;
+  --ok:#4C7A4C;
+  --error:#A94438;
+  --sombra:0 10px 30px rgba(62,46,34,.12);
+  --radius:18px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Jost',sans-serif;
+  background:var(--crema);
+  color:var(--espresso);
+  min-height:100vh;
+  background-image:radial-gradient(ellipse 60% 40% at 85% 8%, rgba(176,125,63,.10), transparent 60%),
+                   radial-gradient(ellipse 50% 35% at 10% 90%, rgba(176,125,63,.08), transparent 60%);
+}
+h1,h2,h3,.serif{font-family:'Cormorant Garamond',serif}
+
+/* ─── Header ─── */
+header{
+  text-align:center;
+  padding:34px 16px 10px;
+}
+.eyebrow{
+  letter-spacing:.32em;
+  text-transform:uppercase;
+  font-size:.68rem;
+  color:var(--caramelo-2);
+  font-weight:600;
+}
+header h1{
+  font-size:clamp(2.1rem,7vw,3.4rem);
+  font-weight:700;
+  line-height:1.05;
+  margin:8px 0 4px;
+}
+.tagline{
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;
+  font-size:1.1rem;
+  color:var(--espresso-2);
+}
+.horario{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-top:14px;
+  background:var(--blanco);
+  border:1.5px solid var(--beige);
+  border-radius:999px;
+  padding:7px 18px;
+  font-size:.82rem;
+  font-weight:500;
+  color:var(--espresso-2);
+}
+.divider{
+  width:70px;height:2px;background:var(--caramelo);
+  margin:22px auto 0;border-radius:2px;position:relative;
+}
+.divider::after{
+  content:'☕';position:absolute;top:-11px;left:50%;transform:translateX(-50%);
+  background:var(--crema);padding:0 10px;font-size:.9rem;
+}
+
+/* ─── Categorías ─── */
+nav.cats{
+  position:sticky;top:0;z-index:40;
+  background:linear-gradient(var(--crema) 75%, transparent);
+  padding:14px 0 18px;
+}
+.cats-scroll{
+  display:flex;gap:10px;overflow-x:auto;
+  padding:2px 16px;
+  scrollbar-width:none;
+  max-width:1080px;margin:0 auto;
+}
+.cats-scroll::-webkit-scrollbar{display:none}
+.cat-pill{
+  flex:0 0 auto;
+  font-family:'Jost',sans-serif;
+  font-size:.86rem;font-weight:500;
+  letter-spacing:.04em;
+  padding:10px 20px;
+  border-radius:999px;
+  border:1.5px solid var(--beige);
+  background:var(--blanco);
+  color:var(--espresso);
+  cursor:pointer;
+  transition:all .2s ease;
+  white-space:nowrap;
+}
+.cat-pill:hover{border-color:var(--caramelo)}
+.cat-pill.active{
+  background:var(--espresso);
+  color:var(--crema);
+  border-color:var(--espresso);
+}
+
+/* ─── Productos ─── */
+main{max-width:1080px;margin:0 auto;padding:6px 16px 130px}
+.cat-title{
+  font-size:clamp(1.6rem,4.5vw,2.2rem);
+  font-weight:700;
+  margin:18px 4px 2px;
+}
+.cat-sub{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  color:var(--caramelo-2);margin:0 4px 16px;font-size:1rem;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+  gap:16px;
+}
+.card{
+  background:var(--blanco);
+  border:1.5px solid var(--crema-2);
+  border-radius:var(--radius);
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.card:hover{transform:translateY(-3px);box-shadow:var(--sombra)}
+.card-img{
+  height:140px;
+  background:linear-gradient(135deg,var(--crema-2),var(--beige));
+  display:flex;align-items:center;justify-content:center;
+  font-size:3rem;
+  position:relative;overflow:hidden;
+}
+.card-img img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.card-body{padding:14px 16px 16px;display:flex;flex-direction:column;flex:1}
+.card-name{font-weight:600;font-size:1rem;line-height:1.25}
+.card-desc{
+  font-size:.82rem;color:var(--espresso-2);
+  margin-top:5px;flex:1;line-height:1.4;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+}
+.card-foot{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:12px;
+}
+.price{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:700}
+.btn-add{
+  border:none;cursor:pointer;
+  background:var(--espresso);color:var(--crema);
+  font-family:'Jost',sans-serif;font-weight:500;font-size:.84rem;
+  padding:9px 18px;border-radius:999px;
+  transition:background .2s;
+}
+.btn-add:hover{background:var(--caramelo-2)}
+.loading,.empty{
+  text-align:center;padding:60px 20px;color:var(--espresso-2);
+  font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.15rem;
+}
+
+/* ─── Botón carrito flotante ─── */
+#cartFab{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  z-index:50;
+  display:none;
+  align-items:center;gap:12px;
+  background:var(--espresso);color:var(--crema);
+  border:none;cursor:pointer;
+  padding:15px 26px;border-radius:999px;
+  font-family:'Jost',sans-serif;font-size:.95rem;font-weight:500;
+  box-shadow:0 12px 28px rgba(62,46,34,.35);
+  transition:transform .15s;
+}
+#cartFab:active{transform:translateX(-50%) scale(.97)}
+#cartFab .badge{
+  background:var(--caramelo);
+  border-radius:999px;padding:2px 10px;font-size:.85rem;font-weight:600;
+}
+
+/* ─── Overlays / paneles ─── */
+.overlay{
+  position:fixed;inset:0;z-index:100;
+  background:rgba(62,46,34,.45);
+  display:none;align-items:flex-end;justify-content:center;
+  backdrop-filter:blur(2px);
+}
+.overlay.open{display:flex}
+.sheet{
+  background:var(--crema);
+  width:100%;max-width:520px;
+  max-height:92vh;overflow-y:auto;
+  border-radius:26px 26px 0 0;
+  padding:24px 22px 30px;
+  animation:up .25s ease;
+}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+@media(min-width:640px){
+  .overlay{align-items:center}
+  .sheet{border-radius:26px;margin:0 16px}
+}
+.sheet h3{font-size:1.5rem;font-weight:700;margin-bottom:4px}
+.sheet .sub{font-size:.88rem;color:var(--espresso-2);margin-bottom:16px}
+.x{
+  float:right;border:none;background:var(--crema-2);
+  width:34px;height:34px;border-radius:50%;
+  font-size:1rem;cursor:pointer;color:var(--espresso);
+}
+label.f{display:block;font-size:.8rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--espresso-2);margin:16px 0 6px}
+input[type=text],input[type=tel],textarea{
+  width:100%;border:1.5px solid var(--beige);border-radius:12px;
+  background:var(--blanco);padding:12px 14px;
+  font-family:'Jost',sans-serif;font-size:.95rem;color:var(--espresso);
+}
+input:focus,textarea:focus{outline:none;border-color:var(--caramelo)}
+textarea{resize:vertical;min-height:64px}
+.qty{
+  display:flex;align-items:center;gap:16px;justify-content:center;margin:6px 0;
+}
+.qty button{
+  width:42px;height:42px;border-radius:50%;
+  border:1.5px solid var(--beige);background:var(--blanco);
+  font-size:1.3rem;cursor:pointer;color:var(--espresso);
+}
+.qty span{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:700;min-width:34px;text-align:center}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.seg button{
+  flex:1;min-width:110px;
+  border:1.5px solid var(--beige);background:var(--blanco);
+  border-radius:12px;padding:12px 8px;cursor:pointer;
+  font-family:'Jost',sans-serif;font-size:.88rem;color:var(--espresso);
+  transition:all .15s;
+}
+.seg button.sel{background:var(--espresso);color:var(--crema);border-color:var(--espresso)}
+.btn-main{
+  width:100%;margin-top:20px;
+  border:none;cursor:pointer;
+  background:var(--espresso);color:var(--crema);
+  font-family:'Jost',sans-serif;font-size:1rem;font-weight:500;
+  padding:16px;border-radius:14px;
+  transition:background .2s;
+}
+.btn-main:hover{background:var(--caramelo-2)}
+.btn-ghost{
+  width:100%;margin-top:10px;
+  border:1.5px solid var(--beige);cursor:pointer;
+  background:transparent;color:var(--espresso);
+  font-family:'Jost',sans-serif;font-size:.92rem;
+  padding:13px;border-radius:14px;
+}
+.err{color:var(--error);font-size:.82rem;margin-top:6px;display:none}
+.err.show{display:block}
+
+/* ─── Carrito ─── */
+.cart-item{
+  display:flex;gap:12px;align-items:flex-start;
+  background:var(--blanco);border:1.5px solid var(--crema-2);
+  border-radius:14px;padding:12px 14px;margin-bottom:10px;
+}
+.cart-item .info{flex:1}
+.cart-item .n{font-weight:600;font-size:.94rem}
+.cart-item .d{font-size:.78rem;color:var(--espresso-2);margin-top:2px}
+.cart-item .p{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:1.1rem}
+.mini-qty{display:flex;align-items:center;gap:10px;margin-top:8px}
+.mini-qty button{
+  width:28px;height:28px;border-radius:50%;border:1.5px solid var(--beige);
+  background:var(--crema);cursor:pointer;font-size:.95rem;color:var(--espresso);
+}
+.mini-qty span{font-weight:600;min-width:20px;text-align:center}
+.trash{border:none;background:none;cursor:pointer;font-size:1rem;color:var(--espresso-2);padding:4px}
+.total-row{
+  display:flex;justify-content:space-between;align-items:center;
+  border-top:2px dashed var(--beige);margin-top:16px;padding-top:16px;
+}
+.total-row .t{font-size:.9rem;letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+.total-row .v{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700}
+
+/* ─── Pasos checkout ─── */
+.steps{display:flex;gap:6px;margin:4px 0 18px}
+.steps i{flex:1;height:4px;border-radius:4px;background:var(--beige)}
+.steps i.on{background:var(--caramelo)}
+.resumen-box{
+  background:var(--blanco);border:1.5px solid var(--crema-2);
+  border-radius:14px;padding:16px;margin-top:8px;font-size:.9rem;
+}
+.resumen-box .row{display:flex;justify-content:space-between;padding:4px 0}
+.resumen-box .row.b{font-weight:600}
+.resumen-box hr{border:none;border-top:1.5px dashed var(--beige);margin:10px 0}
+.ok-screen{text-align:center;padding:20px 0 10px}
+.ok-screen .ico{font-size:3.4rem;margin-bottom:10px}
+.ok-screen h3{font-size:1.7rem}
+.ok-screen p{color:var(--espresso-2);margin-top:8px;font-size:.94rem;line-height:1.5}
+.folio{
+  display:inline-block;margin-top:14px;
+  background:var(--blanco);border:1.5px solid var(--beige);border-radius:12px;
+  padding:10px 22px;font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;
+}
+footer{
+  text-align:center;padding:30px 16px 40px;color:var(--espresso-2);font-size:.8rem;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Cafetería</div>
+  <h1>El Rincón<br>en las Arboledas</h1>
+  <div class="tagline">Crepas, waffles, snacks y repostería</div>
+  <div class="horario">🗓️ Martes a Domingo · 5:00 pm – 11:00 pm</div>
+  <div class="divider"></div>
+</header>
+
+<nav class="cats"><div class="cats-scroll" id="catPills"></div></nav>
+
+<main id="main">
+  <div class="loading" id="loading">Preparando el menú…</div>
+</main>
+
+<button id="cartFab" onclick="openCart()">
+  🛍️ Ver mi pedido <span class="badge" id="fabCount">0</span> · <span id="fabTotal">$0</span>
+</button>
+
+<!-- Modal agregar producto -->
+<div class="overlay" id="ovAdd">
+  <div class="sheet">
+    <button class="x" onclick="closeOv('ovAdd')">✕</button>
+    <h3 id="addName"></h3>
+    <div class="sub" id="addDesc"></div>
+    <label class="f">Cantidad</label>
+    <div class="qty">
+      <button onclick="chQty(-1)">−</button><span id="addQty">1</span><button onclick="chQty(1)">+</button>
+    </div>
+    <label class="f">Notas para tu producto <span style="text-transform:none;font-weight:400">(base, topping, sabor, sin algo…)</span></label>
+    <textarea id="addNote" placeholder="Ej. base nutella, topping oreo, sin azúcar…"></textarea>
+    <button class="btn-main" id="btnConfirmAdd"></button>
+    <button class="btn-ghost" onclick="closeOv('ovAdd')">Cancelar</button>
+  </div>
+</div>
+
+<!-- Carrito -->
+<div class="overlay" id="ovCart">
+  <div class="sheet">
+    <button class="x" onclick="closeOv('ovCart')">✕</button>
+    <h3>Tu pedido</h3>
+    <div class="sub">Revisa tus productos antes de continuar</div>
+    <div id="cartList"></div>
+    <div class="total-row"><span class="t">Total</span><span class="v" id="cartTotal">$0</span></div>
+    <button class="btn-main" onclick="goCheckout()">Continuar con mi pedido →</button>
+    <button class="btn-ghost" onclick="closeOv('ovCart')">Seguir viendo el menú</button>
+  </div>
+</div>
+
+<!-- Checkout -->
+<div class="overlay" id="ovCheck">
+  <div class="sheet">
+    <button class="x" onclick="closeOv('ovCheck')">✕</button>
+
+    <!-- Paso 1: datos -->
+    <div id="step1">
+      <div class="steps"><i class="on"></i><i></i><i></i></div>
+      <h3>Datos de tu pedido</h3>
+      <div class="sub">Solo lo necesario para preparar y entregarte</div>
+
+      <label class="f">Tu nombre *</label>
+      <input type="text" id="fNombre" placeholder="¿A nombre de quién?">
+      <div class="err" id="eNombre">Escribe tu nombre para continuar</div>
+
+      <label class="f">Teléfono <span style="text-transform:none;font-weight:400">(opcional, por si necesitamos contactarte)</span></label>
+      <input type="tel" id="fTel" placeholder="10 dígitos" maxlength="10" inputmode="numeric">
+      <div class="err" id="eTel">Si lo escribes, deben ser 10 dígitos</div>
+
+      <label class="f">¿Cómo lo quieres? *</label>
+      <div class="seg" id="segEntrega">
+        <button data-v="RECOGER" onclick="pick('segEntrega',this)">🏪 Paso por él</button>
+        <button data-v="DOMICILIO" onclick="pick('segEntrega',this)">🛵 A domicilio</button>
+      </div>
+      <div class="err" id="eEntrega">Elige cómo quieres recibir tu pedido</div>
+
+      <div id="domFields" style="display:none">
+        <label class="f">Dirección de entrega *</label>
+        <input type="text" id="fDir" placeholder="Calle, número, colonia">
+        <div class="err" id="eDir">Escribe tu dirección para el envío</div>
+        <label class="f">Referencia <span style="text-transform:none;font-weight:400">(opcional)</span></label>
+        <input type="text" id="fRef" placeholder="Portón negro, entre calles…">
+      </div>
+
+      <label class="f">Método de pago *</label>
+      <div class="seg" id="segPago">
+        <button data-v="EFECTIVO" onclick="pick('segPago',this)">💵 Efectivo</button>
+        <button data-v="TRANSFERENCIA" onclick="pick('segPago',this)">📲 Transferencia</button>
+      </div>
+      <div class="err" id="ePago">Elige tu método de pago</div>
+
+      <div id="cambioField" style="display:none">
+        <label class="f">¿Con cuánto pagas? <span style="text-transform:none;font-weight:400">(para llevarte tu cambio)</span></label>
+        <input type="tel" id="fCambio" placeholder="Ej. 200" inputmode="numeric">
+      </div>
+
+      <button class="btn-main" onclick="toStep2()">Revisar mi pedido →</button>
+      <button class="btn-ghost" onclick="backToCart()">← Volver a mi pedido</button>
+    </div>
+
+    <!-- Paso 2: resumen -->
+    <div id="step2" style="display:none">
+      <div class="steps"><i class="on"></i><i class="on"></i><i></i></div>
+      <h3>Confirma tu pedido</h3>
+      <div class="sub">Última revisión antes de enviarlo a cocina</div>
+      <div class="resumen-box" id="resumenBox"></div>
+      <button class="btn-main" id="btnSend" onclick="sendOrder()">✅ Confirmar y enviar pedido</button>
+      <button class="btn-ghost" onclick="showStep(1)">← Corregir datos</button>
+      <div class="err" id="eSend" style="text-align:center;margin-top:12px"></div>
+    </div>
+
+    <!-- Paso 3: listo -->
+    <div id="step3" style="display:none">
+      <div class="steps"><i class="on"></i><i class="on"></i><i class="on"></i></div>
+      <div class="ok-screen">
+        <div class="ico">☕</div>
+        <h3>¡Pedido recibido!</h3>
+        <p>Tu orden ya está en nuestra cocina.<br>Todos nuestros alimentos se preparan al momento — ¡gracias por tu paciencia y preferencia!</p>
+        <div class="folio" id="folio"></div>
+      </div>
+      <button class="btn-main" onclick="resetAll()">Hacer otro pedido</button>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  El Rincón en las Arboledas · Servicio a domicilio sin costo extra<br>
+  WhatsApp 56 12 67 24 45 · @el_rincon.en.lasarboledas
+</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const money=n=>'$'+Number(n).toLocaleString('es-MX',{maximumFractionDigits:2});
+
+let cats=[], productosCache={}, cart=[], addCtx=null, activeCat=null;
+
+/* Postres y frappes primero */
+function catPriority(nombre){
+  const n=(nombre||'').toLowerCase();
+  if(/crepa|waffle|postre|dulce|reposter/.test(n)) return 0;
+  if(/fr[ií]a|frappe|frape/.test(n)) return 1;
+  if(/caliente/.test(n)) return 2;
+  if(/salad/.test(n)) return 3;
+  return 4;
+}
+function catEmoji(nombre){
+  const n=(nombre||'').toLowerCase();
+  if(/crepa|waffle|postre|dulce/.test(n)) return '🧇';
+  if(/fr[ií]a|frappe/.test(n)) return '🥤';
+  if(/caliente/.test(n)) return '☕';
+  if(/salad/.test(n)) return '🥪';
+  if(/fit/.test(n)) return '🥗';
+  return '🍽️';
+}
+
+async function init(){
+  try{
+    const r=await fetch('/menu/api/catalogo');
+    cats=await r.json();
+    cats.sort((a,b)=>catPriority(a.nombre)-catPriority(b.nombre));
+    renderPills();
+    if(cats.length) selectCat(cats[0].id);
+    else $('loading').textContent='El menú estará disponible muy pronto ☕';
+  }catch(e){
+    $('loading').textContent='No pudimos cargar el menú. Recarga la página o escríbenos por WhatsApp: 56 12 67 24 45';
+  }
+}
+
+function renderPills(){
+  $('catPills').innerHTML=cats.map(c=>
+    `<button class="cat-pill" id="pill${c.id}" onclick="selectCat(${c.id})">${catEmoji(c.nombre)} ${c.nombre}</button>`
+  ).join('');
+}
+
+async function selectCat(id){
+  activeCat=id;
+  document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('active'));
+  $('pill'+id)?.classList.add('active');
+  const cat=cats.find(c=>c.id===id);
+  $('main').innerHTML=`<h2 class="cat-title">${cat.nombre}</h2>
+    <div class="cat-sub">Elige tu favorito y personalízalo en las notas</div>
+    <div class="loading">Cargando productos…</div>`;
+  try{
+    if(!productosCache[id]){
+      const r=await fetch('/menu/api/productos/'+id);
+      if(!r.ok) throw 0;
+      productosCache[id]=await r.json();
+    }
+    renderProductos(cat, productosCache[id]);
+  }catch(e){
+    $('main').innerHTML+=`<div class="empty">No pudimos cargar esta categoría, intenta de nuevo.</div>`;
+  }
+}
+
+function renderProductos(cat, prods){
+  const emoji=catEmoji(cat.nombre);
+  let html=`<h2 class="cat-title">${cat.nombre}</h2>
+    <div class="cat-sub">Elige tu favorito y personalízalo en las notas</div>`;
+  if(!prods.length){
+    html+=`<div class="empty">Muy pronto tendremos productos aquí ✨</div>`;
+  }else{
+    html+=`<div class="grid">`+prods.map(p=>`
+      <div class="card">
+        <div class="card-img">${emoji}<img src="/img/menu/p${p.id}.jpg" alt="" loading="lazy" onerror="this.remove()"></div>
+        <div class="card-body">
+          <div class="card-name">${p.nombre}</div>
+          <div class="card-desc">${p.descripcion||''}</div>
+          <div class="card-foot">
+            <span class="price">${money(p.precio)}</span>
+            <button class="btn-add" onclick='openAdd(${JSON.stringify(p).replace(/'/g,"&#39;")})'>Agregar</button>
+          </div>
+        </div>
+      </div>`).join('')+`</div>`;
+  }
+  $('main').innerHTML=html;
+}
+
+/* ── Agregar producto ── */
+function openAdd(p){
+  addCtx={p, qty:1};
+  $('addName').textContent=p.nombre;
+  $('addDesc').textContent=(p.descripcion||'')+' · '+money(p.precio)+' c/u';
+  $('addQty').textContent='1';
+  $('addNote').value='';
+  updateAddBtn();
+  openOv('ovAdd');
+}
+function chQty(d){
+  addCtx.qty=Math.min(20,Math.max(1,addCtx.qty+d));
+  $('addQty').textContent=addCtx.qty;
+  updateAddBtn();
+}
+function updateAddBtn(){
+  $('btnConfirmAdd').textContent=`Sí, agregar ${addCtx.qty} × ${money(addCtx.p.precio)} = ${money(addCtx.qty*addCtx.p.precio)}`;
+}
+$('btnConfirmAdd').onclick=()=>{
+  const nota=$('addNote').value.trim();
+  cart.push({id:addCtx.p.id, nombre:addCtx.p.nombre, precio:Number(addCtx.p.precio), qty:addCtx.qty, nota});
+  closeOv('ovAdd');
+  refreshFab();
+};
+
+/* ── Carrito ── */
+function refreshFab(){
+  const count=cart.reduce((s,i)=>s+i.qty,0);
+  const total=cart.reduce((s,i)=>s+i.qty*i.precio,0);
+  $('fabCount').textContent=count;
+  $('fabTotal').textContent=money(total);
+  $('cartFab').style.display=count?'flex':'none';
+}
+function openCart(){
+  renderCart();
+  openOv('ovCart');
+}
+function renderCart(){
+  if(!cart.length){
+    $('cartList').innerHTML=`<div class="empty">Tu pedido está vacío — agrega algo delicioso ✨</div>`;
+  }else{
+    $('cartList').innerHTML=cart.map((i,idx)=>`
+      <div class="cart-item">
+        <div class="info">
+          <div class="n">${i.nombre}</div>
+          ${i.nota?`<div class="d">📝 ${i.nota}</div>`:''}
+          <div class="mini-qty">
+            <button onclick="cartQty(${idx},-1)">−</button><span>${i.qty}</span><button onclick="cartQty(${idx},1)">+</button>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div class="p">${money(i.qty*i.precio)}</div>
+          <button class="trash" onclick="removeItem(${idx})" title="Quitar">🗑️</button>
+        </div>
+      </div>`).join('');
+  }
+  $('cartTotal').textContent=money(cart.reduce((s,i)=>s+i.qty*i.precio,0));
+  refreshFab();
+}
+function cartQty(idx,d){
+  cart[idx].qty=Math.min(20,Math.max(1,cart[idx].qty+d));
+  renderCart();
+}
+function removeItem(idx){
+  if(confirm(`¿Quitar "${cart[idx].nombre}" de tu pedido?`)){
+    cart.splice(idx,1);
+    renderCart();
+  }
+}
+
+/* ── Checkout ── */
+let entrega=null, pago=null;
+function pick(segId, btn){
+  document.querySelectorAll('#'+segId+' button').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  const v=btn.dataset.v;
+  if(segId==='segEntrega'){entrega=v;$('domFields').style.display=v==='DOMICILIO'?'block':'none';$('eEntrega').classList.remove('show')}
+  if(segId==='segPago'){pago=v;$('cambioField').style.display=v==='EFECTIVO'?'block':'none';$('ePago').classList.remove('show')}
+}
+function goCheckout(){
+  if(!cart.length){alert('Agrega al menos un producto para continuar');return}
+  closeOv('ovCart');
+  showStep(1);
+  openOv('ovCheck');
+}
+function backToCart(){closeOv('ovCheck');openCart()}
+function showStep(n){
+  $('step1').style.display=n===1?'block':'none';
+  $('step2').style.display=n===2?'block':'none';
+  $('step3').style.display=n===3?'block':'none';
+}
+function toStep2(){
+  let ok=true;
+  const nombre=$('fNombre').value.trim();
+  const tel=$('fTel').value.trim();
+  $('eNombre').classList.toggle('show', !nombre); if(!nombre) ok=false;
+  const telBad=tel && !/^\d{10}$/.test(tel);
+  $('eTel').classList.toggle('show', telBad); if(telBad) ok=false;
+  $('eEntrega').classList.toggle('show', !entrega); if(!entrega) ok=false;
+  let dir='';
+  if(entrega==='DOMICILIO'){
+    dir=$('fDir').value.trim();
+    $('eDir').classList.toggle('show', !dir); if(!dir) ok=false;
+  }
+  $('ePago').classList.toggle('show', !pago); if(!pago) ok=false;
+  if(!ok) return;
+
+  const total=cart.reduce((s,i)=>s+i.qty*i.precio,0);
+  let html=cart.map(i=>`<div class="row"><span>${i.qty} × ${i.nombre}${i.nota?` <em style="color:var(--espresso-2)">(${i.nota})</em>`:''}</span><span>${money(i.qty*i.precio)}</span></div>`).join('');
+  html+=`<hr>
+    <div class="row b"><span>Total</span><span>${money(total)}</span></div>
+    <hr>
+    <div class="row"><span>Nombre</span><span>${nombre}</span></div>
+    ${tel?`<div class="row"><span>Teléfono</span><span>${tel}</span></div>`:''}
+    <div class="row"><span>Entrega</span><span>${entrega==='DOMICILIO'?'🛵 A domicilio':'🏪 Paso por él'}</span></div>
+    ${entrega==='DOMICILIO'?`<div class="row"><span>Dirección</span><span style="text-align:right;max-width:60%">${dir}</span></div>`:''}
+    <div class="row"><span>Pago</span><span>${pago==='EFECTIVO'?'💵 Efectivo':'📲 Transferencia'}</span></div>
+    ${pago==='EFECTIVO'&&$('fCambio').value.trim()?`<div class="row"><span>Pagas con</span><span>${money($('fCambio').value.trim())}</span></div>`:''}`;
+  $('resumenBox').innerHTML=html;
+  $('eSend').classList.remove('show');
+  showStep(2);
+}
+
+async function sendOrder(){
+  const btn=$('btnSend');
+  btn.disabled=true; btn.textContent='Enviando tu pedido…';
+  const payload={
+    nombre:$('fNombre').value.trim(),
+    telefono:$('fTel').value.trim()||null,
+    tipoEntrega:entrega,
+    direccion:entrega==='DOMICILIO'?$('fDir').value.trim():null,
+    referencia:entrega==='DOMICILIO'?($('fRef').value.trim()||null):null,
+    metodoPago:pago,
+    cambioCon:pago==='EFECTIVO'?($('fCambio').value.trim()||null):null,
+    total:cart.reduce((s,i)=>s+i.qty*i.precio,0),
+    items:cart.map(i=>({idProducto:i.id, nombre:i.nombre, precio:i.precio, cantidad:i.qty, nota:i.nota||null}))
+  };
+  try{
+    const r=await fetch('/menu/api/orden',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    });
+    if(!r.ok) throw 0;
+    const data=await r.json();
+    $('folio').textContent='Orden #'+(data.idOrden??'—');
+    showStep(3);
+  }catch(e){
+    const es=$('eSend');
+    es.textContent='No pudimos enviar tu pedido en este momento. Intenta de nuevo o mándanos WhatsApp al 56 12 67 24 45 🙏';
+    es.classList.add('show');
+  }
+  btn.disabled=false; btn.textContent='✅ Confirmar y enviar pedido';
+}
+
+function resetAll(){
+  cart=[]; entrega=null; pago=null;
+  ['fNombre','fTel','fDir','fRef','fCambio'].forEach(id=>$(id).value='');
+  document.querySelectorAll('.seg button').forEach(b=>b.classList.remove('sel'));
+  $('domFields').style.display='none';
+  $('cambioField').style.display='none';
+  refreshFab();
+  closeOv('ovCheck');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function openOv(id){$(id).classList.add('open');document.body.style.overflow='hidden'}
+function closeOv(id){$(id).classList.remove('open');document.body.style.overflow=''}
+document.querySelectorAll('.overlay').forEach(ov=>ov.addEventListener('click',e=>{if(e.target===ov)closeOv(ov.id)}));
+
+init();
+</script>
+</body>
+</html>

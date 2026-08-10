@@ -467,7 +467,7 @@ function renderPendientes(lista) {
         node.querySelector(".col-resumen").textContent = o.resumen ?? "";
 
         // ── Distinguir origen y, si es WhatsApp, añadir botón "Actualizar" ──
-        const esWhatsapp = String(o.source || "").toUpperCase() === "WHATSAPP";
+        const esWhatsapp = window.__WA_ENABLED__ !== false && String(o.source || "").toUpperCase() === "WHATSAPP";
         const tdAccion = document.createElement("td");
         tdAccion.className = "col-accion-wa text-end";
 
@@ -673,3 +673,11 @@ function abrirModalInfoWa(idOrden) {
         error: function () { set("infoWaCliente", "Error al cargar"); }
     });
 }
+
+
+// Config del negocio: apaga la UI de WhatsApp si el modulo esta deshabilitado
+$.ajax({
+    url: "/api/config-negocio", type: "GET",
+    success: function (cfg) { window.__WA_ENABLED__ = cfg && cfg.whatsappEnabled !== false; },
+    error:   function () { window.__WA_ENABLED__ = true; }
+});

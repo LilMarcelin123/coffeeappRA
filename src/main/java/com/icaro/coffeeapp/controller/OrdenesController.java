@@ -38,6 +38,22 @@ public class OrdenesController {
     @Autowired
     private ProductoRepository productoRepository;
 
+    @org.springframework.beans.factory.annotation.Value("${whatsapp.enabled:true}")
+    private boolean whatsappEnabled;
+
+    @org.springframework.beans.factory.annotation.Value("${negocio.nombre:Mi Negocio}")
+    private String negocioNombre;
+
+    /** Config del negocio para el frontend (flags de modulos, nombre, etc.). */
+    @GetMapping("/api/config-negocio")
+    @ResponseBody
+    public Map<String, Object> configNegocio() {
+        Map<String, Object> cfg = new HashMap<>();
+        cfg.put("whatsappEnabled", whatsappEnabled);
+        cfg.put("negocioNombre", negocioNombre);
+        return cfg;
+    }
+
     @GetMapping({"/admin/tomaOrden", "/tomaOrden"})
     public String mostrarTomaOrden(
             @RequestParam(name = "idOrden", required = false) Integer idOrden,

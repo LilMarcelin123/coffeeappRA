@@ -12,9 +12,15 @@ public class WhatsAppWebhookController {
     @Autowired
     private WhatsAppService whatsAppService;
 
+    @org.springframework.beans.factory.annotation.Value("${whatsapp.enabled:true}")
+    private boolean whatsappEnabled;
+
     @PostMapping({"", "/", "/**"})
     public ResponseEntity<String> recibirMensaje(@RequestBody String payload) {
         try {
+            if (!whatsappEnabled) {
+                return ResponseEntity.ok("OK"); // modulo desactivado para este cliente
+            }
             whatsAppService.procesarMensaje(payload);
             return ResponseEntity.ok("OK");
         } catch (Exception e) {

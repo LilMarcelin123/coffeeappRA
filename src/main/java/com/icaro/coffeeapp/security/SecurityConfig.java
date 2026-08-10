@@ -27,6 +27,7 @@ public class SecurityConfig {
             		.requestMatchers("/login", "/postLogin",
                             "/img/**", "/css/**", "/js/**", "/webjars/**",
                             "/pdf/**",
+                            "/menu.html", "/menu/**",
                             "/webhook/whatsapp",
                             "/webhook/whatsapp/**").permitAll()
 
