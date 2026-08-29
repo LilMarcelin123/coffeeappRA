@@ -260,6 +260,7 @@ function guardarNombreClienteSilencioso() {
     const nombre = $nombreCliente().val()?.trim() || '';
     const idOrden = $idOrden().val();
     if (!idOrden) return;
+    if (!nombre && window.__NOMBRE_CLIENTE_ORIGINAL__) return;
 
     $.ajax({
         url:  ENDPOINTS.guardarCliente,
@@ -391,3 +392,23 @@ $(document).ready(function () {
     registrarEventos();
 });
 
+
+
+(function () {
+    const idOrden = document.getElementById('idOrden')?.value;
+    if (!idOrden) return;
+    $.ajax({
+        url: '/admin/orden/' + idOrden + '/info-whatsapp',
+        type: 'GET',
+        success: function (d) {
+            if (!d || !d.ok || !d.cliente) return;
+            const nombre = String(d.cliente).replace(/^WA:/, '');
+            window.__NOMBRE_CLIENTE_ORIGINAL__ = nombre;
+            const input = document.getElementById('nombreCliente');
+            if (input && !input.value.trim()) {
+                input.value = nombre;
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        }
+    });
+})();

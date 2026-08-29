@@ -354,6 +354,21 @@ function actualizarCabeceraCard(card, orden) {
 
     card.querySelector(".orden-hora-val").innerHTML = `<i class="bi bi-clock"></i> ${hora}`;
 
+    const nombreCli = (orden.n_nombre_cliente || "").replace(/^WA:/, "");
+    let elCli = card.querySelector(".op-cliente");
+    if (nombreCli) {
+        if (!elCli) {
+            elCli = document.createElement("div");
+            elCli.className = "op-cliente";
+            const cab = card.querySelector(".orden-id-val");
+            if (cab && cab.parentNode) cab.parentNode.insertBefore(elCli, cab.nextSibling);
+            else card.appendChild(elCli);
+        }
+        elCli.innerHTML = '<i class="bi bi-person-fill"></i> ' + nombreCli;
+    } else if (elCli) {
+        elCli.remove();
+    }
+
     // Guardar hora de creacion para el envejecimiento visual
     if (orden.t_hora_creacion) card.dataset.creacion = String(orden.t_hora_creacion);
 
@@ -522,6 +537,21 @@ setInterval(refrescarEnvejecimiento, 30000);
     .orden-card:not(:has(.op-badge-wa)) .op-chip-tiempo { right: 8px; }
     .op-card-critica, .op-card-critica * { color: #fff !important; }
     @keyframes opChipPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+    `;
+    document.head.appendChild(st);
+})();
+
+
+(function () {
+    const st = document.createElement("style");
+    st.textContent = `
+    .op-cliente {
+        display:inline-flex; align-items:center; gap:.35rem;
+        font-size:.82rem; font-weight:600; color:#6F4E37;
+        background:#FBF6EF; border:1px solid #EFE2D2;
+        padding:.15rem .55rem; border-radius:999px; margin-top:.25rem;
+    }
+    .op-card-critica .op-cliente { background:rgba(255,255,255,.18); border-color:rgba(255,255,255,.35); }
     `;
     document.head.appendChild(st);
 })();
