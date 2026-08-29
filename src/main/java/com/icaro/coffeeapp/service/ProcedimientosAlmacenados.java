@@ -996,6 +996,43 @@ public class ProcedimientosAlmacenados {
         return 0;
     }
 
+    /** Marca/desmarca un item de preparacion. Devuelve el progreso de su orden. */
+    public Map<String, Object> spMarcarItemPreparacion(Integer idOrdenItem, String estado) {
+        final String SQL = "{call sp_marcar_item_preparacion(?, ?)}";
+        try (Connection conn = conexionJDBC.getConexion2();
+             CallableStatement cs = conn.prepareCall(SQL)) {
+            cs.setInt(1, idOrdenItem);
+            cs.setString(2, estado);
+            boolean rs = cs.execute();
+            if (rs) {
+                try (ResultSet r = cs.getResultSet()) {
+                    List<Map<String, Object>> filas = mapResultSetSimple(r);
+                    if (!filas.isEmpty()) return filas.get(0);
+                }
+            }
+        } catch (SQLException e) {
+            log.error("spMarcarItemPreparacion error: {}", e.getMessage());
+        }
+        return Collections.emptyMap();
+    }
+
+    /** Items de todas las ordenes PENDIENTES con su estado, para pintar Administracion. */
+    public List<Map<String, Object>> obtenerItemsOrdenesPendientes() {
+        final String SQL =
+            "SELECT op.id_orden, op.id_orden_item, op.n_nombre_producto, op.p_cantidad, " +
+            "       op.n_extras_descripcion, op.n_estado_preparacion, op.id_rol_preparacion " +
+            "FROM orden_preparacion op JOIN orden o ON o.id_orden = op.id_orden " +
+            "WHERE o.n_estatus_orden = 'PENDIENTE' ORDER BY op.id_orden, op.id_preparacion";
+        try (Connection conn = conexionJDBC.getConexion2();
+             PreparedStatement ps = conn.prepareStatement(SQL);
+             ResultSet r = ps.executeQuery()) {
+            return mapResultSetSimple(r);
+        } catch (SQLException e) {
+            log.error("obtenerItemsOrdenesPendientes error: {}", e.getMessage());
+        }
+        return Collections.emptyList();
+    }
+
     public Map<String, Object> spDatosEnvioOrden(Integer idOrden) {
         final String SQL = "SELECT id_orden, source, wa_phone, n_estatus_orden, n_nombre_cliente FROM orden WHERE id_orden = ?";
         try (Connection conn = conexionJDBC.getConexion2();

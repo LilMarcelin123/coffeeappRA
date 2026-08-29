@@ -413,23 +413,35 @@ function actualizarItemsCard(card, items) {
             extrasEl.style.display = "none";
         }
 
-        // ── Restaurar estado tachado si existía ───────────────
-        if (itemsTachados.has(claveItem)) {
-            itemEl.classList.add("item-hecho");
-        }
+        // ── Estado real persistido en BD (unica fuente de verdad) ──
+        const listo = String(item.n_estado_preparacion || "").toUpperCase() === "LISTO";
+        if (listo) itemEl.classList.add("item-hecho");
+        itemEl.dataset.idOrdenItem = item.id_orden_item;
 
-        // ── Toggle con persistencia en memoria ────────────────
-        itemEl.addEventListener("click", () => {
+        // ── Toggle persistente: marca en BD y refresca progreso ──
+        itemEl.addEventListener("click", function () {
+            const nuevoEstado = itemEl.classList.contains("item-hecho") ? "PENDIENTE" : "LISTO";
             itemEl.classList.toggle("item-hecho");
-            if (itemsTachados.has(claveItem)) {
-                itemsTachados.delete(claveItem);
-            } else {
-                itemsTachados.add(claveItem);
-            }
+            itemEl.style.opacity = ".55";
+            $.ajax({
+                url: "/orden/item/estado", type: "POST",
+                data: { idOrdenItem: itemEl.dataset.idOrdenItem, estado: nuevoEstado },
+                success: function (r) {
+                    if (!r || !r.ok) itemEl.classList.toggle("item-hecho");
+                    actualizarProgresoCard(card);
+                },
+                error: function () {
+                    itemEl.classList.toggle("item-hecho");
+                    actualizarProgresoCard(card);
+                },
+                complete: function () { itemEl.style.opacity = ""; }
+            });
         });
 
         itemsEl.appendChild(cloneItem);
     });
+
+    actualizarProgresoCard(card);
 
     card.querySelector(".orden-items-count").textContent =
         `${items.length} ítem${items.length !== 1 ? "s" : ""}`;
@@ -552,6 +564,57 @@ setInterval(refrescarEnvejecimiento, 30000);
         padding:.15rem .55rem; border-radius:999px; margin-top:.25rem;
     }
     .op-card-critica .op-cliente { background:rgba(255,255,255,.18); border-color:rgba(255,255,255,.35); }
+    `;
+    document.head.appendChild(st);
+})();
+
+
+// ════════════════════════════════════════════════════════════
+// PROGRESO DE PREPARACION (puntos, contador y orden completa)
+// ════════════════════════════════════════════════════════════
+function actualizarProgresoCard(card) {
+    const items  = card.querySelectorAll(".orden-item");
+    const total  = items.length;
+    const listos = card.querySelectorAll(".orden-item.item-hecho").length;
+    if (!total) return;
+
+    let barra = card.querySelector(".op-progreso");
+    if (!barra) {
+        barra = document.createElement("div");
+        barra.className = "op-progreso";
+        const lista = card.querySelector(".orden-items-list");
+        if (lista && lista.parentNode) lista.parentNode.insertBefore(barra, lista);
+        else card.appendChild(barra);
+    }
+
+    let puntos = "";
+    for (let i = 0; i < total; i++) {
+        puntos += '<span class="op-punto' + (i < listos ? " is-listo" : "") + '"></span>';
+    }
+    const completa = listos === total;
+    barra.innerHTML =
+        '<span class="op-puntos">' + puntos + '</span>' +
+        (completa
+            ? '<span class="op-completa"><i class="bi bi-check-circle-fill"></i> ORDEN COMPLETA</span>'
+            : '<span class="op-contador">' + listos + " / " + total + '</span>');
+
+    card.classList.toggle("op-orden-completa", completa);
+}
+
+(function () {
+    const st = document.createElement("style");
+    st.textContent = `
+    .op-progreso { display:flex; align-items:center; justify-content:space-between;
+        gap:.6rem; margin:.5rem 0 .6rem; padding:.35rem .1rem; }
+    .op-puntos { display:inline-flex; gap:.3rem; flex-wrap:wrap; }
+    .op-punto { width:9px; height:9px; border-radius:50%; background:#DDD3C7;
+        box-shadow:inset 0 0 0 1px rgba(0,0,0,.06); transition:background .25s ease, transform .25s ease; }
+    .op-punto.is-listo { background:#2BA84A; transform:scale(1.12); }
+    .op-contador { font-size:.72rem; font-weight:700; color:#8A8A8A; letter-spacing:.03em; }
+    .op-completa { display:inline-flex; align-items:center; gap:.3rem; font-size:.68rem; font-weight:800;
+        letter-spacing:.05em; color:#fff; background:linear-gradient(135deg,#2BA84A,#1A7F4B);
+        padding:.15rem .55rem; border-radius:999px; }
+    .op-orden-completa { box-shadow:0 0 0 2px #2BA84A inset; }
     `;
     document.head.appendChild(st);
 })();

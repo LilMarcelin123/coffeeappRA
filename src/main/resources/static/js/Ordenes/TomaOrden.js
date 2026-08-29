@@ -168,7 +168,11 @@ $(document).ready(function () {
 
     // ── Select all ───────────────────────────────────────────
     $("#chkAll").on("change", function () {
-        $(".chkRow").prop("checked", $(this).is(":checked"));
+        const marcado = $(this).is(":checked");
+        document.querySelectorAll("#gridPendientes .ord-card").forEach(card => {
+            const chk = card.querySelector(".chkRow");
+            if (chk) { chk.checked = marcado; card.classList.toggle("is-sel", marcado); }
+        });
         actualizarBotonesAccion();
     });
 
@@ -450,84 +454,127 @@ function cargarPendientes() {
 }
 
 function renderPendientes(lista) {
+    window.__ORDENES_PENDIENTES__ = lista || [];
+    $.ajax({
+        url: "/admin/orden/items-estado", type: "GET",
+        success: function (items) { pintarTarjetasPendientes(lista || [], items || []); },
+        error:   function ()      { pintarTarjetasPendientes(lista || [], []); }
+    });
+}
+
+function pintarTarjetasPendientes(lista, items) {
     const tbody = document.getElementById("tbodyPendientes");
-    const tpl   = document.getElementById("tplPendienteRow");
-    tbody.innerHTML = "";
+    const tabla = tbody ? tbody.closest("table") : null;
+    if (tabla) tabla.style.display = "none";
 
-    (lista || []).forEach(o => {
-        const idOrden = o.id_orden;
-        const node    = tpl.content.cloneNode(true);
-        const tr      = node.querySelector("tr");
+    let grid = document.getElementById("gridPendientes");
+    if (!grid) {
+        grid = document.createElement("div");
+        grid.id = "gridPendientes";
+        grid.className = "op-grid-pendientes";
+        const cont = tabla ? tabla.parentNode : document.body;
+        cont.parentNode.insertBefore(grid, cont.nextSibling);
 
-        tr.dataset.idOrden = idOrden;
-        node.querySelector(".col-id").textContent      = idOrden ?? "";
-        node.querySelector(".col-nombre").textContent  = o.n_nombre_cliente ?? "—";
-        node.querySelector(".col-hora").textContent    = o.t_hora_creacion ?? "";
-        node.querySelector(".col-total").textContent   = (o.p_total != null) ? `$${Number(o.p_total).toFixed(2)}` : "$0.00";
-        node.querySelector(".col-resumen").textContent = o.resumen ?? "";
-
-        // ── Distinguir origen y, si es WhatsApp, añadir botón "Actualizar" ──
-        const esWhatsapp = window.__WA_ENABLED__ !== false && String(o.source || "").toUpperCase() === "WHATSAPP";
-        const tdAccion = document.createElement("td");
-        tdAccion.className = "col-accion-wa text-end";
-
-        if (esWhatsapp) {
-            const colNombre = node.querySelector(".col-nombre");
-            if (colNombre) {
-                const badge = document.createElement("span");
-                badge.className = "badge-origen-wa ms-2";
-                badge.innerHTML = '<i class="bi bi-whatsapp"></i> WhatsApp';
-                colNombre.appendChild(badge);
-            }
-            const btn = document.createElement("button");
-            btn.type = "button";
-            btn.className = "btn-actualizar-wa";
-            btn.innerHTML = '<i class="bi bi-send"></i> Actualizar';
-            btn.addEventListener("click", function (e) {
-                e.stopPropagation();
-                if (window.ActualizacionEstatus) {
-                    window.ActualizacionEstatus.abrirModal({
-                        idOrden:  idOrden,
-                        cliente:  o.n_nombre_cliente || "—",
-                        telefono: o.wa_phone || "—",
-                    });
-                }
+        const buscador = document.createElement("input");
+        buscador.type = "search";
+        buscador.id = "buscadorPendientes";
+        buscador.className = "op-buscador";
+        buscador.placeholder = "Buscar por número de orden o cliente…";
+        buscador.addEventListener("input", function () {
+            const q = this.value.trim().toLowerCase();
+            grid.querySelectorAll(".ord-card").forEach(card => {
+                const txt = card.dataset.busqueda || "";
+                card.style.display = (!q || txt.includes(q)) ? "" : "none";
             });
-            tdAccion.appendChild(btn);
+        });
+        grid.parentNode.insertBefore(buscador, grid);
+    }
 
-            // Boton "Info" — muestra datos de entrega/pago del cliente
-            const btnInfo = document.createElement("button");
-            btnInfo.type = "button";
-            btnInfo.className = "btn-info-wa ms-1";
-            btnInfo.innerHTML = '<i class="bi bi-info-circle"></i> Info';
-            btnInfo.addEventListener("click", function (e) {
+    const porOrden = {};
+    items.forEach(it => {
+        const k = String(it.id_orden);
+        (porOrden[k] = porOrden[k] || []).push(it);
+    });
+
+    grid.innerHTML = "";
+    if (!lista.length) {
+        grid.innerHTML = '<div class="ord-empty">Sin órdenes pendientes</div>';
+        actualizarBotonesAccion();
+        return;
+    }
+
+    lista.forEach(o => {
+        const id     = o.id_orden;
+        const its    = porOrden[String(id)] || [];
+        const total  = its.length;
+        const listos = its.filter(i => String(i.n_estado_preparacion).toUpperCase() === "LISTO").length;
+        const completa = total > 0 && listos === total;
+        const cliente  = (o.n_nombre_cliente || "").replace(/^WA:/, "");
+        const esWa = window.__WA_ENABLED__ !== false && String(o.source || "").toUpperCase() === "WHATSAPP";
+
+        const card = document.createElement("article");
+        card.className = "ord-card" + (completa ? " ord-card--completa" : "");
+        card.dataset.idOrden  = id;
+        card.dataset.busqueda = (String(id) + " " + cliente).toLowerCase();
+
+        const filas = its.map(i => {
+            const ok = String(i.n_estado_preparacion).toUpperCase() === "LISTO";
+            const cant = Number(i.p_cantidad) > 1 ? '<span class="ord-cant">×' + i.p_cantidad + '</span>' : "";
+            return '<li class="ord-item' + (ok ? " is-listo" : "") + '">' +
+                   '<span class="ord-dot"></span>' +
+                   '<span class="ord-nombre">' + escHtmlAdmin(i.n_nombre_producto || "—") + '</span>' +
+                   cant + '</li>';
+        }).join("");
+
+        card.innerHTML =
+            '<header class="ord-head">' +
+                '<label class="ord-check"><input type="checkbox" class="chkRow form-check-input"></label>' +
+                '<span class="ord-num">#' + id + '</span>' +
+                (esWa ? '<span class="ord-wa" title="Pedido por WhatsApp"><i class="bi bi-whatsapp"></i></span>' : "") +
+                '<span class="ord-hora">' + String(o.t_hora_creacion || "").replace("T", " ").substring(11, 16) + '</span>' +
+            '</header>' +
+            (cliente ? '<div class="ord-cliente"><i class="bi bi-person-fill"></i> ' + escHtmlAdmin(cliente) + '</div>' : "") +
+            '<ul class="ord-items">' + (filas || '<li class="ord-item"><span class="ord-nombre text-muted">Sin productos</span></li>') + '</ul>' +
+            '<footer class="ord-foot">' +
+                '<span class="ord-total">$' + Number(o.p_total || 0).toFixed(2) + '</span>' +
+                (completa
+                    ? '<span class="ord-estado ord-estado--ok"><i class="bi bi-check-circle-fill"></i> COMPLETA</span>'
+                    : '<span class="ord-estado">' + listos + " / " + total + '</span>') +
+            '</footer>';
+
+        if (esWa) {
+            const acc = document.createElement("div");
+            acc.className = "ord-acciones";
+            const bAct = document.createElement("button");
+            bAct.type = "button"; bAct.className = "btn-actualizar-wa";
+            bAct.innerHTML = '<i class="bi bi-send"></i> Actualizar';
+            bAct.addEventListener("click", e => {
                 e.stopPropagation();
-                abrirModalInfoWa(idOrden);
+                if (window.ActualizacionEstatus) window.ActualizacionEstatus.abrirModal({
+                    idOrden: id, cliente: cliente || "—", telefono: o.wa_phone || "—" });
             });
-            tdAccion.appendChild(btnInfo);
+            const bInfo = document.createElement("button");
+            bInfo.type = "button"; bInfo.className = "btn-info-wa ms-1";
+            bInfo.innerHTML = '<i class="bi bi-info-circle"></i> Info';
+            bInfo.addEventListener("click", e => { e.stopPropagation(); abrirModalInfoWa(id); });
+            acc.appendChild(bAct); acc.appendChild(bInfo);
+            card.appendChild(acc);
         }
-        tr.appendChild(tdAccion);
 
-        const chk = node.querySelector(".chkRow");
-
-        chk.addEventListener("change", function () {
-            const total    = $("#tbodyPendientes .chkRow").length;
-            const marcados = $("#tbodyPendientes .chkRow:checked").length;
-            $("#chkAll").prop("checked", total > 0 && marcados === total);
+        const chk = card.querySelector(".chkRow");
+        chk.addEventListener("change", function (e) {
+            e.stopPropagation();
+            card.classList.toggle("is-sel", this.checked);
             actualizarBotonesAccion();
         });
-
-        tr.addEventListener("click", function (e) {
-            const tag = e.target.tagName.toLowerCase();
-            if (tag === "input" || tag === "button" || tag === "a" || e.target.closest("button")) return;
+        card.addEventListener("click", function (e) {
+            if (e.target.closest("button") || e.target.closest("input")) return;
             chk.checked = !chk.checked;
-            const total    = $("#tbodyPendientes .chkRow").length;
-            const marcados = $("#tbodyPendientes .chkRow:checked").length;
-            $("#chkAll").prop("checked", total > 0 && marcados === total);
+            card.classList.toggle("is-sel", chk.checked);
             actualizarBotonesAccion();
         });
 
-        tbody.appendChild(node);
+        grid.appendChild(card);
     });
 
     $("#chkAll").prop("checked", false);
@@ -536,9 +583,9 @@ function renderPendientes(lista) {
 
 function obtenerIdsSeleccionados() {
     const ids = [];
-    $("#tbodyPendientes tr").each(function () {
-        const chk = this.querySelector(".chkRow");
-        if (chk && chk.checked) ids.push(Number(this.dataset.idOrden));
+    document.querySelectorAll("#gridPendientes .ord-card").forEach(card => {
+        const chk = card.querySelector(".chkRow");
+        if (chk && chk.checked) ids.push(Number(card.dataset.idOrden));
     });
     return ids;
 }
@@ -681,3 +728,56 @@ $.ajax({
     success: function (cfg) { window.__WA_ENABLED__ = cfg && cfg.whatsappEnabled !== false; },
     error:   function () { window.__WA_ENABLED__ = true; }
 });
+
+
+// Estilos Liquid Fluid de las tarjetas de ordenes pendientes
+(function () {
+    const st = document.createElement("style");
+    st.textContent = `
+    .op-buscador { width:100%; margin:0 0 14px; padding:.6rem .9rem; font-size:.88rem;
+        border:1px solid #EFE2D2; border-radius:12px; background:#FBF6EF; outline:none; }
+    .op-buscador:focus { border-color:#A47551; box-shadow:0 0 0 3px rgba(164,117,81,.12); }
+    .op-grid-pendientes { display:grid; gap:12px;
+        grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); align-items:start; }
+    .ord-card { position:relative; background:rgba(255,255,255,.82); backdrop-filter:blur(8px);
+        border:1px solid #EFE2D2; border-radius:16px; padding:12px 14px 10px; cursor:pointer;
+        transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+    .ord-card:hover { transform:translateY(-2px); box-shadow:0 10px 24px rgba(62,44,32,.12); }
+    .ord-card.is-sel { border-color:#8B5E3C; box-shadow:0 0 0 2px rgba(139,94,60,.25); }
+    .ord-card--completa { border-color:#2BA84A; background:linear-gradient(180deg,rgba(230,246,234,.7),rgba(255,255,255,.85)); }
+    .ord-head { display:flex; align-items:center; gap:.45rem; margin-bottom:.35rem; }
+    .ord-check { display:flex; margin:0; }
+    .ord-num { font-weight:800; font-size:.95rem; color:#3E2C20; }
+    .ord-wa { color:#128C7E; font-size:.9rem; }
+    .ord-hora { margin-left:auto; font-size:.72rem; color:#9A8778; }
+    .ord-cliente { font-size:.78rem; color:#6F4E37; margin-bottom:.45rem;
+        display:flex; align-items:center; gap:.3rem; }
+    .ord-items { list-style:none; margin:0 0 .5rem; padding:0; display:flex; flex-direction:column; gap:.22rem; }
+    .ord-item { display:flex; align-items:center; gap:.45rem; font-size:.8rem; color:#2B2018; }
+    .ord-dot { width:8px; height:8px; border-radius:50%; background:#DDD3C7; flex:0 0 auto;
+        box-shadow:inset 0 0 0 1px rgba(0,0,0,.06); transition:background .25s ease; }
+    .ord-item.is-listo .ord-dot { background:#2BA84A; }
+    .ord-item.is-listo .ord-nombre { color:#9A8778; text-decoration:line-through; }
+    .ord-nombre { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .ord-cant { font-size:.7rem; font-weight:800; color:#8B5E3C; background:#F5EDE3;
+        padding:.02rem .35rem; border-radius:6px; }
+    .ord-foot { display:flex; align-items:center; justify-content:space-between;
+        border-top:1px solid #F0E7DC; padding-top:.45rem; }
+    .ord-total { font-weight:800; font-size:.9rem; color:#3E2C20; }
+    .ord-estado { font-size:.7rem; font-weight:800; color:#8A8A8A; letter-spacing:.04em; }
+    .ord-estado--ok { display:inline-flex; align-items:center; gap:.25rem; color:#fff;
+        background:linear-gradient(135deg,#2BA84A,#1A7F4B); padding:.12rem .5rem; border-radius:999px; }
+    .ord-acciones { display:flex; margin-top:.5rem; }
+    .ord-empty { grid-column:1/-1; text-align:center; padding:28px; color:#9A8778; font-size:.9rem; }
+    `;
+    document.head.appendChild(st);
+})();
+
+
+// Refresco automatico: refleja en Administracion lo que Cocina va marcando
+window.__REFRESCO_PENDIENTES__ = setInterval(function () {
+    if (document.hidden) return;
+    if (document.querySelector(".modal.show")) return;
+    if (document.querySelectorAll("#gridPendientes .chkRow:checked").length) return;
+    cargarPendientes();
+}, 20000);

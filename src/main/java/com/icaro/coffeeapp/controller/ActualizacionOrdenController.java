@@ -34,6 +34,28 @@ public class ActualizacionOrdenController {
         this.sp = sp;
     }
 
+    /** Cocina marca/desmarca un item. Unica fuente de verdad del estado de preparacion. */
+    @PostMapping("/orden/item/estado")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> marcarItem(
+            @RequestParam("idOrdenItem") Integer idOrdenItem,
+            @RequestParam("estado")      String  estado) {
+        if (idOrdenItem == null || estado == null || estado.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("ok", false, "mensaje", "Faltan parametros."));
+        }
+        Map<String, Object> r = sp.spMarcarItemPreparacion(idOrdenItem, estado);
+        Map<String, Object> salida = new java.util.HashMap<>(r);
+        salida.put("ok", !r.isEmpty());
+        return ResponseEntity.ok(salida);
+    }
+
+    /** Estados de los items de todas las ordenes pendientes (para Administracion). */
+    @GetMapping("/admin/orden/items-estado")
+    @ResponseBody
+    public ResponseEntity<List<Map<String, Object>>> itemsEstado() {
+        return ResponseEntity.ok(sp.obtenerItemsOrdenesPendientes());
+    }
+
     /** Devuelve los datos de entrega/pago de una orden WhatsApp para mostrar en pantalla. */
     @GetMapping("/admin/orden/{idOrden}/info-whatsapp")
     @ResponseBody
