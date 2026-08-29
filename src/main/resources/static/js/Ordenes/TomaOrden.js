@@ -140,28 +140,34 @@ $(document).ready(function () {
     });
 
     // ── Modal confirmacion cierre ─────────────────────────────
+    // Estos modales solo existen en admin/inicio.html. Sin la guarda,
+    // en admin/tomaOrden.html reventaba aqui y abortaba el resto del ready.
     const modalElCerrar = document.getElementById("modalConfirmCerrar");
-    modalConfirmCerrar  = bootstrap.Modal.getOrCreateInstance(modalElCerrar);
+    if (modalElCerrar) {
+        modalConfirmCerrar = bootstrap.Modal.getOrCreateInstance(modalElCerrar);
 
-    modalElCerrar.addEventListener("hidden.bs.modal", function () {
-        document.querySelectorAll(".modal-backdrop").forEach(b => b.remove());
-        document.body.classList.remove("modal-open");
-        document.body.style.removeProperty("overflow");
-        document.body.style.removeProperty("padding-right");
-        $("#selectMetodoPago").val("");
-        $("#btnConfirmarCerrar").prop("disabled", true);
-    });
+        modalElCerrar.addEventListener("hidden.bs.modal", function () {
+            document.querySelectorAll(".modal-backdrop").forEach(b => b.remove());
+            document.body.classList.remove("modal-open");
+            document.body.style.removeProperty("overflow");
+            document.body.style.removeProperty("padding-right");
+            $("#selectMetodoPago").val("");
+            $("#btnConfirmarCerrar").prop("disabled", true);
+        });
+    }
 
     // ── Modal confirmacion reabrir ────────────────────────────
     const modalElReabrir = document.getElementById("modalConfirmReabrir");
-    modalConfirmReabrir  = bootstrap.Modal.getOrCreateInstance(modalElReabrir);
+    if (modalElReabrir) {
+        modalConfirmReabrir = bootstrap.Modal.getOrCreateInstance(modalElReabrir);
 
-    modalElReabrir.addEventListener("hidden.bs.modal", function () {
-        document.querySelectorAll(".modal-backdrop").forEach(b => b.remove());
-        document.body.classList.remove("modal-open");
-        document.body.style.removeProperty("overflow");
-        document.body.style.removeProperty("padding-right");
-    });
+        modalElReabrir.addEventListener("hidden.bs.modal", function () {
+            document.querySelectorAll(".modal-backdrop").forEach(b => b.remove());
+            document.body.classList.remove("modal-open");
+            document.body.style.removeProperty("overflow");
+            document.body.style.removeProperty("padding-right");
+        });
+    }
 
     // ── Cargar tabla pendientes ───────────────────────────────
     cargarPendientes();
@@ -237,7 +243,8 @@ function cargarAlertaStock() {
         type: "GET",
         data: { tipoProceso: 1 },
         success: function (data) {
-            const bajos  = (data || []).filter(r => r.alerta_stock_bajo == 1 && r.f_activo == 1);
+            const filas  = Array.isArray(data) ? data : [];   // el endpoint puede responder un objeto de error
+            const bajos  = filas.filter(r => r.alerta_stock_bajo == 1 && r.f_activo == 1);
             const $wrap  = $("#alertaStockBajo");
             const $modulo = $(".modulo-card[data-modulo='inventario']");
 
@@ -444,7 +451,15 @@ function _resetAccesoModal() {
 // TABLA ORDENES PENDIENTES
 // ════════════════════════════════════════════════════════════
 
+// El panel de pendientes solo existe en admin/inicio.html.
+// TomaOrden.js tambien se carga en admin/tomaOrden.html, donde no hay tabla:
+// sin esta guarda el grid terminaba inyectado fuera de <body>.
+function hayPanelPendientes() {
+    return !!document.getElementById("tbodyPendientes");
+}
+
 function cargarPendientes() {
+    if (!hayPanelPendientes()) return;
     $.ajax({
         url: "/admin/orden/pendientes",
         type: "GET",
@@ -465,14 +480,15 @@ function renderPendientes(lista) {
 function pintarTarjetasPendientes(lista, items) {
     const tbody = document.getElementById("tbodyPendientes");
     const tabla = tbody ? tbody.closest("table") : null;
-    if (tabla) tabla.style.display = "none";
+    if (!tabla) return;               // sin tabla no hay donde anclar el panel
+    tabla.style.display = "none";
 
     let grid = document.getElementById("gridPendientes");
     if (!grid) {
         grid = document.createElement("div");
         grid.id = "gridPendientes";
         grid.className = "op-grid-pendientes";
-        const cont = tabla ? tabla.parentNode : document.body;
+        const cont = tabla.parentNode;
         cont.parentNode.insertBefore(grid, cont.nextSibling);
 
         const buscador = document.createElement("input");
@@ -733,7 +749,7 @@ $.ajax({
 // Los estilos de estas tarjetas viven en css/style.css (bloque "ORDENES PENDIENTES")
 
 // Refresco automatico: refleja en Administracion lo que Cocina va marcando
-window.__REFRESCO_PENDIENTES__ = setInterval(function () {
+if (hayPanelPendientes()) window.__REFRESCO_PENDIENTES__ = setInterval(function () {
     if (document.hidden) return;
     if (document.querySelector(".modal.show")) return;
     if (document.querySelectorAll("#gridPendientes .chkRow:checked").length) return;
