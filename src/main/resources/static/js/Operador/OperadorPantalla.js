@@ -505,19 +505,12 @@ function aplicarEnvejecimiento(card) {
         chip.remove();
     }
 
-    // Degradado: 0-15 min normal; 15→60 min interpola hacia rojo total
+    // Envejecimiento líquido: el CSS pinta la capa de vidrio teñida
+    // a partir de --aging (0 = recién llegada, 1 = crítica).
     const rango = ENVEJECIMIENTO_CRITICO_MIN - ENVEJECIMIENTO_ALERTA_MIN;
     const t = Math.min(1, Math.max(0, (mins - ENVEJECIMIENTO_ALERTA_MIN) / rango));
-    if (t <= 0) {
-        card.style.backgroundColor = "";
-        card.classList.remove("op-card-critica");
-        return;
-    }
-    // Interpolar de blanco (255,255,255) a rojo (220,53,69)
-    const r = Math.round(255 + (220 - 255) * t);
-    const g = Math.round(255 + (53  - 255) * t);
-    const b = Math.round(255 + (69  - 255) * t);
-    card.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+
+    card.style.setProperty("--aging", t.toFixed(3));
     card.classList.toggle("op-card-critica", t >= 0.65);
 }
 
@@ -525,49 +518,6 @@ function refrescarEnvejecimiento() {
     document.querySelectorAll(".orden-card[data-creacion]").forEach(aplicarEnvejecimiento);
 }
 setInterval(refrescarEnvejecimiento, 30000);
-
-// Estilos inyectados (badge WhatsApp, chip de tiempo y estado critico)
-(function () {
-    const st = document.createElement("style");
-    st.textContent = `
-    .orden-card { position: relative; transition: background-color 1.2s ease; }
-    .op-badge-wa {
-        position: absolute; top: 8px; right: 8px;
-        display: inline-flex; align-items: center; justify-content: center;
-        width: 26px; height: 26px; border-radius: 50%;
-        background: linear-gradient(135deg,#25D366,#128C7E); color: #fff;
-        font-size: .85rem; box-shadow: 0 2px 6px rgba(18,140,126,.4); z-index: 2;
-    }
-    .op-chip-tiempo {
-        position: absolute; top: 8px; right: 40px;
-        display: inline-flex; align-items: center; gap: .3rem;
-        padding: .12rem .5rem; border-radius: 999px;
-        background: #DC3545; color: #fff; font-size: .7rem; font-weight: 700;
-        box-shadow: 0 2px 6px rgba(220,53,69,.4); z-index: 2;
-        animation: opChipPulse 1.6s ease-in-out infinite;
-    }
-    .orden-card:not(:has(.op-badge-wa)) .op-chip-tiempo { right: 8px; }
-    .op-card-critica, .op-card-critica * { color: #fff !important; }
-    @keyframes opChipPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
-    `;
-    document.head.appendChild(st);
-})();
-
-
-(function () {
-    const st = document.createElement("style");
-    st.textContent = `
-    .op-cliente {
-        display:inline-flex; align-items:center; gap:.35rem;
-        font-size:.82rem; font-weight:600; color:#6F4E37;
-        background:#FBF6EF; border:1px solid #EFE2D2;
-        padding:.15rem .55rem; border-radius:999px; margin-top:.25rem;
-    }
-    .op-card-critica .op-cliente { background:rgba(255,255,255,.18); border-color:rgba(255,255,255,.35); }
-    `;
-    document.head.appendChild(st);
-})();
-
 
 // ════════════════════════════════════════════════════════════
 // PROGRESO DE PREPARACION (puntos, contador y orden completa)
@@ -600,21 +550,3 @@ function actualizarProgresoCard(card) {
 
     card.classList.toggle("op-orden-completa", completa);
 }
-
-(function () {
-    const st = document.createElement("style");
-    st.textContent = `
-    .op-progreso { display:flex; align-items:center; justify-content:space-between;
-        gap:.6rem; margin:.5rem 0 .6rem; padding:.35rem .1rem; }
-    .op-puntos { display:inline-flex; gap:.3rem; flex-wrap:wrap; }
-    .op-punto { width:9px; height:9px; border-radius:50%; background:#DDD3C7;
-        box-shadow:inset 0 0 0 1px rgba(0,0,0,.06); transition:background .25s ease, transform .25s ease; }
-    .op-punto.is-listo { background:#2BA84A; transform:scale(1.12); }
-    .op-contador { font-size:.72rem; font-weight:700; color:#8A8A8A; letter-spacing:.03em; }
-    .op-completa { display:inline-flex; align-items:center; gap:.3rem; font-size:.68rem; font-weight:800;
-        letter-spacing:.05em; color:#fff; background:linear-gradient(135deg,#2BA84A,#1A7F4B);
-        padding:.15rem .55rem; border-radius:999px; }
-    .op-orden-completa { box-shadow:0 0 0 2px #2BA84A inset; }
-    `;
-    document.head.appendChild(st);
-})();
