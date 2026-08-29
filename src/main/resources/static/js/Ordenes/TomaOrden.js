@@ -730,49 +730,7 @@ $.ajax({
 });
 
 
-// Estilos Liquid Fluid de las tarjetas de ordenes pendientes
-(function () {
-    const st = document.createElement("style");
-    st.textContent = `
-    .op-buscador { width:100%; margin:0 0 14px; padding:.6rem .9rem; font-size:.88rem;
-        border:1px solid #EFE2D2; border-radius:12px; background:#FBF6EF; outline:none; }
-    .op-buscador:focus { border-color:#A47551; box-shadow:0 0 0 3px rgba(164,117,81,.12); }
-    .op-grid-pendientes { display:grid; gap:12px;
-        grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); align-items:start; }
-    .ord-card { position:relative; background:rgba(255,255,255,.82); backdrop-filter:blur(8px);
-        border:1px solid #EFE2D2; border-radius:16px; padding:12px 14px 10px; cursor:pointer;
-        transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
-    .ord-card:hover { transform:translateY(-2px); box-shadow:0 10px 24px rgba(62,44,32,.12); }
-    .ord-card.is-sel { border-color:#8B5E3C; box-shadow:0 0 0 2px rgba(139,94,60,.25); }
-    .ord-card--completa { border-color:#2BA84A; background:linear-gradient(180deg,rgba(230,246,234,.7),rgba(255,255,255,.85)); }
-    .ord-head { display:flex; align-items:center; gap:.45rem; margin-bottom:.35rem; }
-    .ord-check { display:flex; margin:0; }
-    .ord-num { font-weight:800; font-size:.95rem; color:#3E2C20; }
-    .ord-wa { color:#128C7E; font-size:.9rem; }
-    .ord-hora { margin-left:auto; font-size:.72rem; color:#9A8778; }
-    .ord-cliente { font-size:.78rem; color:#6F4E37; margin-bottom:.45rem;
-        display:flex; align-items:center; gap:.3rem; }
-    .ord-items { list-style:none; margin:0 0 .5rem; padding:0; display:flex; flex-direction:column; gap:.22rem; }
-    .ord-item { display:flex; align-items:center; gap:.45rem; font-size:.8rem; color:#2B2018; }
-    .ord-dot { width:8px; height:8px; border-radius:50%; background:#DDD3C7; flex:0 0 auto;
-        box-shadow:inset 0 0 0 1px rgba(0,0,0,.06); transition:background .25s ease; }
-    .ord-item.is-listo .ord-dot { background:#2BA84A; }
-    .ord-item.is-listo .ord-nombre { color:#9A8778; text-decoration:line-through; }
-    .ord-nombre { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .ord-cant { font-size:.7rem; font-weight:800; color:#8B5E3C; background:#F5EDE3;
-        padding:.02rem .35rem; border-radius:6px; }
-    .ord-foot { display:flex; align-items:center; justify-content:space-between;
-        border-top:1px solid #F0E7DC; padding-top:.45rem; }
-    .ord-total { font-weight:800; font-size:.9rem; color:#3E2C20; }
-    .ord-estado { font-size:.7rem; font-weight:800; color:#8A8A8A; letter-spacing:.04em; }
-    .ord-estado--ok { display:inline-flex; align-items:center; gap:.25rem; color:#fff;
-        background:linear-gradient(135deg,#2BA84A,#1A7F4B); padding:.12rem .5rem; border-radius:999px; }
-    .ord-acciones { display:flex; margin-top:.5rem; }
-    .ord-empty { grid-column:1/-1; text-align:center; padding:28px; color:#9A8778; font-size:.9rem; }
-    `;
-    document.head.appendChild(st);
-})();
-
+// Los estilos de estas tarjetas viven en css/style.css (bloque "ORDENES PENDIENTES")
 
 // Refresco automatico: refleja en Administracion lo que Cocina va marcando
 window.__REFRESCO_PENDIENTES__ = setInterval(function () {
