@@ -129,7 +129,39 @@ public class ProcedimientosAlmacenadosController {
 	@ResponseBody
 	public List<Map<String, Object>> getOrdenesPendientes() {
 	    // Para listar pendientes no se necesita pTipoPago
-	    return procedimientosAlmacenados.spGestionarOrdenSelect(null, 4, null, null);
+	    List<Map<String, Object>> pendientes =
+	            procedimientosAlmacenados.spGestionarOrdenSelect(null, 4, null, null);
+
+	    // El SP no devuelve n_tipo_consumo: se agrega aqui para que
+	    // Administracion y Cocina muestren exactamente el mismo dato.
+	    procedimientosAlmacenados.inyectarTipoConsumo(pendientes);
+	    return pendientes;
+	}
+
+
+	// ── Tipo de consumo de la orden (AQUI | LLEVAR) ───────────────
+	@PostMapping("/admin/orden/tipoConsumo")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> guardarTipoConsumo(
+	        @RequestParam("idOrden")     Integer idOrden,
+	        @RequestParam("tipoConsumo") String  tipoConsumo) {
+
+	    boolean ok = procedimientosAlmacenados.guardarTipoConsumo(idOrden, tipoConsumo);
+	    if (!ok) {
+	        return ResponseEntity.badRequest().body(Map.of(
+	                "ok", false,
+	                "mensaje", "Tipo de consumo invalido. Usa AQUI o LLEVAR."));
+	    }
+	    return ResponseEntity.ok(Map.of("ok", true, "tipoConsumo", tipoConsumo.trim().toUpperCase()));
+	}
+
+	@GetMapping("/admin/orden/tipoConsumo")
+	@ResponseBody
+	public Map<String, Object> obtenerTipoConsumo(@RequestParam("idOrden") Integer idOrden) {
+	    Map<String, Object> r = new HashMap<>();
+	    r.put("ok", true);
+	    r.put("tipoConsumo", procedimientosAlmacenados.obtenerTipoConsumo(idOrden));
+	    return r;
 	}
 	
 	
@@ -270,6 +302,9 @@ public class ProcedimientosAlmacenadosController {
 
 	        Map<String, List<Map<String, Object>>> data =
 	                procedimientosAlmacenados.spOperadorOrdenes(idRol);
+
+	        // Mismo dato que ve Administracion, para que Cocina no tenga que preguntar.
+	        procedimientosAlmacenados.inyectarTipoConsumo(data.get("ordenes"));
 
 	        return ResponseEntity.ok(data);
 	    }

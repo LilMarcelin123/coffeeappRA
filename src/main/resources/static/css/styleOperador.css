@@ -790,6 +790,34 @@ body::before {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   TIPO DE CONSUMO — indicador en tarjeta
+   Iconos como mascara CSS: heredan el color del texto.
+   ═══════════════════════════════════════════════════════════ */
+.tc-badge {
+    display: inline-flex; align-items: center; gap: .35rem;
+    font-size: .60rem; font-weight: 800;
+    letter-spacing: .07em; text-transform: uppercase;
+    padding: .22rem .62rem; border-radius: 999px;
+    color: var(--tc-color, #5C3317);
+    background: linear-gradient(158deg, rgba(var(--tc-rgb, 92,51,23), .18), rgba(255,255,255,.58));
+    border: 1px solid rgba(var(--tc-rgb, 92,51,23), .38);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.88);
+    white-space: nowrap;
+}
+.tc-badge .tc-ico {
+    width: .95rem; height: .95rem; flex: 0 0 auto;
+    background: currentColor;
+    -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+    -webkit-mask-position: center;  mask-position: center;
+    -webkit-mask-size: contain;     mask-size: contain;
+}
+.op-tc { padding: .6rem .875rem 0; }
+.tc-aqui   { --tc-rgb: 92, 51, 23;  --tc-color: #5C3317; }
+.tc-llevar { --tc-rgb: 61, 78, 173; --tc-color: #34479E; }
+.tc-aqui   .tc-ico { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M2.6%2011h18.8%22%2F%3E%3Cpath%20d%3D%22M6.2%2011%204.3%2020.4%22%2F%3E%3Cpath%20d%3D%22M17.8%2011l1.9%209.4%22%2F%3E%3Cpath%20d%3D%22M5.4%2016.2h13.2%22%2F%3E%3Cpath%20d%3D%22M9.4%203.6h5.2v2.6a2.6%202.6%200%200%201-2.6%202.6%202.6%202.6%200%200%201-2.6-2.6z%22%2F%3E%3Cpath%20d%3D%22M14.9%204.9h1a1.35%201.35%200%200%201%200%202.7h-1%22%2F%3E%3C%2Fsvg%3E");  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M2.6%2011h18.8%22%2F%3E%3Cpath%20d%3D%22M6.2%2011%204.3%2020.4%22%2F%3E%3Cpath%20d%3D%22M17.8%2011l1.9%209.4%22%2F%3E%3Cpath%20d%3D%22M5.4%2016.2h13.2%22%2F%3E%3Cpath%20d%3D%22M9.4%203.6h5.2v2.6a2.6%202.6%200%200%201-2.6%202.6%202.6%202.6%200%200%201-2.6-2.6z%22%2F%3E%3Cpath%20d%3D%22M14.9%204.9h1a1.35%201.35%200%200%201%200%202.7h-1%22%2F%3E%3C%2Fsvg%3E"); }
+.tc-llevar .tc-ico { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4.5%208.1h15l-1.75%2011.3a2%202%200%200%201-2%201.7H8.25a2%202%200%200%201-2-1.7z%22%2F%3E%3Cpath%20d%3D%22M8.6%208.1V5.7a3.4%203.4%200%200%201%206.8%200v2.4%22%2F%3E%3C%2Fsvg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4.5%208.1h15l-1.75%2011.3a2%202%200%200%201-2%201.7H8.25a2%202%200%200%201-2-1.7z%22%2F%3E%3Cpath%20d%3D%22M8.6%208.1V5.7a3.4%203.4%200%200%201%206.8%200v2.4%22%2F%3E%3C%2Fsvg%3E"); }
+
+/* ═══════════════════════════════════════════════════════════
    FALLBACK sin backdrop-filter — superficies más sólidas
    ═══════════════════════════════════════════════════════════ */
 @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {

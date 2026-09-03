@@ -238,6 +238,104 @@ public class ProcedimientosAlmacenados {
     }
 
     // ════════════════════════════════════════════════════════
+    // TIPO DE CONSUMO (AQUI | LLEVAR)
+    // Vive en orden.n_tipo_consumo. No pasa por sp_gestionar_orden:
+    // se lee y escribe directo, igual que el nombre del cliente.
+    // ════════════════════════════════════════════════════════
+
+    public static final String CONSUMO_AQUI   = "AQUI";
+    public static final String CONSUMO_LLEVAR = "LLEVAR";
+
+    private String normalizarTipoConsumo(String tipo) {
+        if (tipo == null) return null;
+        String t = tipo.trim().toUpperCase();
+        return (CONSUMO_AQUI.equals(t) || CONSUMO_LLEVAR.equals(t)) ? t : null;
+    }
+
+    /** Guarda el tipo de consumo. Devuelve false si el valor no es valido o falla el UPDATE. */
+    public boolean guardarTipoConsumo(Integer idOrden, String tipoConsumo) {
+        String tipo = normalizarTipoConsumo(tipoConsumo);
+        if (idOrden == null || tipo == null) return false;
+
+        final String SQL = "UPDATE orden SET n_tipo_consumo = ? WHERE id_orden = ?";
+        try (Connection conn = conexionJDBC.getConexion2();
+             PreparedStatement ps = conn.prepareStatement(SQL)) {
+
+            ps.setString(1, tipo);
+            ps.setInt(2, idOrden);
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            log.error("guardarTipoConsumo error: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /** Tipo de consumo de una orden, o null si no se ha definido. */
+    public String obtenerTipoConsumo(Integer idOrden) {
+        if (idOrden == null) return null;
+        final String SQL = "SELECT n_tipo_consumo FROM orden WHERE id_orden = ?";
+        try (Connection conn = conexionJDBC.getConexion2();
+             PreparedStatement ps = conn.prepareStatement(SQL)) {
+
+            ps.setInt(1, idOrden);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return normalizarTipoConsumo(rs.getString(1));
+            }
+        } catch (SQLException e) {
+            log.error("obtenerTipoConsumo error: {}", e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * Agrega n_tipo_consumo a una lista de ordenes que ya viene del SP.
+     * Asi Administracion y Cocina muestran el mismo dato sin tocar sp_gestionar_orden.
+     * Si la columna todavia no existe en la BD, se registra el error y las ordenes
+     * siguen su camino sin el campo: la pantalla no se rompe.
+     */
+    public void inyectarTipoConsumo(List<Map<String, Object>> ordenes) {
+        if (ordenes == null || ordenes.isEmpty()) return;
+
+        List<Integer> ids = new ArrayList<>();
+        for (Map<String, Object> o : ordenes) {
+            Object v = (o == null) ? null : o.get("id_orden");
+            if (v instanceof Number) ids.add(((Number) v).intValue());
+        }
+        if (ids.isEmpty()) return;
+
+        StringBuilder marcadores = new StringBuilder();
+        for (int i = 0; i < ids.size(); i++) marcadores.append(i == 0 ? "?" : ",?");
+
+        final String SQL = "SELECT id_orden, n_tipo_consumo FROM orden WHERE id_orden IN ("
+                + marcadores + ")";
+
+        Map<Integer, String> porOrden = new HashMap<>();
+        try (Connection conn = conexionJDBC.getConexion2();
+             PreparedStatement ps = conn.prepareStatement(SQL)) {
+
+            for (int i = 0; i < ids.size(); i++) ps.setInt(i + 1, ids.get(i));
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    porOrden.put(rs.getInt("id_orden"),
+                                 normalizarTipoConsumo(rs.getString("n_tipo_consumo")));
+                }
+            }
+        } catch (SQLException e) {
+            log.error("inyectarTipoConsumo error: {}", e.getMessage());
+            return;
+        }
+
+        for (Map<String, Object> o : ordenes) {
+            Object v = (o == null) ? null : o.get("id_orden");
+            if (v instanceof Number) {
+                o.put("n_tipo_consumo", porOrden.get(((Number) v).intValue()));
+            }
+        }
+    }
+
+    // ════════════════════════════════════════════════════════
     // CATÁLOGO
     // ════════════════════════════════════════════════════════
 

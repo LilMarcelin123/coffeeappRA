@@ -12,6 +12,7 @@ const ENDPOINTS = {
     eliminarItem:              '/admin/orden/eliminarItem',
     confirmarOrden:            '/admin/orden/gestionar',
     guardarCliente:            '/admin/orden/nombreCliente',   // ← NUEVO endpoint
+    tipoConsumo:               '/admin/orden/tipoConsumo',
     redireccionInicio:         '/admin/inicio',
 };
 
@@ -41,6 +42,8 @@ const $btnConfirmaOrden         = () => $('#btnConfirmaOrden');
 const $totalOrdenVista          = () => $('#totalOrdenVista');
 const $idOrden                  = () => $('#idOrden');
 const $nombreCliente            = () => $('#nombreCliente');       // ← NUEVO
+const $tipoConsumoWrap          = () => $('#tipoConsumoWrap');
+const $tipoConsumoOpts          = () => $('#tipoConsumoSelector .tc-opt');
 const $tplResumenItem           = () => document.getElementById('tplResumenItem');
 
 // ─────────────────────────────────────────────────────────────
@@ -68,6 +71,75 @@ function validarItemParaAgregar() {
         return false;
     }
     return true;
+}
+
+// ─────────────────────────────────────────────────────────────
+// TIPO DE CONSUMO (obligatorio: AQUI | LLEVAR)
+// ─────────────────────────────────────────────────────────────
+const TIPO_CONSUMO_LABEL = { AQUI: 'Para comer aquí', LLEVAR: 'Para llevar' };
+
+let tipoConsumoActual = null;
+
+function pintarTipoConsumo(tipo) {
+    tipoConsumoActual = (tipo === 'AQUI' || tipo === 'LLEVAR') ? tipo : null;
+
+    $tipoConsumoOpts().each(function () {
+        const activa = this.dataset.tipo === tipoConsumoActual;
+        this.classList.toggle('is-activa', activa);
+        this.setAttribute('aria-pressed', activa ? 'true' : 'false');
+    });
+
+    if (tipoConsumoActual) $tipoConsumoWrap().removeClass('tc-falta');
+
+    // Chip espejo en el resumen de la derecha
+    const chip = document.getElementById('resumenTipoConsumo');
+    const txt  = document.getElementById('resumenTipoConsumoTexto');
+    if (chip && txt) {
+        if (tipoConsumoActual) {
+            chip.classList.remove('tc-aqui', 'tc-llevar');
+            chip.classList.add(tipoConsumoActual === 'AQUI' ? 'tc-aqui' : 'tc-llevar');
+            txt.textContent   = TIPO_CONSUMO_LABEL[tipoConsumoActual];
+            chip.style.display = 'inline-flex';
+        } else {
+            chip.style.display = 'none';
+        }
+    }
+}
+
+/** Persiste la eleccion en cuanto se hace, para que sobreviva a una recarga. */
+function guardarTipoConsumo(tipo) {
+    const idOrden = $idOrden().val();
+    if (!idOrden || !tipo) return $.Deferred().reject().promise();
+
+    return $.ajax({
+        url: ENDPOINTS.tipoConsumo, type: 'POST',
+        data: { idOrden, tipoConsumo: tipo },
+        error: function (xhr) {
+            console.warn('No se pudo guardar el tipo de consumo:', xhr.responseText);
+        },
+    });
+}
+
+/** Al abrir (o reabrir) la orden, deja marcado lo que ya estaba guardado. */
+function cargarTipoConsumo() {
+    const idOrden = $idOrden().val();
+    if (!idOrden) return;
+
+    $.ajax({
+        url: ENDPOINTS.tipoConsumo, type: 'GET', data: { idOrden },
+        success: function (r) { if (r && r.tipoConsumo) pintarTipoConsumo(r.tipoConsumo); },
+        error:   function ()  { /* silencioso: la seleccion sigue siendo obligatoria */ },
+    });
+}
+
+function validarTipoConsumo() {
+    if (tipoConsumoActual) return true;
+
+    $tipoConsumoWrap().addClass('tc-falta');
+    document.getElementById('tipoConsumoWrap')
+            ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    mensajesAlert('Selecciona el tipo de consumo: para comer aquí o para llevar.|bg-danger');
+    return false;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -279,6 +351,9 @@ function confirmarOrden() {
         tipoProceso: 2,
         idRol:       1,
     };
+    // El tipo de consumo se re-guarda aqui: si el POST del click fallo,
+    // la orden no llega a cocina sin el dato.
+    $.when(guardarTipoConsumo(tipoConsumoActual)).always(function () {
     $.ajax({
         url: ENDPOINTS.confirmarOrden, type: 'POST', data: payload,
         success: function (resp) {
@@ -288,6 +363,7 @@ function confirmarOrden() {
         error: function (xhr) {
             console.error('Error confirmando orden:', xhr.responseText);
         },
+    });
     });
 }
 
@@ -371,7 +447,16 @@ function registrarEventos() {
 
     $btnAñadeItem().on('click', agregarItemOrden);
 
+    $(document).on('click', '#tipoConsumoSelector .tc-opt', function () {
+        const tipo = this.dataset.tipo;
+        pintarTipoConsumo(tipo);
+        guardarTipoConsumo(tipo);
+    });
+
     $btnConfirmaOrden().on('click', function () {
+        // Sin tipo de consumo la orden no sale a cocina.
+        if (!validarTipoConsumo()) return;
+
         // Guardar nombre antes de confirmar (por si no se agregó ítem aún)
         guardarNombreClienteSilencioso();
         mostrarConfirmacion(
@@ -389,6 +474,7 @@ $(document).ready(function () {
     ocultarCamposCaptura();
     $btnConfirmaOrden().prop('disabled', true).hide();
     cargarResumenOrden();
+    cargarTipoConsumo();
     registrarEventos();
 });
 

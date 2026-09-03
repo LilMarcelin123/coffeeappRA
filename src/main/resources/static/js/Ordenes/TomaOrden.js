@@ -533,6 +533,16 @@ function pintarTarjetasPendientes(lista, items) {
         card.dataset.idOrden  = id;
         card.dataset.busqueda = (String(id) + " " + cliente).toLowerCase();
 
+        // Tipo de consumo: se ve en la tarjeta, sin abrir la orden.
+        const tipoConsumo = String(o.n_tipo_consumo || "").toUpperCase();
+        const tcHtml = (tipoConsumo === "AQUI" || tipoConsumo === "LLEVAR")
+            ? '<div class="ord-tc"><span class="tc-badge ' +
+              (tipoConsumo === "AQUI" ? "tc-aqui" : "tc-llevar") + '">' +
+              '<span class="tc-ico"></span>' +
+              (tipoConsumo === "AQUI" ? "Para comer aqu\u00ed" : "Para llevar") +
+              '</span></div>'
+            : "";
+
         const filas = its.map(i => {
             const ok = String(i.n_estado_preparacion).toUpperCase() === "LISTO";
             const cant = Number(i.p_cantidad) > 1 ? '<span class="ord-cant">×' + i.p_cantidad + '</span>' : "";
@@ -549,6 +559,7 @@ function pintarTarjetasPendientes(lista, items) {
                 (esWa ? '<span class="ord-wa" title="Pedido por WhatsApp"><i class="bi bi-whatsapp"></i></span>' : "") +
                 '<span class="ord-hora">' + String(o.t_hora_creacion || "").replace("T", " ").substring(11, 16) + '</span>' +
             '</header>' +
+            tcHtml +
             (cliente ? '<div class="ord-cliente"><i class="bi bi-person-fill"></i> ' + escHtmlAdmin(cliente) + '</div>' : "") +
             '<ul class="ord-items">' + (filas || '<li class="ord-item"><span class="ord-nombre text-muted">Sin productos</span></li>') + '</ul>' +
             '<footer class="ord-foot">' +

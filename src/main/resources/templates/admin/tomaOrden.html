@@ -83,6 +83,27 @@
             <p class="cliente-hint">Si lo dejas vacío la orden se identifica solo por su número.</p>
         </div>
 
+        <!-- ── TIPO DE CONSUMO (obligatorio) ─────────────── -->
+        <div class="tc-wrap" id="tipoConsumoWrap">
+            <div class="tc-wrap-label">
+                <i class="bi bi-ui-checks-grid"></i>
+                Tipo de consumo
+                <span class="tc-requerido">obligatorio</span>
+            </div>
+            <div class="tc-selector" id="tipoConsumoSelector">
+                <button type="button" class="tc-opt" data-tipo="AQUI"
+                        aria-pressed="false" aria-label="Para comer aquí">
+                    <span class="tc-opt-ico" aria-hidden="true"></span>
+                    <span class="tc-opt-label">Para comer aquí</span>
+                </button>
+                <button type="button" class="tc-opt" data-tipo="LLEVAR"
+                        aria-pressed="false" aria-label="Para llevar">
+                    <span class="tc-opt-ico" aria-hidden="true"></span>
+                    <span class="tc-opt-label">Para llevar</span>
+                </button>
+            </div>
+        </div>
+
         <!-- Bienvenida -->
         <p class="text-muted" style="font-size:.88rem; margin-bottom:20px;">
             <i class="bi bi-person-fill me-1"></i>
@@ -151,6 +172,12 @@
         <div id="resumenClienteChip" class="resumen-cliente-chip" style="display:none;">
             <i class="bi bi-person-fill"></i>
             <span id="resumenClienteNombre"></span>
+        </div>
+
+        <!-- Chip tipo de consumo en resumen -->
+        <div id="resumenTipoConsumo" class="tc-badge" style="display:none; margin-bottom:12px;">
+            <span class="tc-ico" aria-hidden="true"></span>
+            <span id="resumenTipoConsumoTexto"></span>
         </div>
 
         <div id="contenedorResumenOrden">

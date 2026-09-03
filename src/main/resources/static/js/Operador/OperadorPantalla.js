@@ -369,6 +369,26 @@ function actualizarCabeceraCard(card, orden) {
         elCli.remove();
     }
 
+    // ── Tipo de consumo: mismo dato que ve Administracion ──
+    const tipoConsumo = String(orden.n_tipo_consumo || "").toUpperCase();
+    let elTc = card.querySelector(".op-tc");
+    if (tipoConsumo === "AQUI" || tipoConsumo === "LLEVAR") {
+        if (!elTc) {
+            elTc = document.createElement("div");
+            elTc.className = "op-tc";
+            const cab = card.querySelector(".orden-card-header");
+            if (cab) cab.insertAdjacentElement("afterend", elTc);
+            else card.appendChild(elTc);
+        }
+        elTc.innerHTML =
+            '<span class="tc-badge ' + (tipoConsumo === "AQUI" ? "tc-aqui" : "tc-llevar") + '">' +
+            '<span class="tc-ico"></span>' +
+            (tipoConsumo === "AQUI" ? "Para comer aqu\u00ed" : "Para llevar") +
+            '</span>';
+    } else if (elTc) {
+        elTc.remove();
+    }
+
     // Guardar hora de creacion para el envejecimiento visual
     if (orden.t_hora_creacion) card.dataset.creacion = String(orden.t_hora_creacion);
 
