@@ -26,10 +26,11 @@ export function mostrarConfirmacion(mensaje, onContinuar, onRegresar) {
   const btnContinuar = document.getElementById("btnContinuar");
   const btnRegresar = document.getElementById("btnRegresar");
 
+  // La redireccion la hace el callback cuando el servidor responde.
+  // Redirigir aqui abortaba el AJAX en curso (orden confirmada que no llegaba a cocina).
   btnContinuar.onclick = () => {
-    if (onContinuar) onContinuar();
     $('#modalConfirmacion').modal('hide');
-	window.location.href = "/admin/inicio";
+    if (onContinuar) onContinuar();
   };
 
   btnRegresar.onclick = () => {

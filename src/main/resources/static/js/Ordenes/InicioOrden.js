@@ -345,26 +345,56 @@ function guardarNombreClienteSilencioso() {
     });
 }
 
+let enviandoOrden = false;
+
+function guardarNombreCliente() {
+    const nombre  = $nombreCliente().val()?.trim() || '';
+    const idOrden = $idOrden().val();
+    if (!idOrden || (!nombre && window.__NOMBRE_CLIENTE_ORIGINAL__)) {
+        return $.Deferred().resolve().promise();
+    }
+    return $.ajax({ url: ENDPOINTS.guardarCliente, type: 'POST', data: { idOrden, nombreCliente: nombre } });
+}
+
+function bloquearConfirmar(bloquear) {
+    $btnConfirmaOrden().prop('disabled', bloquear)
+        .html(bloquear
+            ? '<span class="spinner-border spinner-border-sm me-2"></span>Enviando…'
+            : $btnConfirmaOrden().data('html-original'));
+}
+
 function confirmarOrden() {
-    const payload = {
-        idOrden:     $idOrden().val(),
-        tipoProceso: 2,
-        idRol:       1,
+    if (enviandoOrden) return;           // evita doble envio (doble click / doble tap)
+    enviandoOrden = true;
+    if (!$btnConfirmaOrden().data('html-original')) {
+        $btnConfirmaOrden().data('html-original', $btnConfirmaOrden().html());
+    }
+    bloquearConfirmar(true);
+
+    const payload = { idOrden: $idOrden().val(), tipoProceso: 2, idRol: 1 };
+
+    const fallo = (detalle) => {
+        console.error('Error confirmando orden:', detalle);
+        enviandoOrden = false;
+        bloquearConfirmar(false);
+        mensajesAlert('La orden NO se envió a cocina. Revisa la conexión e intenta de nuevo.|bg-danger');
     };
-    // El tipo de consumo se re-guarda aqui: si el POST del click fallo,
-    // la orden no llega a cocina sin el dato.
-    $.when(guardarTipoConsumo(tipoConsumoActual)).always(function () {
-    $.ajax({
-        url: ENDPOINTS.confirmarOrden, type: 'POST', data: payload,
-        success: function (resp) {
+
+    // Orden estricto: tipo de consumo -> nombre -> enviar a cocina.
+    // Si falla guardar un dato, NO se manda la orden sin el dato.
+    guardarTipoConsumo(tipoConsumoActual)
+        .then(() => guardarNombreCliente())
+        .then(() => $.ajax({ url: ENDPOINTS.confirmarOrden, type: 'POST', data: payload }))
+        .then(function (resp) {
+            if (!resp || resp.ok === false || Number(resp.filas) < 0) {
+                fallo(resp);
+                return;
+            }
             console.log('Preparaciones generadas:', resp.filas);
             window.location.href = ENDPOINTS.redireccionInicio;
-        },
-        error: function (xhr) {
-            console.error('Error confirmando orden:', xhr.responseText);
-        },
-    });
-    });
+        }, function (xhr) {
+            fallo(xhr && xhr.responseText ? xhr.responseText : xhr);
+        });
 }
 
 function cargarProductosPorCategoria(idCategoria) {
@@ -454,11 +484,10 @@ function registrarEventos() {
     });
 
     $btnConfirmaOrden().on('click', function () {
+        if (enviandoOrden) return;
         // Sin tipo de consumo la orden no sale a cocina.
         if (!validarTipoConsumo()) return;
 
-        // Guardar nombre antes de confirmar (por si no se agregó ítem aún)
-        guardarNombreClienteSilencioso();
         mostrarConfirmacion(
             '¿Confirmas el envío de la orden a cocina?',
             confirmarOrden,

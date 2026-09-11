@@ -95,11 +95,18 @@ public class ProcedimientosAlmacenadosController {
 	    Integer filas = procedimientosAlmacenados.spGestionarOrden(idOrden, tipoProceso, idRol, pTipoPago);
 
 	    Map<String, Object> response = new HashMap<>();
+	    boolean ok = filas != null && filas >= 0;
+	    response.put("ok", ok);
 	    response.put("filas", filas);
 	    response.put("idOrden", idOrden);
 	    response.put("tipoProceso", tipoProceso);
 	    response.put("pTipoPago", pTipoPago);
 
+	    if (!ok) {
+	        throw new org.springframework.web.server.ResponseStatusException(
+	                org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR,
+	                "spGestionarOrden fallo para orden " + idOrden + " (tipoProceso " + tipoProceso + ")");
+	    }
 	    return response;
 	}
 
