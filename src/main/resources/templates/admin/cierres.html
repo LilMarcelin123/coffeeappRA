@@ -1,161 +1,100 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cierres — Módulo de Gestión</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-    <link rel="stylesheet" th:href="@{/css/styleGestion.css}">
-</head>
+<head th:replace="~{admin/gestion/fragmentos :: cabeza('Cierres — Módulo de Gestión', 'cierres')}"></head>
 
-<body>
+<body class="gestion-body" th:attr="data-hoy-negocio=${hoyNegocio}">
 
-<header>
-    <div class="hero-section">
-        <div class="hero-overlay"></div>
-        <div class="hero-content">
-            <div class="hero-left">
-                <span class="hero-badge">
-                    <i class="bi bi-cash-coin"></i> Módulo de Gestión
-                </span>
-                <h1 class="hero-title">Cierres de caja</h1>
-                <p class="hero-subtitle">
-                    Qué se vendió cada día y qué se arqueó en los cortes.
-                </p>
-            </div>
-            <div class="hero-right">
-                <div class="hero-logo-wrap">
-                    <img th:src="@{/img/arboledasLogo.jpg}" alt="Logo">
-                </div>
-                <p class="hero-negocio">Rincón Arboledas</p>
-            </div>
-        </div>
-    </div>
-</header>
+<header th:replace="~{admin/gestion/fragmentos :: encabezado(
+            'bi-cash-coin',
+            'Cierres de caja',
+            'Qué se vendió cada día y qué se arqueó en los cortes.')}"></header>
 
 <main class="gestion-main">
 
-    <!-- ── PERIODO ────────────────────────────────────────── -->
-    <section class="periodo-bar" aria-label="Periodo a consultar">
-        <span class="periodo-label">Periodo</span>
+    <section th:replace="~{admin/gestion/fragmentos :: periodo(
+                'hoy=Hoy|7dias=7 días|mes=Este mes|rango=Rango',
+                '/admin/gestion', 'Volver al módulo')}"></section>
 
-        <div class="periodo-chips" id="periodoChips">
-            <button type="button" class="chip-periodo" data-periodo="hoy">Hoy</button>
-            <button type="button" class="chip-periodo" data-periodo="7dias">7 días</button>
-            <button type="button" class="chip-periodo is-activo" data-periodo="mes">Este mes</button>
-            <button type="button" class="chip-periodo" data-periodo="rango">Rango</button>
+    <!-- ── Resumen del periodo ────────────────────────────── -->
+    <section class="tiras" id="resumenPeriodo" hidden>
+        <div class="tira vidrio">
+            <small class="rotulo">Vendido</small>
+            <b class="cifra" id="totVendido">$0</b>
         </div>
-
-        <div class="periodo-rango" id="periodoRango">
-            <input type="date" id="inputDesde" aria-label="Desde">
-            <span>a</span>
-            <input type="date" id="inputHasta" aria-label="Hasta">
+        <div class="tira vidrio">
+            <small class="rotulo">Arqueado en cortes</small>
+            <b class="cifra" id="totArqueado">$0</b>
         </div>
-
-        <a th:href="@{/admin/gestion}" class="btn-logout-top">
-            <i class="bi bi-arrow-left"></i> Volver al módulo
-        </a>
-
-        <p class="periodo-leyenda" id="periodoLeyenda">Cargando…</p>
-    </section>
-
-    <!-- ── RESUMEN DEL PERIODO ────────────────────────────── -->
-    <section class="resumen-tiras" id="resumenPeriodo" hidden>
-        <div class="tira">
-            <small>Vendido</small>
-            <b id="totVendido">$0</b>
-        </div>
-        <div class="tira">
-            <small>Arqueado en cortes</small>
-            <b id="totArqueado">$0</b>
-        </div>
-        <div class="tira tira-alerta" id="tiraDiferencia" hidden>
-            <small>Sin arquear</small>
-            <b id="totDiferencia">$0</b>
+        <div class="tira vidrio tira--alerta" id="tiraDiferencia" hidden>
+            <small class="rotulo">Sin arquear</small>
+            <b class="cifra" id="totDiferencia">$0</b>
         </div>
     </section>
 
-    <!-- ── DÍAS ───────────────────────────────────────────── -->
-    <section class="lista-dias" id="listaDias" aria-live="polite"></section>
+    <!-- ── Días ───────────────────────────────────────────── -->
+    <section class="dias" id="listaDias" aria-live="polite"></section>
 
+    <!-- ── Plantillas ─────────────────────────────────────── -->
     <template id="tplDia">
-        <article class="dia-card">
-            <button class="dia-header" type="button" aria-expanded="false">
-                <div class="dia-fecha">
-                    <b class="dia-titulo"></b>
-                    <span class="dia-semana"></span>
-                </div>
+        <article class="dia vidrio">
+            <button class="dia__cabecera" type="button" aria-expanded="false">
+                <span class="dia__fecha">
+                    <b class="dia__titulo"></b>
+                    <span class="dia__semana"></span>
+                </span>
 
-                <div class="dia-cifras">
-                    <div class="dia-cifra">
+                <span class="dia__cifras">
+                    <span class="dia__cifra">
                         <small>Venta</small>
-                        <b class="dia-venta"></b>
-                    </div>
-                    <div class="dia-cifra">
+                        <b class="dia__venta cifra"></b>
+                    </span>
+                    <span class="dia__cifra">
                         <small>Órdenes</small>
-                        <b class="dia-ordenes"></b>
-                    </div>
-                    <div class="dia-cifra dia-cifra-cortes">
+                        <b class="dia__ordenes cifra"></b>
+                    </span>
+                    <span class="dia__cifra dia__cifra--cortes">
                         <small>Cortes</small>
-                        <b class="dia-cortes"></b>
-                    </div>
-                </div>
+                        <b class="dia__cortes cifra"></b>
+                    </span>
+                </span>
 
-                <div class="dia-estado">
+                <span class="dia__estado">
                     <span class="pastilla"></span>
-                    <i class="bi bi-chevron-down dia-chevron"></i>
-                </div>
+                    <i class="bi bi-chevron-down dia__chevron"></i>
+                </span>
             </button>
 
-            <div class="dia-detalle" hidden>
-                <div class="dia-pagos">
-                    <span><i class="bi bi-cash"></i> Efectivo <b class="pago-efectivo"></b></span>
-                    <span><i class="bi bi-credit-card"></i> Tarjeta <b class="pago-tarjeta"></b></span>
-                    <span><i class="bi bi-arrow-left-right"></i> Otro <b class="pago-otro"></b></span>
+            <div class="dia__detalle" hidden>
+                <div class="pagos">
+                    <span><i class="bi bi-cash"></i> Efectivo <b class="pago-efectivo cifra"></b></span>
+                    <span><i class="bi bi-credit-card"></i> Tarjeta <b class="pago-tarjeta cifra"></b></span>
+                    <span><i class="bi bi-arrow-left-right"></i> Otro <b class="pago-otro cifra"></b></span>
                 </div>
-                <div class="dia-cortes-lista"></div>
+                <div class="cortes"></div>
             </div>
         </article>
     </template>
 
     <template id="tplCorte">
-        <div class="corte-row">
-            <div class="corte-hora">
-                <i class="bi bi-clock-history"></i>
-                <span class="corte-hora-txt"></span>
-            </div>
-            <div class="corte-datos">
-                <span class="corte-usuario"></span>
-                <span class="corte-ordenes"></span>
-            </div>
-            <b class="corte-total"></b>
-            <p class="corte-nota"></p>
+        <div class="corte">
+            <span class="corte__hora cifra">
+                <i class="bi bi-clock-history"></i><span class="corte__hora-txt"></span>
+            </span>
+            <span class="corte__datos">
+                <span class="corte__usuario"></span>
+                <span class="corte__ordenes"></span>
+            </span>
+            <b class="corte__total cifra"></b>
+            <p class="corte__nota"></p>
         </div>
     </template>
 
 </main>
 
-<footer class="footer-custom">
-    <div class="footer-inner">
-        <span>&copy; 2026 · Rincón Arboledas. Todos los derechos reservados.</span>
-        <div class="footer-powered">
-            <span>Powered by</span>
-            <img src="/img/isotipo_icarix.jpg" alt="ICARIX" class="footer-icarix-logo">
-            <span class="footer-icarix-name">ICARIX</span>
-        </div>
-    </div>
-</footer>
+<footer th:replace="~{admin/gestion/fragmentos :: pie}"></footer>
 
-<script th:inline="javascript">
-    /*<![CDATA[*/
-    window.__HOY_NEGOCIO__ = /*[[${hoyNegocio}]]*/ '';
-    /*]]>*/
-</script>
-<script type="module" th:src="@{/js/Gestion/Cierres.js}"></script>
+<script type="module" th:src="@{/js/Gestion/cierres.js}"></script>
 
 </body>
 </html>

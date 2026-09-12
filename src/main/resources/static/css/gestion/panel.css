@@ -1,0 +1,208 @@
+/* ================================================================
+   gestion/panel.css
+   Pantalla principal del modulo: el reloj de secciones con los
+   numeros del periodo al centro.
+
+   Requiere gestion/nucleo.css.
+   ================================================================ */
+
+.reloj {
+    position: relative;
+    width: min(660px, 100%);
+    margin: 30px auto 0;
+    aspect-ratio: 1;
+}
+
+/* ── Anillo guia ─────────────────────────────────────────────────
+   Una circunferencia tenue que ata los satelites entre si. Sin
+   ella los circulos se leen sueltos y el reloj no se arma.      */
+.reloj::before {
+    content: '';
+    position: absolute;
+    inset: 12%;
+    border-radius: 50%;
+    border: 1px dashed rgba(184,147,106,.32);
+    pointer-events: none;
+}
+
+/* ── Satelites ───────────────────────────────────────────────────
+   La posicion sale de --x y --y, que define cada clase de abajo.
+   Nada de estilos en el HTML: la plantilla solo dice cual es.    */
+.satelites { display: contents; }
+
+.satelite {
+    position: absolute;
+    left: var(--x);
+    top:  var(--y);
+    width: clamp(98px, 15vw, 126px);
+    height: clamp(98px, 15vw, 126px);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px;
+    text-align: center;
+    text-decoration: none;
+    color: var(--cafe-deep);
+    cursor: pointer;
+    background: var(--vidrio-1);
+    border: 1px solid rgba(255,255,255,.72);
+    box-shadow: var(--filo), var(--elevacion-1);
+    -webkit-backdrop-filter: var(--desenfoque-leve);
+    backdrop-filter: var(--desenfoque-leve);
+    transform: translate(-50%, -50%);
+    transition: transform var(--medio) var(--rebote),
+                box-shadow var(--medio) var(--fluido),
+                border-color var(--medio) var(--fluido);
+}
+.satelite__icono { font-size: 1.4rem; color: var(--cafe-dark); transition: transform var(--medio) var(--rebote); }
+.satelite__nombre { font-size: var(--txt-chico); font-weight: 700; line-height: 1.15; }
+
+.satelite:hover {
+    transform: translate(-50%, -50%) scale(1.07);
+    border-color: rgba(212,184,150,.92);
+    box-shadow: var(--filo), var(--elevacion-2);
+}
+.satelite:hover .satelite__icono { transform: translateY(-2px) scale(1.08); }
+.satelite:active { transform: translate(-50%, -50%) scale(1.02); }
+.satelite:focus-visible { outline: 3px solid var(--cafe-mid); outline-offset: 4px; }
+
+.satelite--pendiente { opacity: .48; cursor: not-allowed; }
+.satelite--pendiente:hover { transform: translate(-50%, -50%); box-shadow: var(--filo), var(--elevacion-1); }
+.satelite--pendiente:hover .satelite__icono { transform: none; }
+.satelite__pronto {
+    position: absolute;
+    bottom: 13%;
+    font-size: .56rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+/* Las doce posiciones del reloj que se usan, en horas */
+.satelite--h12 { --x: 50%;   --y: 0%; }
+.satelite--h13 { --x: 85.4%; --y: 14.6%; }
+.satelite--h15 { --x: 100%;  --y: 50%; }
+.satelite--h17 { --x: 85.4%; --y: 85.4%; }
+.satelite--h18 { --x: 50%;   --y: 100%; }
+.satelite--h19 { --x: 14.6%; --y: 85.4%; }
+.satelite--h21 { --x: 0%;    --y: 50%; }
+.satelite--h23 { --x: 14.6%; --y: 14.6%; }
+
+/* ── Nucleo: los numeros ─────────────────────────────────────── */
+.nucleo {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: min(312px, 47%);
+    height: min(312px, 47%);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 20px;
+    text-align: center;
+    overflow: hidden;
+}
+
+/* Brillo superior: la luz que cae sobre una esfera de vidrio */
+.nucleo::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(70% 48% at 50% 2%, rgba(255,255,255,.22), transparent 62%);
+}
+.nucleo > * { position: relative; z-index: 1; }
+
+.nucleo__label {
+    font-size: var(--txt-micro);
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.6);
+}
+.nucleo__venta {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.75rem, 4.6vw, 2.55rem);
+    font-weight: 700;
+    line-height: 1.04;
+    transition: opacity var(--medio) var(--fluido);
+}
+.nucleo__comparativo {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 5px;
+    padding: 3px 11px;
+    border-radius: var(--radius-pill);
+    font-size: var(--txt-chico);
+    font-weight: 700;
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.2);
+}
+.nucleo__comparativo--sube  { color: #9BE8A8; }
+.nucleo__comparativo--baja  { color: #F3B0A0; }
+.nucleo__comparativo--plano { color: rgba(255,255,255,.72); }
+
+.nucleo__secundarios {
+    display: flex;
+    gap: 18px;
+    margin-top: 13px;
+    padding-top: 13px;
+    border-top: 1px solid rgba(255,255,255,.16);
+}
+.nucleo__dato { display: flex; flex-direction: column; gap: 1px; }
+.nucleo__dato b { font-size: var(--txt-medio); line-height: 1.1; }
+.nucleo__dato small {
+    font-size: .56rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.6);
+}
+
+.nucleo__aviso {
+    margin: 9px 0 0;
+    max-width: 90%;
+    font-size: .6rem;
+    line-height: 1.3;
+    color: rgba(255,255,255,.56);
+}
+
+/* ── Movil: el reloj se vuelve lista ─────────────────────────── */
+@media (max-width: 720px) {
+    .reloj { aspect-ratio: auto; display: flex; flex-direction: column; gap: 14px; }
+    .reloj::before { display: none; }
+
+    .nucleo {
+        position: static;
+        transform: none;
+        width: 100%;
+        height: auto;
+        border-radius: var(--radius-xl);
+        padding: 26px 20px;
+    }
+
+    .satelites { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .satelite {
+        position: static;
+        transform: none;
+        width: 100%;
+        height: auto;
+        border-radius: var(--radius-lg);
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 12px;
+        padding: 14px 16px;
+        text-align: left;
+    }
+    .satelite:hover, .satelite:active { transform: none; }
+    .satelite__pronto { position: static; margin-left: auto; }
+}

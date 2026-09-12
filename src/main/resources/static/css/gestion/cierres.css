@@ -1,0 +1,124 @@
+/* ================================================================
+   gestion/cierres.css
+   Cierres de caja: dias que se despliegan para ver sus cortes.
+
+   Requiere gestion/nucleo.css.
+   ================================================================ */
+
+/* ── Tiras de resumen ────────────────────────────────────────── */
+.tiras {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 18px;
+}
+.tira {
+    flex: 1 1 190px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 15px 19px;
+    border-radius: var(--radius-lg);
+}
+.tira b {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.55rem;
+    color: var(--cafe-deep);
+}
+.tira--alerta { border-left: 3px solid #C1601F; }
+.tira--alerta b { color: #A34E17; }
+
+/* ── Lista de dias ──────────────────────────────────────────── */
+.dias {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.dia { border-radius: var(--radius-lg); overflow: hidden; }
+
+.dia__cabecera {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 16px 20px;
+    background: none;
+    border: 0;
+    text-align: left;
+    font-family: inherit;
+    color: inherit;
+    cursor: pointer;
+    transition: background var(--veloz) var(--fluido);
+}
+.dia__cabecera:hover { background: rgba(255,255,255,.38); }
+.dia__cabecera:focus-visible { outline: 3px solid var(--cafe-mid); outline-offset: -3px; }
+
+.dia__fecha { display: flex; flex-direction: column; min-width: 134px; }
+.dia__titulo { font-family: 'Playfair Display', Georgia, serif; font-size: 1.12rem; color: var(--cafe-deep); }
+.dia__semana { font-size: var(--txt-chico); text-transform: capitalize; color: var(--text-muted); }
+
+.dia__cifras { display: flex; gap: 22px; margin-left: auto; }
+.dia__cifra { display: flex; flex-direction: column; align-items: flex-end; }
+.dia__cifra small {
+    font-size: .56rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+.dia__cifra b { font-size: var(--txt-medio); color: var(--text-primary); }
+.dia__cifra--cortes b { color: var(--cafe-dark); }
+
+.dia__estado { display: flex; align-items: center; gap: 10px; }
+.dia__chevron { color: var(--cafe-mid); transition: transform var(--medio) var(--fluido); }
+.dia__cabecera[aria-expanded="true"] .dia__chevron { transform: rotate(180deg); }
+
+/* ── Detalle ────────────────────────────────────────────────── */
+.dia__detalle { padding: 4px 20px 18px; border-top: 1px solid rgba(212,184,150,.34); }
+
+.pagos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    padding: 12px 0 14px;
+    font-size: var(--txt-base);
+    color: var(--text-muted);
+}
+.pagos b { color: var(--text-primary); }
+.pagos i { color: var(--cafe-mid); margin-right: 5px; }
+
+.cortes { display: flex; flex-direction: column; gap: 8px; }
+
+.corte {
+    display: grid;
+    grid-template-columns: 78px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    background: rgba(255,255,255,.5);
+    border: 1px solid rgba(212,184,150,.3);
+    border-radius: var(--radius-md);
+}
+.corte__hora { font-size: var(--txt-base); font-weight: 700; color: var(--cafe-deep); }
+.corte__hora i { color: var(--cafe-mid); margin-right: 4px; }
+.corte__datos { display: flex; flex-direction: column; }
+.corte__usuario { font-size: var(--txt-base); font-weight: 600; }
+.corte__ordenes { font-size: var(--txt-chico); color: var(--text-muted); }
+.corte__total { font-size: var(--txt-medio); color: var(--cafe-deep); }
+.corte__nota {
+    grid-column: 1 / -1;
+    margin: 2px 0 0;
+    font-size: var(--txt-chico);
+    line-height: 1.35;
+    color: var(--text-muted);
+}
+
+@media (max-width: 620px) {
+    .dia__cifras { margin-left: 0; width: 100%; gap: 16px; justify-content: space-between; }
+    .dia__cifra { align-items: flex-start; }
+    .corte { grid-template-columns: 1fr auto; }
+    .corte__hora { grid-column: 1 / -1; }
+}

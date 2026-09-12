@@ -1,0 +1,235 @@
+/* ================================================================
+   gestion/bitacora.css
+   Calendario del mes, panel del dia y detalle de la orden.
+
+   Requiere gestion/nucleo.css.
+   ================================================================ */
+
+/* ── Navegacion de mes ──────────────────────────────────────── */
+.mes { display: flex; align-items: center; gap: 10px; }
+.mes__titulo {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.16rem;
+    color: var(--cafe-deep);
+    text-transform: capitalize;
+    min-width: 176px;
+    text-align: center;
+}
+.mes__btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid rgba(184,147,106,.42);
+    background: rgba(255,255,255,.62);
+    color: var(--cafe-deep);
+    cursor: pointer;
+    transition: all var(--veloz) var(--fluido);
+}
+.mes__btn:hover:not(:disabled) {
+    background: linear-gradient(150deg, var(--cafe-dark), var(--cafe-deep));
+    color: #fff;
+    border-color: transparent;
+    transform: translateY(-1px);
+}
+.mes__btn:disabled { opacity: .32; cursor: not-allowed; }
+
+/* ── Calendario ─────────────────────────────────────────────── */
+.calendario-wrap { margin-top: 18px; padding: 18px; }
+
+.calendario__dias,
+.calendario {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+.calendario__dias { margin-bottom: 8px; }
+.calendario__dias span {
+    text-align: center;
+    font-size: var(--txt-micro);
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.celda {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-height: 94px;
+    padding: 8px 9px;
+    background: rgba(255,255,255,.55);
+    border: 1px solid rgba(212,184,150,.34);
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: transform var(--veloz) var(--rebote),
+                box-shadow var(--veloz) var(--fluido),
+                border-color var(--veloz) var(--fluido);
+}
+.celda:hover:not(:disabled) {
+    transform: translateY(-3px);
+    border-color: var(--cafe-mid);
+    box-shadow: var(--elevacion-1);
+}
+.celda:focus-visible { outline: 3px solid var(--cafe-mid); outline-offset: 2px; }
+.celda:disabled { cursor: default; }
+
+.celda--hueco    { background: none; border: 0; min-height: 0; }
+.celda--sin-venta{ background: rgba(255,255,255,.24); border-style: dashed; }
+.celda--futura   { opacity: .4; }
+.celda--hoy      { border-color: var(--cafe-dark); border-width: 2px; }
+.celda--activa {
+    background: var(--vidrio-hondo);
+    border-color: transparent;
+    box-shadow: var(--filo-hondo), var(--elevacion-2);
+}
+.celda--activa .celda__dia,
+.celda--activa .celda__venta   { color: #fff; }
+.celda--activa .celda__ordenes { color: rgba(255,255,255,.7); }
+.celda--activa .celda__barra i { background: rgba(255,255,255,.72); }
+
+.celda__dia     { font-size: var(--txt-chico); font-weight: 700; color: var(--text-muted); }
+.celda__venta   { font-size: .92rem; font-weight: 700; color: var(--cafe-deep); }
+.celda__ordenes { font-size: var(--txt-micro); color: var(--text-muted); }
+.celda__nada    { margin-top: auto; font-size: var(--txt-base); color: rgba(138,112,96,.45); }
+
+.celda__barra {
+    display: block;
+    height: 3px;
+    margin-top: auto;
+    border-radius: 3px;
+    background: rgba(184,147,106,.22);
+    overflow: hidden;
+}
+.celda__barra i {
+    display: block;
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--cafe-mid), var(--cafe-dark));
+    transition: width var(--lento) var(--fluido);
+}
+
+.calendario__pie {
+    margin: 14px 0 0;
+    font-size: var(--txt-chico);
+    line-height: 1.45;
+    color: var(--text-muted);
+}
+
+/* ── Panel del dia ──────────────────────────────────────────── */
+.dia-panel { margin-top: 16px; overflow: hidden; }
+.dia-panel__cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(212,184,150,.34);
+}
+.dia-panel__titulo {
+    display: block;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.16rem;
+    color: var(--cafe-deep);
+    text-transform: capitalize;
+}
+.dia-panel__resumen { font-size: var(--txt-base); color: var(--text-muted); }
+
+.dia-panel__cerrar {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid rgba(184,147,106,.4);
+    background: rgba(255,255,255,.6);
+    color: var(--cafe-deep);
+    cursor: pointer;
+    transition: all var(--veloz) var(--fluido);
+}
+.dia-panel__cerrar:hover { background: var(--cafe-dark); color: #fff; border-color: transparent; }
+
+/* ── Ordenes del dia ────────────────────────────────────────── */
+.ordenes { display: flex; flex-direction: column; }
+
+.orden {
+    display: grid;
+    grid-template-columns: 54px minmax(90px, 1fr) auto auto;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 20px;
+    background: none;
+    border: 0;
+    border-bottom: 1px solid rgba(212,184,150,.22);
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background var(--veloz) var(--fluido);
+}
+.orden:hover { background: rgba(255,255,255,.45); }
+.orden:last-child { border-bottom: 0; }
+.orden__hora    { font-size: var(--txt-base); font-weight: 700; color: var(--cafe-dark); }
+.orden__cliente { font-size: var(--txt-base); font-weight: 600; color: var(--text-primary); }
+.orden__tags    { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+.orden__total   { font-size: .95rem; color: var(--cafe-deep); text-align: right; }
+
+/* ── Detalle de la orden ────────────────────────────────────── */
+.modal-orden {
+    border: 1px solid rgba(255,255,255,.7);
+    border-radius: var(--radius-xl);
+    background: var(--crema);
+    box-shadow: var(--elevacion-2);
+}
+.modal-orden .modal-title { font-family: 'Playfair Display', Georgia, serif; color: var(--cafe-deep); }
+
+.orden-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(98px, 1fr));
+    gap: 12px;
+    padding-bottom: 14px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid rgba(212,184,150,.4);
+}
+.orden-meta small {
+    display: block;
+    font-size: .56rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+.orden-meta b { font-size: var(--txt-base); color: var(--text-primary); }
+
+.items { display: flex; flex-direction: column; gap: 10px; }
+.item {
+    display: grid;
+    grid-template-columns: 36px 1fr auto;
+    gap: 10px;
+    align-items: start;
+}
+.item__cant   { font-weight: 700; color: var(--cafe-dark); }
+.item__nombre { font-size: var(--txt-base); line-height: 1.3; }
+.item__detalle {
+    display: block;
+    font-size: var(--txt-chico);
+    color: var(--text-muted);
+}
+.item__total { color: var(--cafe-deep); }
+
+.orden-total-final {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.22rem;
+    font-weight: 700;
+    color: var(--cafe-deep);
+}
+
+@media (max-width: 720px) {
+    .celda { min-height: 76px; padding: 6px; }
+    .celda__venta { font-size: var(--txt-chico); }
+    .celda__ordenes { display: none; }
+    .mes__titulo { min-width: 132px; font-size: 1rem; }
+    .orden { grid-template-columns: 48px 1fr auto; }
+    .orden__tags { grid-column: 2 / -1; justify-content: flex-start; }
+}

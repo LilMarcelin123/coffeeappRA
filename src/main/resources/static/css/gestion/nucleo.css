@@ -1,0 +1,296 @@
+/* ================================================================
+   gestion/nucleo.css
+   Modulo de Gestion — El Rincon en las Arboledas
+
+   Cimiento del modulo: superficies de vidrio, tipografia, fondo,
+   barra de periodo y piezas compartidas por las tres pantallas.
+   Lo propio de cada una vive en su archivo (panel, cierres,
+   bitacora) y nunca al reves.
+
+   Depende de style.css, que aporta la paleta de marca y el hero.
+   ================================================================ */
+
+/* ── Fichas del modulo ───────────────────────────────────────────
+   Se apoyan en las variables de marca de style.css y agregan las
+   capas de vidrio propias del modulo.                            */
+:root {
+    /* Vidrio por capas: cada nivel se despega mas del fondo */
+    --vidrio-1: linear-gradient(158deg,
+                    rgba(255,255,255,.82) 0%,
+                    rgba(255,255,255,.52) 46%,
+                    rgba(255,252,247,.68) 100%);
+    --vidrio-2: linear-gradient(158deg,
+                    rgba(255,255,255,.94) 0%,
+                    rgba(255,255,255,.68) 46%,
+                    rgba(255,252,247,.82) 100%);
+    --vidrio-hondo: linear-gradient(158deg,
+                    rgba(92,51,23,.95) 0%,
+                    rgba(69,37,15,.97) 52%,
+                    rgba(59,31,10,.99) 100%);
+
+    /* Filo especular: la linea de luz que hace que el vidrio
+       parezca tener grosor y no ser una capa plana */
+    --filo: inset 0 1px 0 rgba(255,255,255,.9),
+            inset 0 -1px 0 rgba(139,94,60,.07),
+            inset 1px 0 0 rgba(255,255,255,.45),
+            inset -1px 0 0 rgba(255,255,255,.2);
+    --filo-hondo: inset 0 1px 0 rgba(255,255,255,.26),
+                  inset 0 -1px 0 rgba(0,0,0,.22);
+
+    --desenfoque:      blur(22px) saturate(170%);
+    --desenfoque-leve: blur(14px) saturate(145%);
+
+    --elevacion-1: 0 1px 2px rgba(92,51,23,.07),
+                   0 12px 28px -14px rgba(92,51,23,.26);
+    --elevacion-2: 0 2px 6px rgba(92,51,23,.09),
+                   0 28px 56px -20px rgba(92,51,23,.34);
+    --elevacion-honda: 0 30px 60px -22px rgba(59,31,10,.66);
+
+    /* Movimiento: una sola curva para todo el modulo, para que las
+       transiciones se sientan del mismo material */
+    --fluido:  cubic-bezier(.32, .72, 0, 1);
+    --rebote:  cubic-bezier(.34, 1.4, .64, 1);
+    --veloz:   .22s;
+    --medio:   .34s;
+    --lento:   .6s;
+
+    /* Escala tipografica */
+    --txt-micro: .62rem;
+    --txt-chico: .74rem;
+    --txt-base:  .88rem;
+    --txt-medio: 1rem;
+}
+
+/* ── Fondo del modulo ────────────────────────────────────────────
+   Dos halos muy suaves detras del contenido. Fijos, sin animacion:
+   el movimiento en un fondo distrae cuando se leen cifras.       */
+.gestion-body {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+.gestion-body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        radial-gradient(70% 55% at 12% 8%,  rgba(212,184,150,.30), transparent 62%),
+        radial-gradient(60% 50% at 92% 22%, rgba(184,147,106,.20), transparent 60%),
+        radial-gradient(80% 60% at 50% 108%, rgba(92,51,23,.10), transparent 66%);
+}
+
+/* ── Contenedor ──────────────────────────────────────────────── */
+.gestion-main {
+    width: 100%;
+    max-width: 1140px;
+    margin: 24px auto 0;
+    padding: 0 clamp(16px, 3vw, 32px) 72px;
+}
+
+/* ── Superficie de vidrio, en una sola clase ─────────────────────
+   Cualquier pieza del modulo que necesite vidrio usa .vidrio y,
+   si quiere mas presencia, .vidrio--alto. Asi el material se
+   cambia en un lugar y no en veinte.                             */
+.vidrio {
+    position: relative;
+    background: var(--vidrio-1);
+    border: 1px solid rgba(255,255,255,.72);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--filo), var(--elevacion-1);
+    -webkit-backdrop-filter: var(--desenfoque);
+    backdrop-filter: var(--desenfoque);
+}
+.vidrio--alto { background: var(--vidrio-2); box-shadow: var(--filo), var(--elevacion-2); }
+.vidrio--hondo {
+    background: var(--vidrio-hondo);
+    border-color: rgba(255,255,255,.16);
+    box-shadow: var(--filo-hondo), var(--elevacion-honda);
+    color: #fff;
+}
+
+/* Reflejo que cruza al pasar el puntero. Se activa agregando
+   .vidrio--reflejo; el barrido solo corre en hover, nunca solo. */
+.vidrio--reflejo { overflow: hidden; }
+.vidrio--reflejo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    background: linear-gradient(115deg,
+                transparent 38%,
+                rgba(255,255,255,.42) 50%,
+                transparent 62%);
+    transform: translateX(-120%);
+    transition: transform var(--lento) var(--fluido);
+}
+.vidrio--reflejo:hover::after { transform: translateX(120%); }
+
+/* ── Tipografia del modulo ───────────────────────────────────── */
+.titulo-serif {
+    font-family: 'Playfair Display', Georgia, serif;
+    color: var(--cafe-deep);
+    letter-spacing: -.01em;
+}
+.rotulo {
+    font-size: var(--txt-micro);
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+.cifra { font-variant-numeric: tabular-nums; }
+
+/* ── Barra de periodo ────────────────────────────────────────── */
+.periodo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 14px 18px;
+}
+.periodo__label { color: var(--cafe-dark); }
+
+.periodo__chips {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 4px;
+    border-radius: var(--radius-pill);
+    background: rgba(255,255,255,.42);
+    border: 1px solid rgba(184,147,106,.26);
+}
+
+.chip {
+    position: relative;
+    border: 0;
+    background: none;
+    color: var(--cafe-deep);
+    border-radius: var(--radius-pill);
+    padding: 7px 16px;
+    font-family: inherit;
+    font-size: var(--txt-base);
+    font-weight: 600;
+    cursor: pointer;
+    transition: color var(--veloz) var(--fluido),
+                transform var(--veloz) var(--rebote);
+}
+.chip:hover { transform: translateY(-1px); }
+.chip:focus-visible { outline: 3px solid var(--cafe-mid); outline-offset: 2px; }
+.chip::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(150deg, var(--cafe-dark), var(--cafe-deep));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.34),
+                0 6px 16px -8px rgba(92,51,23,.85);
+    opacity: 0;
+    transform: scale(.86);
+    transition: opacity var(--veloz) var(--fluido),
+                transform var(--medio) var(--rebote);
+}
+.chip > span { position: relative; z-index: 1; }
+.chip.is-activo { color: #fff; }
+.chip.is-activo::before { opacity: 1; transform: scale(1); }
+
+.periodo__rango {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.periodo__rango.is-visible { display: flex; }
+.periodo__rango input[type="date"] {
+    border: 1px solid rgba(184,147,106,.42);
+    background: rgba(255,255,255,.72);
+    border-radius: var(--radius-md);
+    padding: 6px 10px;
+    font-family: inherit;
+    font-size: var(--txt-base);
+    color: var(--text-primary);
+}
+.periodo__rango span { font-size: var(--txt-chico); color: var(--text-muted); }
+
+.periodo__leyenda {
+    width: 100%;
+    margin: 0;
+    font-size: var(--txt-chico);
+    color: var(--text-muted);
+}
+
+/* ── Volver ──────────────────────────────────────────────────── */
+.volver {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 16px;
+    border-radius: var(--radius-pill);
+    border: 1px solid rgba(184,147,106,.42);
+    background: rgba(255,255,255,.6);
+    color: var(--cafe-deep);
+    font-size: var(--txt-base);
+    font-weight: 600;
+    text-decoration: none;
+    transition: all var(--veloz) var(--fluido);
+}
+.volver:hover {
+    background: linear-gradient(150deg, var(--cafe-dark), var(--cafe-deep));
+    border-color: transparent;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+/* ── Pastillas de estado ─────────────────────────────────────── */
+.pastilla {
+    font-size: var(--txt-micro);
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 4px 11px;
+    border-radius: var(--radius-pill);
+    white-space: nowrap;
+}
+.pastilla--ok    { background: rgba(46,125,50,.12);   color: #2E7D32;        border: 1px solid rgba(46,125,50,.3); }
+.pastilla--falta { background: rgba(193,96,31,.12);   color: #A34E17;        border: 1px solid rgba(193,96,31,.35); }
+.pastilla--curso { background: rgba(184,147,106,.16); color: var(--cafe-deep); border: 1px solid rgba(184,147,106,.4); }
+
+/* ── Etiquetas de orden ──────────────────────────────────────── */
+.tag {
+    font-size: var(--txt-micro);
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: var(--radius-pill);
+    background: rgba(184,147,106,.16);
+    border: 1px solid rgba(184,147,106,.32);
+    color: var(--cafe-deep);
+    white-space: nowrap;
+}
+.tag--wa   { background: rgba(37,211,102,.14); border-color: rgba(37,211,102,.38); color: #1B7F45; }
+.tag--pago { background: rgba(255,255,255,.6); }
+.tag--vivo { background: rgba(193,96,31,.12);  border-color: rgba(193,96,31,.34); color: #A34E17; }
+
+/* ── Mensajes ────────────────────────────────────────────────── */
+.mensaje-vacio {
+    margin: 0;
+    padding: 20px 4px;
+    font-size: var(--txt-base);
+    color: var(--text-muted);
+}
+
+/* ── Carga: atenuar sin mover el layout ──────────────────────── */
+[data-estado="cargando"] .cifra { opacity: .35; }
+
+/* ── Accesibilidad ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}
