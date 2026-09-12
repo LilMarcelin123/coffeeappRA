@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Volcados de esquema (pueden traer datos de conexion)
+esquema_*.sql

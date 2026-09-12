@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -603,19 +604,34 @@ public class ProcedimientosAlmacenados {
     // CIERRE DE DÍA
     // ════════════════════════════════════════════════════════
 
+    /** Cierre del dia que acaba de terminar (la fecha la decide el procedimiento). */
     public Map<String, Object> spEjecutarCierreDia(String username, String observaciones) {
-        final String SQL = "{CALL sp_cierre_dia(1, ?, ?, NULL)}";
+        return spEjecutarCierreDia(username, observaciones, null);
+    }
+
+    /**
+     * Cierra un dia de negocio concreto. El dia va de las 01:00 a las 01:00
+     * del siguiente, asi que el cierre que corre el 04 a la 1 am es del 03.
+     * Con fechaNegocio en null, el procedimiento cierra el dia recien terminado.
+     */
+    public Map<String, Object> spEjecutarCierreDia(String username, String observaciones,
+                                                   LocalDate fechaNegocio) {
+        final String SQL = "{CALL sp_cierre_dia(1, ?, ?, NULL, ?)}";
         Map<String, Object> resultado = new LinkedHashMap<>();
         try (Connection conn = conexionJDBC.getConexion2();
              CallableStatement cs = conn.prepareCall(SQL)) {
 
             cs.setString(1, username);
             cs.setString(2, observaciones != null ? observaciones : "");
+            if (fechaNegocio == null) cs.setNull(3, Types.DATE);
+            else                      cs.setDate(3, java.sql.Date.valueOf(fechaNegocio));
+
             try (ResultSet rs = cs.executeQuery()) {
                 if (rs.next()) {
-                    resultado.put("resultado", rs.getInt("resultado"));
-                    resultado.put("mensaje",   rs.getString("mensaje"));
-                    resultado.put("id_cierre", rs.getObject("id_cierre"));
+                    resultado.put("resultado",       rs.getInt("resultado"));
+                    resultado.put("mensaje",         rs.getString("mensaje"));
+                    resultado.put("id_cierre",       rs.getObject("id_cierre"));
+                    resultado.put("d_fecha_negocio", rs.getObject("d_fecha_negocio"));
                 }
             }
         } catch (SQLException e) {
@@ -626,8 +642,25 @@ public class ProcedimientosAlmacenados {
         return resultado;
     }
 
+    /** Ultimo dia de negocio ya cerrado. Null si nunca se ha cerrado nada. */
+    public LocalDate obtenerUltimaFechaNegocio() {
+        final String SQL = "SELECT MAX(d_fecha_negocio) AS ultima FROM hist_cierre_dia";
+        try (Connection conn = conexionJDBC.getConexion2();
+             PreparedStatement ps = conn.prepareStatement(SQL);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                java.sql.Date d = rs.getDate("ultima");
+                if (d != null) return d.toLocalDate();
+            }
+        } catch (SQLException e) {
+            log.error("obtenerUltimaFechaNegocio error: {}", e.getMessage());
+        }
+        return null;
+    }
+
     public List<Map<String, Object>> spListarCierres() {
-        final String SQL = "{CALL sp_cierre_dia(2, NULL, NULL, NULL)}";
+        final String SQL = "{CALL sp_cierre_dia(2, NULL, NULL, NULL, NULL)}";
         try (Connection conn = conexionJDBC.getConexion2();
              CallableStatement cs = conn.prepareCall(SQL);
              ResultSet rs = cs.executeQuery()) {
