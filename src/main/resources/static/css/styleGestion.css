@@ -1,0 +1,278 @@
+/* ================================================================
+   styleGestion.css — Modulo de Gestion
+   El Rincon en las Arboledas
+
+   Reusa las variables de style.css (vidrio, radios, sombras, marca).
+   Este archivo solo agrega lo propio del modulo: el reloj de
+   secciones, el bloque de KPIs y el selector de periodo.
+   ================================================================ */
+
+/* ── PAGINA ─────────────────────────────────────────────────── */
+.gestion-main {
+    width: 100%;
+    max-width: 1140px;
+    margin: 24px auto 0;
+    padding: 0 clamp(16px, 3vw, 32px) 64px;
+}
+
+/* ── BARRA DE PERIODO ───────────────────────────────────────── */
+.periodo-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    background: var(--glass-tint);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--glass-edge), var(--shadow-card);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    padding: 14px 18px;
+}
+
+.periodo-label {
+    font-size: .70rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--cafe-dark);
+}
+
+.periodo-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.chip-periodo {
+    border: 1px solid rgba(184,147,106,.45);
+    background: rgba(255,255,255,.55);
+    color: var(--cafe-deep);
+    border-radius: var(--radius-pill);
+    padding: 7px 16px;
+    font-size: .84rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--dur) var(--ease-liquid);
+}
+.chip-periodo:hover { border-color: var(--cafe-mid); transform: translateY(-1px); }
+.chip-periodo.is-activo {
+    background: linear-gradient(150deg, var(--cafe-dark), var(--cafe-deep));
+    border-color: transparent;
+    color: #fff;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 6px 16px -8px rgba(92,51,23,.8);
+}
+
+.periodo-rango {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.periodo-rango.is-visible { display: flex; }
+.periodo-rango input[type="date"] {
+    border: 1px solid rgba(184,147,106,.45);
+    background: rgba(255,255,255,.7);
+    border-radius: var(--radius-md);
+    padding: 6px 10px;
+    font-family: inherit;
+    font-size: .84rem;
+    color: var(--text-primary);
+}
+.periodo-rango span { font-size: .82rem; color: var(--text-muted); }
+
+.periodo-leyenda {
+    width: 100%;
+    font-size: .78rem;
+    color: var(--text-muted);
+}
+
+/* ── RELOJ DE SECCIONES ─────────────────────────────────────── */
+.reloj-wrap {
+    position: relative;
+    width: min(640px, 100%);
+    margin: 32px auto 0;
+    aspect-ratio: 1;
+}
+
+/* En escritorio el envoltorio desaparece y los satelites se posicionan
+   contra el reloj; en movil ese mismo envoltorio se vuelve rejilla. */
+.reloj-satelites-movil { display: contents; }
+
+.reloj-satelite {
+    position: absolute;
+    left: var(--x);
+    top:  var(--y);
+    transform: translate(-50%, -50%);
+    width: clamp(96px, 15vw, 124px);
+    height: clamp(96px, 15vw, 124px);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-align: center;
+    background: var(--glass-tint);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-edge), var(--shadow-card);
+    -webkit-backdrop-filter: var(--glass-blur-soft);
+    backdrop-filter: var(--glass-blur-soft);
+    color: var(--cafe-deep);
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform var(--dur) var(--ease-spring),
+                box-shadow var(--dur) var(--ease-liquid),
+                border-color var(--dur) var(--ease-liquid);
+}
+.reloj-satelite i { font-size: 1.35rem; color: var(--cafe-dark); }
+.reloj-satelite span {
+    font-size: .74rem;
+    font-weight: 700;
+    line-height: 1.15;
+    padding: 0 8px;
+}
+.reloj-satelite:hover {
+    transform: translate(-50%, -50%) scale(1.06);
+    border-color: rgba(212,184,150,.9);
+    box-shadow: var(--glass-edge), var(--shadow-card-hover);
+}
+.reloj-satelite:focus-visible {
+    outline: 3px solid var(--cafe-mid);
+    outline-offset: 3px;
+}
+
+.reloj-satelite.is-pendiente { opacity: .5; cursor: not-allowed; }
+.reloj-satelite.is-pendiente:hover { transform: translate(-50%, -50%); box-shadow: var(--glass-edge), var(--shadow-card); }
+.reloj-satelite.is-pendiente::after {
+    content: 'Pronto';
+    position: absolute;
+    bottom: 14%;
+    font-size: .58rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+/* ── NUCLEO: LOS NUMEROS ────────────────────────────────────── */
+.reloj-nucleo {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: min(300px, 46%);
+    height: min(300px, 46%);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 18px;
+    text-align: center;
+    background: linear-gradient(158deg, rgba(92,51,23,.96), rgba(59,31,10,.98));
+    border: 1px solid rgba(255,255,255,.18);
+    box-shadow: var(--glass-edge-dark), 0 24px 48px -18px rgba(59,31,10,.7);
+    color: #fff;
+}
+
+.nucleo-label {
+    font-size: .62rem;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.62);
+}
+.nucleo-venta {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.7rem, 4.6vw, 2.5rem);
+    font-weight: 700;
+    line-height: 1.05;
+    font-variant-numeric: tabular-nums;
+}
+.nucleo-comparativo {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: .72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: var(--radius-pill);
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.2);
+    margin-top: 4px;
+}
+.nucleo-comparativo.sube  { color: #9BE8A8; }
+.nucleo-comparativo.baja  { color: #F3B0A0; }
+.nucleo-comparativo.plano { color: rgba(255,255,255,.75); }
+
+.nucleo-secundarios {
+    display: flex;
+    gap: 18px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,.16);
+}
+.nucleo-dato { display: flex; flex-direction: column; gap: 1px; }
+.nucleo-dato b {
+    font-size: 1rem;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+}
+.nucleo-dato small {
+    font-size: .58rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.6);
+}
+
+.nucleo-aviso {
+    margin-top: 8px;
+    font-size: .60rem;
+    color: rgba(255,255,255,.55);
+    line-height: 1.25;
+    max-width: 88%;
+}
+
+/* Estado de carga: sin saltos de layout */
+.reloj-nucleo.is-cargando .nucleo-venta,
+.reloj-nucleo.is-cargando .nucleo-dato b { opacity: .35; }
+
+/* ── MOVIL: el reloj se vuelve lista ────────────────────────── */
+@media (max-width: 720px) {
+    .reloj-wrap {
+        aspect-ratio: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+    .reloj-nucleo {
+        position: static;
+        transform: none;
+        width: 100%;
+        height: auto;
+        border-radius: var(--radius-xl);
+        padding: 24px 20px;
+    }
+    .reloj-satelites-movil {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    .reloj-satelite {
+        position: static;
+        transform: none;
+        width: 100%;
+        height: auto;
+        border-radius: var(--radius-lg);
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 12px;
+        padding: 14px 16px;
+        text-align: left;
+    }
+    .reloj-satelite:hover { transform: none; }
+    .reloj-satelite span { padding: 0; font-size: .82rem; }
+    .reloj-satelite.is-pendiente::after { position: static; margin-left: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .reloj-satelite, .chip-periodo { transition: none; }
+}

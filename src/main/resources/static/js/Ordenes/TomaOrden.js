@@ -12,7 +12,8 @@ var _accesoBloqueado = false;
 var MODULOS_ACCESO = {
     "usuarios":   { label: "Gestion de Usuarios",    redirect: "/admin/GestionUsuarios"   },
     "reportes":   { label: "Generacion de Reportes", redirect: "/admin/GeneracionReportes" },
-    "inventario": { label: "Gestion de Inventario",  redirect: "/admin/gestionInventario"  } // ← AGREGAR
+    "inventario": { label: "Gestion de Inventario",  redirect: "/admin/gestionInventario"  },
+    "gestion":    { label: "Modulo de Gestion",      redirect: "/admin/gestion"            }
 };
 
 function _elAcceso(id) {
@@ -110,6 +111,11 @@ $(document).ready(function () {
 			// ── Gestion usuarios — CON contrasena maestra ────
 			case "usuarios":
 				_abrirAcceso("usuarios");
+				break;
+
+			// ── Modulo de Gestion — CON contrasena maestra ───
+			case "gestion":
+				_abrirAcceso("gestion");
 				break;
 
 			default:

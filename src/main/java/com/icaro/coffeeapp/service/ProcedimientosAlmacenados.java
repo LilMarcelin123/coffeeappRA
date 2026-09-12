@@ -674,6 +674,34 @@ public class ProcedimientosAlmacenados {
     }
 
     // ════════════════════════════════════════════════════════
+    // MODULO DE GESTION — sp_gestion_modulo
+    // ════════════════════════════════════════════════════════
+
+    /**
+     * 1 = KPIs del periodo con comparativo, 2 = venta por dia.
+     * Las fechas son dias de negocio (de 01:00 a 01:00), no dias naturales.
+     */
+    public List<Map<String, Object>> spGestionModulo(int tipoProceso,
+                                                     LocalDate desde, LocalDate hasta) {
+        final String SQL = "{CALL sp_gestion_modulo(?,?,?)}";
+        try (Connection conn = conexionJDBC.getConexion2();
+             CallableStatement cs = conn.prepareCall(SQL)) {
+
+            cs.setInt(1, tipoProceso);
+            cs.setDate(2, java.sql.Date.valueOf(desde));
+            cs.setDate(3, java.sql.Date.valueOf(hasta));
+
+            try (ResultSet rs = cs.executeQuery()) {
+                return mapResultSetGeneric(rs);
+            }
+
+        } catch (SQLException e) {
+            log.error("sp_gestion_modulo proceso {}: {}", tipoProceso, e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    // ════════════════════════════════════════════════════════
     // INVENTARIO — sp_gestion_inventario
     // ════════════════════════════════════════════════════════
 
