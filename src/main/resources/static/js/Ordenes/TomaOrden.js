@@ -690,7 +690,7 @@ function abrirModalInfoWa(idOrden) {
     set("infoWaTelefono", "—"); set("infoWaTipoEntrega", "—");
     set("infoWaDireccion", "—"); set("infoWaReferencia", "—");
     set("infoWaPago", "—"); set("infoWaCambio", "—");
-    ["infoWaChatLink", "infoWaMapsLink"].forEach(id => { const e = document.getElementById(id); if (e) e.style.display = "none"; });
+    ["infoWaChatLink", "infoWaMapsLink"].forEach(id => { const e = document.getElementById(id); if (e) e.hidden = true; });
 
     const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById("modalInfoWa"), { backdrop: true, keyboard: true });
     modal.show();
@@ -708,7 +708,7 @@ function abrirModalInfoWa(idOrden) {
             set("infoWaReferencia", d.referencia || "—");
 
             const chat = document.getElementById("infoWaChatLink");
-            if (chat && tel) { chat.href = "https://wa.me/" + tel.replace(/\D/g, ""); chat.style.display = "inline-flex"; }
+            if (chat && tel) { chat.href = "https://wa.me/" + tel.replace(/\D/g, ""); chat.hidden = false; }
 
             const copyBtn = document.getElementById("infoWaCopyBtn");
             if (copyBtn) {
@@ -747,7 +747,7 @@ function abrirModalInfoWa(idOrden) {
             const linkMaps = document.getElementById("infoWaMapsLink");
             if (linkMaps) {
                 const m = (d.direccion || "").match(/(-?\d+\.\d+)[,\s]+(-?\d+\.\d+)/);
-                if (m) { linkMaps.href = "https://maps.google.com/?q=" + m[1] + "," + m[2]; linkMaps.style.display = "inline-flex"; }
+                if (m) { linkMaps.href = "https://maps.google.com/?q=" + m[1] + "," + m[2]; linkMaps.hidden = false; }
             }
         },
         error: function () { set("infoWaCliente", "Error al cargar"); }

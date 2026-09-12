@@ -25,25 +25,41 @@
     --radius-md:    13px;
     --radius-pill:  999px;
 
-    /* Vidrio (liquid glass) */
-    --glass-blur:        blur(18px) saturate(160%);
-    --glass-blur-soft:   blur(12px) saturate(140%);
-    --glass-tint:        linear-gradient(158deg, rgba(255,255,255,.86) 0%, rgba(255,255,255,.60) 48%, rgba(255,252,247,.72) 100%);
-    --glass-tint-dark:   linear-gradient(158deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,.06) 55%, rgba(255,255,255,.12) 100%);
-    --glass-border:      rgba(255,255,255,.72);
+    /* ── Vidrio (liquid glass) ────────────────────────────────
+       El material del sistema. Cambiarlo aqui cambia todas las
+       pantallas que usan esta hoja: panel, operadores e inicio. */
+    --glass-blur:        blur(22px) saturate(170%);
+    --glass-blur-soft:   blur(14px) saturate(145%);
+
+    /* Tres paradas en vez de dos: el vidrio deja de verse como un
+       degradado plano y gana volumen hacia el centro */
+    --glass-tint:        linear-gradient(158deg,
+                             rgba(255,255,255,.88) 0%,
+                             rgba(255,255,255,.58) 46%,
+                             rgba(255,252,247,.74) 100%);
+    --glass-tint-dark:   linear-gradient(158deg,
+                             rgba(255,255,255,.18) 0%,
+                             rgba(255,255,255,.06) 55%,
+                             rgba(255,255,255,.13) 100%);
+    --glass-border:      rgba(255,255,255,.74);
     --glass-border-dark: rgba(255,255,255,.26);
 
-    --glass-edge:        inset 0 1px 0 rgba(255,255,255,.85),
-                         inset 0 -1px 0 rgba(139,94,60,.08);
-    --glass-edge-dark:   inset 0 1px 0 rgba(255,255,255,.34),
-                         inset 0 -1px 0 rgba(0,0,0,.18);
+    /* Filo especular en los cuatro lados: es lo que hace que la
+       pieza parezca tener grosor y no ser una calcomania */
+    --glass-edge:        inset 0  1px 0 rgba(255,255,255,.92),
+                         inset 0 -1px 0 rgba(139,94,60,.07),
+                         inset  1px 0 0 rgba(255,255,255,.46),
+                         inset -1px 0 0 rgba(255,255,255,.22);
+    --glass-edge-dark:   inset 0  1px 0 rgba(255,255,255,.30),
+                         inset 0 -1px 0 rgba(0,0,0,.20);
 
-    --shadow-card:       0 1px 2px rgba(92,51,23,.08),
-                         0 10px 30px -12px rgba(92,51,23,.28);
+    /* Sombras en dos tiempos: un contacto corto y una caida larga */
+    --shadow-card:       0 1px 2px rgba(92,51,23,.07),
+                         0 12px 30px -14px rgba(92,51,23,.27);
     --shadow-card-hover: 0 2px 6px rgba(92,51,23,.10),
-                         0 24px 48px -16px rgba(92,51,23,.34);
+                         0 28px 56px -20px rgba(92,51,23,.35);
     --shadow-float:      0 1px 2px rgba(92,51,23,.10),
-                         0 14px 34px -14px rgba(92,51,23,.30);
+                         0 18px 40px -16px rgba(92,51,23,.30);
 
     /* Movimiento */
     --ease-liquid:  cubic-bezier(.32, .72, 0, 1);
@@ -962,6 +978,7 @@ header, .page-main, .footer-custom { position: relative; z-index: 1; }
 
 /* ── ALERTA STOCK BAJO ───────────────────────────────────────── */
 .alerta-stock-wrap {
+    display: none;            /* la muestra el JS cuando hay insumos bajos */
     border: 1px solid rgba(232,146,74,.55);
     border-radius: var(--radius-lg);
     background: linear-gradient(158deg, rgba(253,243,235,.86), rgba(255,255,255,.62));
@@ -1080,3 +1097,38 @@ header, .page-main, .footer-custom { position: relative; z-index: 1; }
 .tc-llevar { --tc-rgb: 61, 78, 173; --tc-color: #34479E; }
 .tc-aqui   .tc-ico { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M2.6%2011h18.8%22%2F%3E%3Cpath%20d%3D%22M6.2%2011%204.3%2020.4%22%2F%3E%3Cpath%20d%3D%22M17.8%2011l1.9%209.4%22%2F%3E%3Cpath%20d%3D%22M5.4%2016.2h13.2%22%2F%3E%3Cpath%20d%3D%22M9.4%203.6h5.2v2.6a2.6%202.6%200%200%201-2.6%202.6%202.6%202.6%200%200%201-2.6-2.6z%22%2F%3E%3Cpath%20d%3D%22M14.9%204.9h1a1.35%201.35%200%200%201%200%202.7h-1%22%2F%3E%3C%2Fsvg%3E");  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M2.6%2011h18.8%22%2F%3E%3Cpath%20d%3D%22M6.2%2011%204.3%2020.4%22%2F%3E%3Cpath%20d%3D%22M17.8%2011l1.9%209.4%22%2F%3E%3Cpath%20d%3D%22M5.4%2016.2h13.2%22%2F%3E%3Cpath%20d%3D%22M9.4%203.6h5.2v2.6a2.6%202.6%200%200%201-2.6%202.6%202.6%202.6%200%200%201-2.6-2.6z%22%2F%3E%3Cpath%20d%3D%22M14.9%204.9h1a1.35%201.35%200%200%201%200%202.7h-1%22%2F%3E%3C%2Fsvg%3E"); }
 .tc-llevar .tc-ico { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4.5%208.1h15l-1.75%2011.3a2%202%200%200%201-2%201.7H8.25a2%202%200%200%201-2-1.7z%22%2F%3E%3Cpath%20d%3D%22M8.6%208.1V5.7a3.4%203.4%200%200%201%206.8%200v2.4%22%2F%3E%3C%2Fsvg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4.5%208.1h15l-1.75%2011.3a2%202%200%200%201-2%201.7H8.25a2%202%200%200%201-2-1.7z%22%2F%3E%3Cpath%20d%3D%22M8.6%208.1V5.7a3.4%203.4%200%200%201%206.8%200v2.4%22%2F%3E%3C%2Fsvg%3E"); }
+
+
+/* ================================================================
+   PIEZAS QUE ANTES VIVIAN EN EL HTML
+   Los degradados de los iconos, el ancho de la columna de selección
+   y los elementos que arrancan ocultos estaban escritos como
+   style="" dentro de inicio.html. Aqui quedan como clases: el HTML
+   dice QUE es cada cosa y esta hoja dice COMO se ve.
+   ================================================================ */
+
+/* ── Iconos de modulo ────────────────────────────────────────────
+   Tres profundidades de la misma familia de marca. Se eligen por
+   peso del modulo, no por capricho: mientras mas hondo, mas
+   delicado es lo que hay detras.                                */
+.modulo-icon-wrap--claro { background: linear-gradient(135deg, #D4B896, #8B5E3C); }
+.modulo-icon-wrap--medio { background: linear-gradient(135deg, #B8936A, #5C3317); }
+.modulo-icon-wrap--hondo { background: linear-gradient(135deg, #8B5E3C, #3B1F0A); }
+
+/* ── Tabla de pendientes ─────────────────────────────────────── */
+.col-seleccion { width: 44px; }
+
+/* ── Etiqueta de formulario compacta ─────────────────────────── */
+.form-label-compacta { font-size: .85rem; }
+
+/* ── Cabecera del modal de WhatsApp ──────────────────────────── */
+.modal-header--wa {
+    background: linear-gradient(135deg, #25D366, #128C7E);
+    color: #fff;
+}
+
+/* ── Estado inicial, no estilo ───────────────────────────────────
+   Estos arrancan ocultos y el JS los muestra. Se hace con el
+   atributo hidden, que es lo que el navegador ya entiende, en vez
+   de un style suelto en la plantilla.                           */
+[hidden] { display: none !important; }

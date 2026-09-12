@@ -4,381 +4,85 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>El Rincón en las Arboledas | Inicio de Sesión</title>
+    <title>El Rincón en las Arboledas | Inicio de sesión</title>
 
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-          crossorigin="anonymous">
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Poppins:wght@300;400;500;600&display=swap"
-          rel="stylesheet">
-
-    <style>
-        :root {
-            --crema:      #FDFAF6;
-            --cafe-light: #D4B896;
-            --cafe-mid:   #B8936A;
-            --cafe-dark:  #8B5E3C;
-            --cafe-deep:  #5C3317;
-            --cafe-ink:   #3B1F0A;
-        }
-
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            height: 100vh;
-            font-family: 'Poppins', sans-serif;
-            display: flex;
-            overflow: hidden;
-        }
-
-        /* ── Fondo foto ──────────────────────────────────── */
-        .bg-foto {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-        }
-        .bg-foto img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center 30%;
-            display: block;
-        }
-        .bg-foto::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(
-                135deg,
-                rgba(59,31,10,.72) 0%,
-                rgba(92,51,23,.50) 45%,
-                rgba(59,31,10,.78) 100%
-            );
-        }
-
-        /* ── Centrador ───────────────────────────────────── */
-        .center-wrapper {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        /* ── Card ────────────────────────────────────────── */
-        .login-card {
-            width: 100%;
-            max-width: 420px;
-            background: rgba(253,250,246,.97);
-            border-radius: 24px;
-            padding: clamp(32px,5vw,52px) clamp(28px,5vw,48px);
-            box-shadow:
-                0 24px 60px rgba(59,31,10,.45),
-                0 0 0 1px rgba(212,184,150,.25);
-            backdrop-filter: blur(16px);
-            animation: fadeUp .7s cubic-bezier(.16,1,.3,1) both;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .login-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--cafe-deep), var(--cafe-mid), var(--cafe-light));
-            border-radius: 24px 24px 0 0;
-        }
-
-        /* ── Logo ────────────────────────────────────────── */
-        .login-logo {
-            width: 78px;
-            height: 78px;
-            border-radius: 16px;
-            object-fit: cover;
-            border: 2px solid rgba(212,184,150,.40);
-            box-shadow: 0 6px 20px rgba(92,51,23,.22);
-            display: block;
-            margin: 0 auto 18px;
-            animation: fadeUp .6s ease .08s both;
-        }
-
-        /* ── Textos ──────────────────────────────────────── */
-        .login-eyebrow {
-            text-align: center;
-            font-size: .65rem;
-            font-weight: 700;
-            letter-spacing: .20em;
-            text-transform: uppercase;
-            color: var(--cafe-mid);
-            margin-bottom: 4px;
-            animation: fadeUp .6s ease .12s both;
-        }
-
-        .login-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.85rem;
-            font-weight: 700;
-            color: var(--cafe-ink);
-            text-align: center;
-            line-height: 1.15;
-            margin-bottom: 4px;
-            animation: fadeUp .6s ease .15s both;
-        }
-        .login-title em { font-style: italic; color: var(--cafe-dark); }
-
-        .login-divider {
-            width: 40px;
-            height: 3px;
-            background: linear-gradient(90deg, var(--cafe-mid), var(--cafe-light));
-            border-radius: 4px;
-            margin: 10px auto 12px;
-            animation: fadeUp .6s ease .14s both;
-        }
-
-        .login-subtitle {
-            text-align: center;
-            font-size: .78rem;
-            color: #9C7E65;
-            margin-bottom: 26px;
-            animation: fadeUp .6s ease .18s both;
-        }
-
-        /* ── Campos ──────────────────────────────────────── */
-        .field-wrap {
-            margin-bottom: 15px;
-            position: relative;
-            animation: fadeUp .6s ease .22s both;
-        }
-        .field-wrap + .field-wrap { animation-delay: .27s; }
-
-        .field-label {
-            display: block;
-            font-size: .68rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: .09em;
-            color: var(--cafe-dark);
-            margin-bottom: 6px;
-        }
-
-        .field-icon {
-            position: absolute;
-            left: 14px;
-            bottom: 13px;
-            color: var(--cafe-mid);
-            font-size: .95rem;
-            pointer-events: none;
-        }
-
-        .form-control-custom {
-            width: 100%;
-            padding: 13px 42px 13px 40px;
-            background: rgba(255,255,255,.90);
-            border: 1.5px solid rgba(212,184,150,.40);
-            border-radius: 14px;
-            font-family: 'Poppins', sans-serif;
-            font-size: .88rem;
-            color: var(--cafe-ink);
-            outline: none;
-            transition: border-color .2s, box-shadow .2s, background .2s;
-        }
-        .form-control-custom::placeholder { color: #C4A882; }
-        .form-control-custom:focus {
-            border-color: var(--cafe-mid);
-            background: #fff;
-            box-shadow: 0 0 0 3px rgba(184,147,106,.18);
-        }
-
-        .toggle-pass {
-            position: absolute;
-            right: 13px;
-            bottom: 10px;
-            background: none;
-            border: none;
-            color: var(--cafe-mid);
-            cursor: pointer;
-            font-size: .95rem;
-            padding: 3px;
-            transition: color .2s;
-        }
-        .toggle-pass:hover { color: var(--cafe-dark); }
-
-        /* ── Botón ───────────────────────────────────────── */
-        .btn-login {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, var(--cafe-dark) 0%, var(--cafe-deep) 100%);
-            color: #fff;
-            border: none;
-            border-radius: 14px;
-            font-family: 'Poppins', sans-serif;
-            font-size: .93rem;
-            font-weight: 600;
-            letter-spacing: .02em;
-            cursor: pointer;
-            box-shadow: 0 6px 20px rgba(92,51,23,.32);
-            transition: transform .22s cubic-bezier(.16,1,.3,1), box-shadow .22s;
-            position: relative;
-            overflow: hidden;
-            margin-top: 6px;
-            animation: fadeUp .6s ease .32s both;
-        }
-        .btn-login::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -75%;
-            width: 50%; height: 100%;
-            background: linear-gradient(120deg, transparent, rgba(255,255,255,.15), transparent);
-            transform: skewX(-20deg);
-            transition: left .5s ease;
-        }
-        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(92,51,23,.42); }
-        .btn-login:hover::before { left: 130%; }
-        .btn-login:active { transform: translateY(0); }
-
-        /* ── Alertas ─────────────────────────────────────── */
-        .login-alert {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-            padding: 9px 13px;
-            border-radius: 11px;
-            font-size: .80rem;
-            font-weight: 500;
-            margin-top: 14px;
-        }
-        .login-alert--success {
-            background: rgba(21,128,61,.10);
-            border: 1.5px solid rgba(21,128,61,.25);
-            color: #15803D;
-        }
-        .login-alert--error {
-            background: rgba(185,28,28,.09);
-            border: 1.5px solid rgba(185,28,28,.22);
-            color: #b91c1c;
-        }
-
-        /* ── Footer ──────────────────────────────────────── */
-        .login-footer {
-            text-align: center;
-            margin-top: 22px;
-            font-size: .73rem;
-            color: var(--cafe-mid);
-            animation: fadeUp .6s ease .36s both;
-        }
-
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(16px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Poppins:wght@300;400;500;600&display=swap">
+    <link rel="stylesheet" th:href="@{/css/login.css}">
 </head>
 
 <body>
 
-    <!-- Foto de fondo -->
-    <div class="bg-foto">
-        <img th:src="@{/img/IMG_1450.jpg}" src="/img/IMG_1450.jpg" alt="">
-    </div>
+<!-- Foto del local -->
+<div class="fondo" aria-hidden="true">
+    <img th:src="@{/img/IMG_1450.jpg}" src="/img/IMG_1450.jpg" alt="">
+</div>
 
-    <!-- Card -->
-    <div class="center-wrapper">
-        <div class="login-card">
+<main class="centrado">
+    <div class="acceso">
 
-            <img class="login-logo"
-                 th:src="@{/img/IMG_8220.jpg}"
-                 src="/img/IMG_8220.jpg"
-                 alt="El Rincón en las Arboledas">
+        <img class="acceso__logo"
+             th:src="@{/img/IMG_8220.jpg}" src="/img/IMG_8220.jpg"
+             alt="El Rincón en las Arboledas">
 
-            <p class="login-eyebrow">Bienvenido</p>
-            <h1 class="login-title">Inicia <em>sesión</em></h1>
-            <div class="login-divider"></div>
-            <p class="login-subtitle">Acceso para personal de <strong>El Rincón en las Arboledas</strong></p>
+        <p class="acceso__eyebrow">Bienvenido</p>
+        <h1 class="acceso__titulo">Inicia <em>sesión</em></h1>
+        <div class="acceso__filo" aria-hidden="true"></div>
+        <p class="acceso__bajada">
+            Acceso para personal de <strong>El Rincón en las Arboledas</strong>
+        </p>
 
-            <!-- Formulario — misma acción Thymeleaf que el original -->
-            <form th:action="@{/login}" method="post">
+        <form th:action="@{/login}" method="post">
 
-                <div class="field-wrap">
-                    <label class="field-label" for="username">
-                        <i class="bi bi-person me-1"></i>Usuario
-                    </label>
-                    <i class="bi bi-person field-icon"></i>
-                    <input class="form-control-custom"
-                           type="text"
-                           id="username"
-                           name="username"
-                           placeholder="Ingresa tu usuario"
-                           autocomplete="username">
-                </div>
+            <div class="campo">
+                <label class="campo__label" for="username">Usuario</label>
+                <i class="bi bi-person campo__icono" aria-hidden="true"></i>
+                <input class="campo__input"
+                       type="text" id="username" name="username"
+                       placeholder="Ingresa tu usuario"
+                       autocomplete="username" required autofocus>
+            </div>
 
-                <div class="field-wrap">
-                    <label class="field-label" for="password">
-                        <i class="bi bi-lock me-1"></i>Contraseña
-                    </label>
-                    <i class="bi bi-lock field-icon"></i>
-                    <input class="form-control-custom"
-                           type="password"
-                           id="password"
-                           name="password"
-                           placeholder="Ingresa tu contraseña"
-                           autocomplete="current-password">
-                    <button type="button" class="toggle-pass" id="togglePass" tabindex="-1">
-                        <i class="bi bi-eye" id="iconoOjo"></i>
-                    </button>
-                </div>
-
-                <button class="btn-login" type="submit">
-                    <i class="bi bi-box-arrow-in-right me-2"></i>
-                    Iniciar sesión
+            <div class="campo">
+                <label class="campo__label" for="password">Contraseña</label>
+                <i class="bi bi-lock campo__icono" aria-hidden="true"></i>
+                <input class="campo__input"
+                       type="password" id="password" name="password"
+                       placeholder="Ingresa tu contraseña"
+                       autocomplete="current-password" required>
+                <button type="button" class="campo__ojo" id="verPassword"
+                        tabindex="-1" aria-label="Mostrar contraseña">
+                    <i class="bi bi-eye" aria-hidden="true"></i>
                 </button>
-
-            </form>
-
-            <!-- Mensajes — misma lógica Thymeleaf que el original -->
-            <div>
-                <div th:if="${param.logout}" id="logoutAlert"
-                     class="login-alert login-alert--success">
-                    <i class="bi bi-check-circle-fill"></i>
-                    Sesión cerrada correctamente.
-                </div>
-                <div th:if="${param.error}" id="errorAlert"
-                     class="login-alert login-alert--error">
-                    <i class="bi bi-exclamation-circle-fill"></i>
-                    Usuario o contraseña incorrectos. Intenta de nuevo.
-                </div>
             </div>
 
-            <div class="login-footer">
-                <i class="bi bi-cup-hot-fill me-1"></i>
-                Sistema interno de cafetería
-            </div>
+            <button class="btn-entrar" type="submit">
+                <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>
+                Iniciar sesión
+            </button>
 
+        </form>
+
+        <div role="status">
+            <div th:if="${param.logout}" class="aviso aviso--ok">
+                <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+                Sesión cerrada correctamente.
+            </div>
+            <div th:if="${param.error}" class="aviso aviso--error">
+                <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+                Usuario o contraseña incorrectos. Intenta de nuevo.
+            </div>
         </div>
+
+        <p class="acceso__pie">
+            <i class="bi bi-cup-hot-fill" aria-hidden="true"></i>
+            Sistema interno de cafetería
+        </p>
+
     </div>
+</main>
 
-    <script>
-        document.getElementById('togglePass').addEventListener('click', function () {
-            var input = document.getElementById('password');
-            var icono = document.getElementById('iconoOjo');
-            var esPass = input.type === 'password';
-            input.type      = esPass ? 'text'            : 'password';
-            icono.className = esPass ? 'bi bi-eye-slash' : 'bi bi-eye';
-        });
+<script type="module" th:src="@{/js/Login/login.js}"></script>
 
-        setTimeout(function () {
-            var logout = document.getElementById('logoutAlert');
-            var error  = document.getElementById('errorAlert');
-            if (logout) logout.style.display = 'none';
-            if (error)  error.style.display  = 'none';
-        }, 2500);
-    </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-            crossorigin="anonymous"></script>
 </body>
 </html>

@@ -55,7 +55,7 @@
     </div>
 	
 	<!-- ── ALERTA STOCK BAJO ───────────────────────────────── -->
-	<div id="alertaStockBajo" style="display:none;" class="alerta-stock-wrap mb-3">
+	<div id="alertaStockBajo" class="alerta-stock-wrap mb-3">
 	    <div class="alerta-stock-header">
 	        <span><i class="bi bi-exclamation-triangle-fill me-2"></i>Insumos con stock bajo — requieren reabastecimiento</span>
 	        <span id="alertaStockConteo" class="alerta-stock-badge"></span>
@@ -84,7 +84,7 @@
             <table class="table table-hover align-middle mb-0">
                 <thead>
                     <tr>
-                        <th style="width:44px;"><input type="checkbox" id="chkAll" class="form-check-input"></th>
+                        <th class="col-seleccion"><input type="checkbox" id="chkAll" class="form-check-input"></th>
                         <th>ID</th>
 						<th>Nombre</th> 
                         <th>Hora</th>
@@ -113,7 +113,7 @@
     <div class="modulos-grid">
 
         <div class="modulo-card" data-modulo="orden">
-            <div class="modulo-icon-wrap" style="background: linear-gradient(135deg,#D4B896,#8B5E3C);">
+            <div class="modulo-icon-wrap modulo-icon-wrap--claro">
                 <i class="bi bi-clipboard2-fill"></i>
             </div>
             <div class="modulo-info">
@@ -126,7 +126,7 @@
         </div>
 
         <div class="modulo-card" data-modulo="catalogo">
-            <div class="modulo-icon-wrap" style="background: linear-gradient(135deg,#B8936A,#5C3317);">
+            <div class="modulo-icon-wrap modulo-icon-wrap--medio">
                 <i class="bi bi-boxes"></i>
             </div>
             <div class="modulo-info">
@@ -140,7 +140,7 @@
 
         <!-- CAMBIO 3b: Inventario deshabilitado -->
 		<div class="modulo-card modulo-protegido" data-modulo="inventario">
-		    <div class="modulo-icon-wrap" style="background: linear-gradient(135deg,#8B5E3C,#3B1F0A);">
+		    <div class="modulo-icon-wrap modulo-icon-wrap--hondo">
 		        <i class="bi bi-box-seam-fill"></i>
 		    </div>
 		    <div class="modulo-info">
@@ -153,7 +153,7 @@
 		</div>
 
         <div class="modulo-card modulo-protegido" data-modulo="reportes">
-            <div class="modulo-icon-wrap" style="background: linear-gradient(135deg,#D4B896,#8B5E3C);">
+            <div class="modulo-icon-wrap modulo-icon-wrap--claro">
                 <i class="bi bi-bar-chart-line-fill"></i>
             </div>
             <div class="modulo-info">
@@ -166,7 +166,7 @@
         </div>
 
         <div class="modulo-card modulo-protegido" data-modulo="usuarios">
-            <div class="modulo-icon-wrap" style="background: linear-gradient(135deg,#B8936A,#5C3317);">
+            <div class="modulo-icon-wrap modulo-icon-wrap--medio">
                 <i class="bi bi-people-fill"></i>
             </div>
             <div class="modulo-info">
@@ -179,7 +179,7 @@
         </div>
 		
 		<div class="modulo-card modulo-protegido" data-modulo="gestion">
-		    <div class="modulo-icon-wrap" style="background: linear-gradient(135deg,#8B5E3C,#5C3317);">
+		    <div class="modulo-icon-wrap modulo-icon-wrap--medio">
 		        <i class="bi bi-graph-up-arrow"></i>
 		    </div>
 		    <div class="modulo-info">
@@ -193,7 +193,7 @@
 
 		<!-- Gestion de Pedidos: en pausa, se retoma mas adelante.
 		<div class="modulo-card modulo-disabled"  data-modulo="reportes">
-		       <div class="modulo-icon-wrap" style="background: linear-gradient(135deg,#D4B896,#8B5E3C);">
+		       <div class="modulo-icon-wrap modulo-icon-wrap--claro">
 		           <i class="bi bi-bicycle"></i>
 		       </div>
 			   <div class="modulo-info">
@@ -295,7 +295,7 @@
                     <div>Orden <strong id="aeOrdenId">#—</strong> · Cliente: <strong id="aeOrdenCliente">—</strong></div>
                     <div>Destino WhatsApp: <strong id="aeOrdenTelefono">—</strong></div>
                 </div>
-                <label class="form-label fw-semibold mb-2" style="font-size:.85rem;">Selecciona el estatus a enviar</label>
+                <label class="form-label fw-semibold mb-2 form-label-compacta">Selecciona el estatus a enviar</label>
                 <div class="ae-estatus-selector" id="aeEstatusSelector">
                     <div class="ae-estatus-opt" data-estatus="EN_PREPARACION"><i class="bi bi-hourglass-split"></i> En preparación</div>
                     <div class="ae-estatus-opt" data-estatus="EN_CAMINO"><i class="bi bi-truck"></i> En camino</div>
@@ -335,7 +335,7 @@
 <div class="modal fade" id="modalInfoWa" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;">
+            <div class="modal-header modal-header--wa">
                 <h5 class="modal-title"><i class="bi bi-info-circle"></i> Orden <span id="infoWaOrdenId">#—</span></h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
@@ -345,7 +345,7 @@
                         <div class="iw-cliente-nombre" id="infoWaCliente">—</div>
                         <div class="iw-cliente-tel"><i class="bi bi-telephone"></i> <span id="infoWaTelefono">—</span></div>
                     </div>
-                    <a id="infoWaChatLink" href="#" target="_blank" rel="noopener" class="iw-btn-chat" style="display:none;">
+                    <a id="infoWaChatLink" href="#" target="_blank" rel="noopener" class="iw-btn-chat" hidden>
                         <i class="bi bi-whatsapp"></i> Abrir chat
                     </a>
                 </div>
@@ -356,7 +356,7 @@
                     <div class="iw-fila"><span class="iw-label">Referencia</span><span class="iw-valor" id="infoWaReferencia">—</span></div>
                     <div class="iw-acciones">
                         <button type="button" id="infoWaCopyBtn" class="btn btn-sm btn-outline-secondary"><i class="bi bi-clipboard"></i> Copiar dirección</button>
-                        <a id="infoWaMapsLink" href="#" target="_blank" rel="noopener" class="btn btn-sm btn-outline-success" style="display:none;">
+                        <a id="infoWaMapsLink" href="#" target="_blank" rel="noopener" class="btn btn-sm btn-outline-success" hidden>
                             <i class="bi bi-map"></i> Ver en Maps
                         </a>
                     </div>
