@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -112,6 +113,44 @@ public class GestionController {
         if (dDesde.isAfter(dHasta)) { LocalDate t = dDesde; dDesde = dHasta; dHasta = t; }
 
         return ResponseEntity.ok(procedimientosAlmacenados.spGestionModulo(2, dDesde, dHasta));
+    }
+
+    @GetMapping("/admin/gestion/bitacora")
+    public String bitacora(Model model, Authentication authentication) {
+        model.addAttribute("nombreUsuario", authentication.getName());
+        model.addAttribute("hoyNegocio", hoyNegocio().toString());
+        return "admin/bitacora";
+    }
+
+    /**
+     * Calendario del periodo y ordenes del mismo. Van juntos porque el
+     * calendario pinta los totales y la lista se arma al picar un dia.
+     */
+    @GetMapping("/admin/gestion/bitacora/datos")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> datosBitacora(
+            @RequestParam(required = false) String desde,
+            @RequestParam(required = false) String hasta) {
+
+        LocalDate dHasta = parseOHoy(hasta);
+        LocalDate dDesde = parseO(desde, dHasta);
+        if (dDesde.isAfter(dHasta)) { LocalDate t = dDesde; dDesde = dHasta; dHasta = t; }
+
+        return ResponseEntity.ok(Map.of(
+                "ok",      true,
+                "desde",   dDesde.toString(),
+                "hasta",   dHasta.toString(),
+                "dias",    procedimientosAlmacenados.spGestionModulo(2, dDesde, dHasta),
+                "ordenes", procedimientosAlmacenados.spGestionModulo(5, dDesde, dHasta)));
+    }
+
+    /** Detalle de una orden: lo unico que abre en modal dentro del modulo. */
+    @GetMapping("/admin/gestion/orden/{idOrden}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> detalleOrden(@PathVariable Integer idOrden) {
+        Map<String, Object> detalle = procedimientosAlmacenados.spDetalleOrden(idOrden);
+        if (detalle.get("orden") == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(detalle);
     }
 
     private LocalDate parseOHoy(String valor) {

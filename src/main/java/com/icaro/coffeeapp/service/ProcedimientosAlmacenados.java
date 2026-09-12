@@ -701,6 +701,44 @@ public class ProcedimientosAlmacenados {
         }
     }
 
+    /**
+     * Detalle de una orden para el modal de la Bitacora.
+     * El procedimiento devuelve dos resultados: cabecera e items.
+     */
+    public Map<String, Object> spDetalleOrden(int idOrden) {
+        final String SQL = "{CALL sp_gestion_detalle_orden(?)}";
+        Map<String, Object> salida = new LinkedHashMap<>();
+
+        try (Connection conn = conexionJDBC.getConexion2();
+             CallableStatement cs = conn.prepareCall(SQL)) {
+
+            cs.setInt(1, idOrden);
+            boolean hayResultado = cs.execute();
+
+            // Primer resultado: la cabecera
+            if (hayResultado) {
+                try (ResultSet rs = cs.getResultSet()) {
+                    List<Map<String, Object>> cab = mapResultSetGeneric(rs);
+                    salida.put("orden", cab.isEmpty() ? null : cab.get(0));
+                }
+            }
+
+            // Segundo resultado: los items
+            if (cs.getMoreResults()) {
+                try (ResultSet rs = cs.getResultSet()) {
+                    salida.put("items", mapResultSetGeneric(rs));
+                }
+            }
+
+        } catch (SQLException e) {
+            log.error("sp_gestion_detalle_orden {}: {}", idOrden, e.getMessage());
+        }
+
+        salida.putIfAbsent("orden", null);
+        salida.putIfAbsent("items", new ArrayList<>());
+        return salida;
+    }
+
     // ════════════════════════════════════════════════════════
     // INVENTARIO — sp_gestion_inventario
     // ════════════════════════════════════════════════════════
