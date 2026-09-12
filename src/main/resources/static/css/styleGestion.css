@@ -276,3 +276,190 @@
 @media (prefers-reduced-motion: reduce) {
     .reloj-satelite, .chip-periodo { transition: none; }
 }
+
+/* ================================================================
+   CIERRES DE CAJA
+   Lista de dias; cada uno se despliega para ver sus cortes.
+   ================================================================ */
+
+/* ── Tiras de resumen del periodo ───────────────────────────── */
+.resumen-tiras {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 18px;
+}
+.tira {
+    flex: 1 1 180px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 14px 18px;
+    background: var(--glass-tint);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--glass-edge), var(--shadow-card);
+    -webkit-backdrop-filter: var(--glass-blur-soft);
+    backdrop-filter: var(--glass-blur-soft);
+}
+.tira small {
+    font-size: .62rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+.tira b {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: var(--cafe-deep);
+    font-variant-numeric: tabular-nums;
+}
+.tira-alerta { border-left: 3px solid #C1601F; }
+.tira-alerta b { color: #A34E17; }
+
+/* ── Lista de dias ──────────────────────────────────────────── */
+.lista-dias {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 18px;
+}
+.lista-vacia, .corte-vacio {
+    color: var(--text-muted);
+    font-size: .9rem;
+    padding: 18px 4px;
+    margin: 0;
+}
+
+.dia-card {
+    background: var(--glass-tint);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--glass-edge), var(--shadow-card);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    overflow: hidden;
+}
+
+.dia-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 16px 20px;
+    background: none;
+    border: 0;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+    color: inherit;
+    transition: background var(--dur) var(--ease-liquid);
+}
+.dia-header:hover { background: rgba(255,255,255,.35); }
+.dia-header:focus-visible { outline: 3px solid var(--cafe-mid); outline-offset: -3px; }
+
+.dia-fecha { display: flex; flex-direction: column; min-width: 132px; }
+.dia-titulo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--cafe-deep);
+}
+.dia-semana {
+    font-size: .72rem;
+    text-transform: capitalize;
+    color: var(--text-muted);
+}
+
+.dia-cifras { display: flex; gap: 22px; margin-left: auto; }
+.dia-cifra { display: flex; flex-direction: column; align-items: flex-end; }
+.dia-cifra small {
+    font-size: .58rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+.dia-cifra b {
+    font-size: 1rem;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+.dia-cifra-cortes b { color: var(--cafe-dark); }
+
+.dia-estado { display: flex; align-items: center; gap: 10px; }
+.dia-chevron { color: var(--cafe-mid); transition: transform var(--dur) var(--ease-liquid); }
+.dia-header[aria-expanded="true"] .dia-chevron { transform: rotate(180deg); }
+
+.pastilla {
+    font-size: .64rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 4px 11px;
+    border-radius: var(--radius-pill);
+    white-space: nowrap;
+}
+.pastilla-ok     { background: rgba(46,125,50,.12);  color: #2E7D32; border: 1px solid rgba(46,125,50,.3); }
+.pastilla-falta  { background: rgba(193,96,31,.12);  color: #A34E17; border: 1px solid rgba(193,96,31,.35); }
+.pastilla-curso  { background: rgba(184,147,106,.16); color: var(--cafe-deep); border: 1px solid rgba(184,147,106,.4); }
+
+/* ── Detalle del dia ────────────────────────────────────────── */
+.dia-detalle {
+    padding: 4px 20px 18px;
+    border-top: 1px solid rgba(212,184,150,.35);
+}
+
+.dia-pagos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    padding: 12px 0 14px;
+    font-size: .82rem;
+    color: var(--text-muted);
+}
+.dia-pagos b { color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.dia-pagos i { color: var(--cafe-mid); margin-right: 4px; }
+
+.dia-cortes-lista { display: flex; flex-direction: column; gap: 8px; }
+
+.corte-row {
+    display: grid;
+    grid-template-columns: 74px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: rgba(255,255,255,.5);
+    border: 1px solid rgba(212,184,150,.3);
+    border-radius: var(--radius-md);
+}
+.corte-hora {
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--cafe-deep);
+    font-variant-numeric: tabular-nums;
+}
+.corte-hora i { color: var(--cafe-mid); margin-right: 4px; }
+.corte-datos { display: flex; flex-direction: column; }
+.corte-usuario { font-size: .86rem; font-weight: 600; }
+.corte-ordenes { font-size: .72rem; color: var(--text-muted); }
+.corte-total {
+    font-size: 1rem;
+    color: var(--cafe-deep);
+    font-variant-numeric: tabular-nums;
+}
+.corte-nota {
+    grid-column: 1 / -1;
+    margin: 2px 0 0;
+    font-size: .74rem;
+    color: var(--text-muted);
+    line-height: 1.35;
+}
+
+@media (max-width: 620px) {
+    .dia-cifras { margin-left: 0; gap: 16px; width: 100%; justify-content: space-between; }
+    .dia-cifra { align-items: flex-start; }
+    .corte-row { grid-template-columns: 1fr auto; }
+    .corte-hora { grid-column: 1 / -1; }
+}

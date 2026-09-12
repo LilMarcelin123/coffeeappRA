@@ -70,6 +70,36 @@ public class GestionController {
         return ResponseEntity.ok(kpis);
     }
 
+    @GetMapping("/admin/gestion/cierres")
+    public String cierres(Model model, Authentication authentication) {
+        model.addAttribute("nombreUsuario", authentication.getName());
+        model.addAttribute("hoyNegocio", hoyNegocio().toString());
+        return "admin/cierres";
+    }
+
+    /**
+     * Cierres del periodo: el resumen por dia y los cortes individuales.
+     * Van juntos en una sola respuesta porque la pantalla necesita los dos
+     * a la vez y pedirlos por separado solo duplicaria viajes.
+     */
+    @GetMapping("/admin/gestion/cierres/datos")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> datosCierres(
+            @RequestParam(required = false) String desde,
+            @RequestParam(required = false) String hasta) {
+
+        LocalDate dHasta = parseOHoy(hasta);
+        LocalDate dDesde = parseO(desde, dHasta);
+        if (dDesde.isAfter(dHasta)) { LocalDate t = dDesde; dDesde = dHasta; dHasta = t; }
+
+        return ResponseEntity.ok(Map.of(
+                "ok",     true,
+                "desde",  dDesde.toString(),
+                "hasta",  dHasta.toString(),
+                "dias",   procedimientosAlmacenados.spGestionModulo(3, dDesde, dHasta),
+                "cortes", procedimientosAlmacenados.spGestionModulo(4, dDesde, dHasta)));
+    }
+
     /** Venta por dia del periodo, para la grafica y la Bitacora. */
     @GetMapping("/admin/gestion/ventas-dia")
     @ResponseBody
