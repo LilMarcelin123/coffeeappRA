@@ -135,7 +135,7 @@ function renderTablaDetalle(lista) {
         const tr = document.createElement("tr");
         tr.innerHTML = `
             <td style="color:var(--text-muted);font-size:.78rem;">${idx + 1}</td>
-            <td><strong>#${row.id_orden ?? "—"}</strong></td>
+            <td><strong>#${row.n_folio_dia ?? row.id_orden ?? "—"}</strong></td>
             <td style="font-size:.82rem;color:var(--text-muted);">${hora}</td>
             <td style="font-size:.82rem;max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
                 ${row.resumen ?? "—"}
@@ -156,6 +156,7 @@ function filtrarTablaLocal(q) {
         return;
     }
     const filtrados = estado.datosDetalle.filter(row =>
+        String(row.n_folio_dia ?? "").includes(q) ||
         String(row.id_orden    ?? "").includes(q) ||
         String(row.resumen     ?? "").toLowerCase().includes(q) ||
         String(row.metodo_pago ?? "").toLowerCase().includes(q)
