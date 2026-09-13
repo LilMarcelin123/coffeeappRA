@@ -346,7 +346,9 @@ function obtenerOCrearCard(grid, idStr, idx) {
 }
 
 function actualizarCabeceraCard(card, orden) {
-    card.querySelector(".orden-id-val").textContent = `Orden #${orden.id_orden}`;
+    // El folio del dia es el numero que la barra le canta al cliente.
+    const folio = orden.n_folio_dia != null ? orden.n_folio_dia : orden.id_orden;
+    card.querySelector(".orden-id-val").textContent = `Orden #${folio}`;
 
     const hora = orden.t_hora_creacion
         ? String(orden.t_hora_creacion).replace("T", " ").substring(11, 16)

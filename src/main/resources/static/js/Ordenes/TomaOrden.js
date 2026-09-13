@@ -527,6 +527,10 @@ function pintarTarjetasPendientes(lista, items) {
 
     lista.forEach(o => {
         const id     = o.id_orden;
+        // Lo que se le canta al cliente es el folio del dia, que
+        // empieza en 1 cada dia; el id interno nunca se reusa y solo
+        // sirve para amarrar la orden por dentro.
+        const folio  = o.n_folio_dia != null ? o.n_folio_dia : id;
         const its    = porOrden[String(id)] || [];
         const total  = its.length;
         const listos = its.filter(i => String(i.n_estado_preparacion).toUpperCase() === "LISTO").length;
@@ -537,7 +541,7 @@ function pintarTarjetasPendientes(lista, items) {
         const card = document.createElement("article");
         card.className = "ord-card" + (completa ? " ord-card--completa" : "");
         card.dataset.idOrden  = id;
-        card.dataset.busqueda = (String(id) + " " + cliente).toLowerCase();
+        card.dataset.busqueda = (String(folio) + " " + String(id) + " " + cliente).toLowerCase();
 
         // Tipo de consumo: se ve en la tarjeta, sin abrir la orden.
         const tipoConsumo = String(o.n_tipo_consumo || "").toUpperCase();
@@ -561,7 +565,7 @@ function pintarTarjetasPendientes(lista, items) {
         card.innerHTML =
             '<header class="ord-head">' +
                 '<label class="ord-check"><input type="checkbox" class="chkRow form-check-input"></label>' +
-                '<span class="ord-num">#' + id + '</span>' +
+                '<span class="ord-num">#' + folio + '</span>' +
                 (esWa ? '<span class="ord-wa" title="Pedido por WhatsApp"><i class="bi bi-whatsapp"></i></span>' : "") +
                 '<span class="ord-hora">' + String(o.t_hora_creacion || "").replace("T", " ").substring(11, 16) + '</span>' +
             '</header>' +
@@ -685,7 +689,7 @@ function reabrirOrdenes(ids) {
 // ════════════════════════════════════════════════════════════
 function abrirModalInfoWa(idOrden) {
     const set = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
-    set("infoWaOrdenId", "#" + idOrden);
+    set("infoWaOrdenId", "#" + (d.folio != null ? d.folio : idOrden));
     set("infoWaCliente", "Cargando…");
     set("infoWaTelefono", "—"); set("infoWaTipoEntrega", "—");
     set("infoWaDireccion", "—"); set("infoWaReferencia", "—");

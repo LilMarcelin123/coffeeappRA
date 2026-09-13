@@ -129,11 +129,12 @@ function abrirDia(iso) {
         const fila = nodo.querySelector('.orden');
 
         fila.querySelector('.orden__hora').textContent    = orden.n_hora_texto || '';
-        fila.querySelector('.orden__cliente').textContent = orden.n_nombre_cliente || `Orden ${orden.id_orden}`;
+        const folio = orden.n_folio_dia != null ? orden.n_folio_dia : orden.id_orden;
+        fila.querySelector('.orden__cliente').textContent = orden.n_nombre_cliente || `Orden ${folio}`;
         fila.querySelector('.orden__tags').append(...etiquetasDe(orden));
         fila.querySelector('.orden__total').textContent   = fmt.dinero(orden.p_total);
 
-        fila.addEventListener('click', () => abrirOrden(orden.id_orden));
+        fila.addEventListener('click', () => abrirOrden(orden.id_orden, folio));
         lista.appendChild(nodo);
     });
 
@@ -206,8 +207,10 @@ function pintarItems(productos) {
     });
 }
 
-async function abrirOrden(idOrden) {
-    document.getElementById('modalOrdenTitulo').textContent = `Orden ${idOrden}`;
+async function abrirOrden(idOrden, folio) {
+    // Se titula con el folio del dia, que es el numero que conocen en la
+    // barra; el id interno queda para la consulta.
+    document.getElementById('modalOrdenTitulo').textContent = `Orden ${folio ?? idOrden}`;
     document.getElementById('ordenMeta').replaceChildren();
     document.getElementById('ordenTotalFinal').textContent = '';
 

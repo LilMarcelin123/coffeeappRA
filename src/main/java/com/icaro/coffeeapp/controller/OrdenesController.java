@@ -21,6 +21,7 @@ import com.icaro.coffeeapp.repository.SubcategoriaOpcionRepository;
 import com.icaro.coffeeapp.model.Subcategoria;
 import com.icaro.coffeeapp.model.SubcategoriaOpcion;
 import com.icaro.coffeeapp.repository.SubcategoriaRepository;
+import com.icaro.coffeeapp.service.ProcedimientosAlmacenados;
 
 
 @Controller
@@ -37,6 +38,9 @@ public class OrdenesController {
 
     @Autowired
     private ProductoRepository productoRepository;
+
+    @Autowired
+    private ProcedimientosAlmacenados procedimientosAlmacenados;
 
     @org.springframework.beans.factory.annotation.Value("${whatsapp.enabled:true}")
     private boolean whatsappEnabled;
@@ -63,6 +67,11 @@ public class OrdenesController {
         model.addAttribute("categorias", categorias);
 
         model.addAttribute("idOrden", idOrden);
+
+        // El encabezado muestra el folio del dia, que es el numero que la
+        // barra le canta al cliente. Si por algo faltara, cae al id interno.
+        Integer folio = (idOrden != null) ? procedimientosAlmacenados.obtenerFolioDia(idOrden) : null;
+        model.addAttribute("folioOrden", folio != null ? folio : idOrden);
 
         return "admin/tomaOrden";
     }

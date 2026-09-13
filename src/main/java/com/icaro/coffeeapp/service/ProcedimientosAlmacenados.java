@@ -1059,10 +1059,33 @@ public class ProcedimientosAlmacenados {
         return 0;
     }
 
+    /**
+     * Folio del dia de una orden: el numero que se ve en pantalla y se le
+     * canta al cliente. Empieza en 1 cada dia de negocio, a diferencia de
+     * id_orden, que nunca se reusa.
+     */
+    public Integer obtenerFolioDia(Integer idOrden) {
+        final String SQL = "SELECT n_folio_dia FROM orden WHERE id_orden = ?";
+        try (Connection conn = conexionJDBC.getConexion2();
+             PreparedStatement ps = conn.prepareStatement(SQL)) {
+
+            ps.setInt(1, idOrden);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int folio = rs.getInt("n_folio_dia");
+                    return rs.wasNull() ? null : folio;
+                }
+            }
+        } catch (SQLException e) {
+            log.error("obtenerFolioDia {}: {}", idOrden, e.getMessage());
+        }
+        return null;
+    }
+
     /** Lee los datos de entrega/pago WhatsApp de una orden para mostrarlos en pantalla. */
     public Map<String, Object> obtenerInfoWhatsapp(Integer idOrden) {
         final String SQL = "SELECT wa_phone, wa_direccion, wa_referencia, wa_metodo_pago, " +
-                           "wa_cambio_con, wa_tipo_entrega, n_nombre_cliente, p_total " +
+                           "wa_cambio_con, wa_tipo_entrega, n_nombre_cliente, p_total, n_folio_dia " +
                            "FROM orden WHERE id_orden = ?";
         Map<String, Object> info = new java.util.HashMap<>();
         try (Connection conn = conexionJDBC.getConexion2();
@@ -1079,6 +1102,7 @@ public class ProcedimientosAlmacenados {
                     info.put("tipoEntrega",  r.getString("wa_tipo_entrega"));
                     info.put("cliente",      r.getString("n_nombre_cliente"));
                     info.put("total",        r.getObject("p_total"));
+                    info.put("folio",        r.getObject("n_folio_dia"));
                 }
             }
         } catch (SQLException e) {
