@@ -62,7 +62,7 @@ public class ExcelService {
             sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 5));
 
             // ── Fila 1: Encabezados ───────────────────────────────────
-            String[] headers = {"#", "ID Orden", "Hora Cierre", "Resumen", "Método de Pago", "Total"};
+            String[] headers = {"#", "Orden", "Hora de la orden", "Resumen", "Método de Pago", "Total"};
             Row rowHeader = sheet.createRow(1);
             rowHeader.setHeightInPoints(18);
             for (int i = 0; i < headers.length; i++) {
@@ -82,7 +82,10 @@ public class ExcelService {
                 CellStyle csMoney  = esAlt ? estiloMonedaAlt : estiloMoneda;
 
                 fila.createCell(0).setCellValue(contador++);
-                fila.createCell(1).setCellValue(toStr(row.get("id_orden")));
+                // El folio del dia es el numero que conocen en la barra; el id
+                // interno solo sirve por dentro.
+                Object folio = row.get("n_folio_dia") != null ? row.get("n_folio_dia") : row.get("id_orden");
+                fila.createCell(1).setCellValue(toStr(folio));
 
                 String hora = toStr(row.get("hora_cierre")).replace("T", " ");
                 if (hora.length() > 19) hora = hora.substring(0, 19);
