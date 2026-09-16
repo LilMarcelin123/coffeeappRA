@@ -70,5 +70,66 @@
 
 </div>
 
+
+<!-- ── Banda decorada ──────────────────────────────────────────
+     Version para pantallas de trabajo (panel, cocina, modulo).
+     Aqui los adornos NO flotan sobre el contenido: viven dentro
+     de la banda cafe del encabezado, que ya es decorativa. Sobre
+     las tarjetas de ordenes no va nada, porque ahi la gente
+     trabaja a prisa y un adorno encima es un estorbo.
+
+     Se coloca dentro del encabezado, que debe ser position:
+     relative. -->
+<div th:fragment="halloween-banda" class="temporada-banda" aria-hidden="true">
+
+    <svg class="tb-telarana tb-telarana--izq" viewBox="0 0 120 120">
+        <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M0 0 L120 60 M0 0 L95 95 M0 0 L60 120 M0 0 L118 22 M0 0 L22 118"/>
+            <path d="M26 6 C20 18 14 24 6 26"/>
+            <path d="M46 12 C36 32 26 42 12 46"/>
+            <path d="M68 20 C52 46 40 58 20 68"/>
+            <path d="M92 30 C70 62 56 76 30 92"/>
+        </g>
+    </svg>
+
+    <svg class="tb-telarana tb-telarana--der" viewBox="0 0 120 120">
+        <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M120 0 L0 60 M120 0 L25 95 M120 0 L60 120 M120 0 L2 22 M120 0 L98 118"/>
+            <path d="M94 6 C100 18 106 24 114 26"/>
+            <path d="M74 12 C84 32 94 42 108 46"/>
+            <path d="M52 20 C68 46 80 58 100 68"/>
+            <path d="M28 30 C50 62 64 76 90 92"/>
+        </g>
+    </svg>
+
+    <div class="tb-arana">
+        <span class="tb-arana__hilo"></span>
+        <svg class="tb-arana__cuerpo" viewBox="0 0 44 40">
+            <g stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round">
+                <path d="M18 18 C10 14 6 8 4 2"/>
+                <path d="M18 21 C9 20 4 18 1 13"/>
+                <path d="M18 24 C9 26 5 30 3 35"/>
+                <path d="M19 27 C13 32 11 36 11 39"/>
+                <path d="M26 18 C34 14 38 8 40 2"/>
+                <path d="M26 21 C35 20 40 18 43 13"/>
+                <path d="M26 24 C35 26 39 30 41 35"/>
+                <path d="M25 27 C31 32 33 36 33 39"/>
+            </g>
+            <ellipse cx="22" cy="22" rx="8" ry="9" fill="currentColor"/>
+            <circle cx="22" cy="13" r="4.5" fill="currentColor"/>
+            <circle class="tb-arana__ojo" cx="20" cy="12" r="1.2"/>
+            <circle class="tb-arana__ojo" cx="24" cy="12" r="1.2"/>
+        </svg>
+    </div>
+
+    <svg class="tb-murcielago tb-murcielago--1" viewBox="0 0 64 28">
+        <path fill="currentColor" d="M32 6c2 0 3 2 3 4 3-4 7-6 11-6-2 2-2 5-1 7 3-3 8-4 12-2-4 1-7 4-8 8-3-2-7-1-9 2-2-3-5-4-8-4s-6 1-8 4c-2-3-6-4-9-2-1-4-4-7-8-8 4-2 9-1 12 2 1-2 1-5-1-7 4 0 8 2 11 6 0-2 1-4 3-4z"/>
+    </svg>
+    <svg class="tb-murcielago tb-murcielago--2" viewBox="0 0 64 28">
+        <path fill="currentColor" d="M32 6c2 0 3 2 3 4 3-4 7-6 11-6-2 2-2 5-1 7 3-3 8-4 12-2-4 1-7 4-8 8-3-2-7-1-9 2-2-3-5-4-8-4s-6 1-8 4c-2-3-6-4-9-2-1-4-4-7-8-8 4-2 9-1 12 2 1-2 1-5-1-7 4 0 8 2 11 6 0-2 1-4 3-4z"/>
+    </svg>
+
+</div>
+
 </body>
 </html>

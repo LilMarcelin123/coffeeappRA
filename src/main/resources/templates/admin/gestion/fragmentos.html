@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/temporada.css}">
     <link rel="stylesheet" th:href="@{/css/gestion/nucleo.css}">
     <link rel="stylesheet" th:href="@{'/css/gestion/' + ${hojaPropia} + '.css'}">
 </head>
@@ -35,6 +36,8 @@
 <header th:fragment="encabezado(icono, titulo, bajada)">
     <div class="hero-section">
         <div class="hero-overlay"></div>
+        <div th:if="${tema == 'halloween'}"
+             th:replace="~{fragmentos/temporada :: halloween-banda}"></div>
         <div class="hero-content">
             <div class="hero-left">
                 <span class="hero-badge">

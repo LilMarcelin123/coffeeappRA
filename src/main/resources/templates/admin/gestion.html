@@ -3,7 +3,7 @@
 
 <head th:replace="~{admin/gestion/fragmentos :: cabeza('Módulo de Gestión — Rincón Arboledas', 'panel')}"></head>
 
-<body class="gestion-body" th:attr="data-hoy-negocio=${hoyNegocio}">
+<body class="gestion-body" th:attr="data-hoy-negocio=${hoyNegocio}, data-tema=${tema}">
 
 <header th:replace="~{admin/gestion/fragmentos :: encabezado(
             'bi-graph-up-arrow',

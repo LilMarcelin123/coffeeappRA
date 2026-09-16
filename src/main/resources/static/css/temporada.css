@@ -118,3 +118,100 @@ body:not([data-tema="halloween"]) .temporada { display: none; }
     .murcielago { display: none; }
     .arana { right: 12%; }
 }
+
+
+/* ================================================================
+   BANDA DECORADA — pantallas de trabajo
+   Panel, cocina y modulo de gestion.
+
+   Diferencia con el login: aqui los adornos se quedan DENTRO del
+   encabezado cafe. Nada flota sobre las ordenes; en cocina una
+   telaraña encima de una tarjeta es un estorbo, no un adorno.
+   ================================================================ */
+
+.temporada-banda {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    overflow: hidden;
+}
+body:not([data-tema="halloween"]) .temporada-banda { display: none; }
+
+/* Las telaraãs se recargan en las esquinas de la banda */
+.tb-telarana {
+    position: absolute;
+    top: 0;
+    width: clamp(70px, 9vw, 120px);
+    height: clamp(70px, 9vw, 120px);
+    color: rgba(255, 246, 232, .34);
+}
+.tb-telarana--izq { left: 0; }
+.tb-telarana--der { right: 0; }
+
+/* La araña cuelga del borde de arriba, con hilo corto: tiene que
+   caber en la banda y no asomarse al area de trabajo. */
+.tb-arana {
+    position: absolute;
+    top: 0;
+    left: clamp(26%, 34vw, 42%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform-origin: top center;
+    animation: tb-mece 5s ease-in-out infinite;
+}
+.tb-arana__hilo {
+    width: 1px;
+    height: clamp(26px, 4vh, 48px);
+    background: linear-gradient(rgba(255,246,232,.1), rgba(255,246,232,.5));
+}
+.tb-arana__cuerpo {
+    width: clamp(22px, 2.4vw, 32px);
+    height: auto;
+    color: #1E0F04;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,.5));
+}
+.tb-arana__ojo { fill: #F6C453; }
+
+@keyframes tb-mece {
+    0%, 100% { transform: rotate(-3deg); }
+    50%      { transform: rotate(3deg); }
+}
+
+/* Dos murcielagos cruzando la banda, apenas visibles */
+.tb-murcielago {
+    position: absolute;
+    width: clamp(20px, 2.2vw, 32px);
+    color: rgba(30, 15, 4, .5);
+    animation: tb-cruza linear infinite;
+}
+.tb-murcielago--1 { top: 22%; animation-duration: 22s; animation-delay:  -3s; }
+.tb-murcielago--2 { top: 58%; animation-duration: 29s; animation-delay: -14s; transform: scale(.72); }
+
+@keyframes tb-cruza {
+    from { left: -10%; }
+    to   { left: 110%; }
+}
+
+.tb-murcielago path { animation: tb-aletea 1.05s ease-in-out infinite; transform-origin: center; }
+.tb-murcielago--2 path { animation-duration: 1.3s; }
+
+@keyframes tb-aletea {
+    0%, 100% { transform: scaleY(1); }
+    50%      { transform: scaleY(.6); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tb-arana, .tb-murcielago, .tb-murcielago path { animation: none; }
+    .tb-murcielago--1 { left: 18%; }
+    .tb-murcielago--2 { left: 72%; }
+}
+
+/* En pantallas chicas la banda es angosta: se queda una telaraña y
+   la araña, y los murcielagos se van para no encimarse al texto. */
+@media (max-width: 720px) {
+    .tb-telarana--der { display: none; }
+    .tb-murcielago { display: none; }
+    .tb-arana { left: auto; right: 18%; }
+}
