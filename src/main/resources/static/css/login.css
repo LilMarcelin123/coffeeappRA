@@ -42,8 +42,14 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center 30%;
+    object-position: center;
     display: block;
+    /* La foto es de 1026x1352, o sea vertical y chica para una
+       pantalla ancha: al estirarla se pixelea. Un desenfoque leve y
+       un poco de escala la vuelven fondo a proposito, en vez de una
+       imagen mal escalada. */
+    filter: blur(3px) saturate(.92);
+    transform: scale(1.08);
 }
 .fondo::after {
     content: '';
@@ -104,10 +110,14 @@ body {
 
 /* ── Identidad ───────────────────────────────────────────────── */
 .acceso__logo {
-    width: 92px;
-    height: 92px;
+    width: 104px;
+    height: 104px;
     border-radius: 50%;
-    object-fit: cover;
+    /* contain, no cover: el logo es circular y trae texto en el
+       borde. Con cover se le come el anillo de letras. */
+    object-fit: contain;
+    padding: 6px;
+    background: #FFFDF9;
     border: 3px solid rgba(212,184,150,.75);
     box-shadow: 0 10px 26px -10px rgba(92,51,23,.6);
     margin-bottom: 16px;
