@@ -91,10 +91,21 @@ public class OrdenesController {
     }
 
     
+    /**
+     * Reportes y arqueo de caja.
+     *
+     * El dia de negocio va de las 01:00 a las 01:00, asi que antes de esa
+     * hora "hoy" sigue siendo el dia anterior. Se calcula aqui y el
+     * navegador solo lo lee: la regla no debe repetirse en el JS.
+     */
     @GetMapping("/admin/GeneracionReportes")
-    public String mostrarGeneracionReportes(Model model) {
-
-        return "admin/GeneracionReportes"; 
+    public String mostrarGeneracionReportes(Model model, jakarta.servlet.http.HttpSession session) {
+        model.addAttribute("nombreUsuario", session.getAttribute("nombreUsuario"));
+        model.addAttribute("nombreNegocio", session.getAttribute("nombreNegocio"));
+        model.addAttribute("hoyNegocio", java.time.LocalDateTime
+                .now(java.time.ZoneId.of("America/Mexico_City"))
+                .minusHours(1).toLocalDate().toString());
+        return "admin/GeneracionReportes";
     }
 
     

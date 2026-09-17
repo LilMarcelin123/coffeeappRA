@@ -1,4 +1,4 @@
-import { mensajesAlert, mostrarConfirmacion2 } from '../FuncionesGenerales.js';
+import { initCaja } from './Caja.js';
 
 const API = {
     detalle : "/admin/reportes/detalle",
@@ -67,8 +67,8 @@ $(document).ready(() => {
         descargarExcel(estado.filtroActivo, this);
     });
 
-    /* Cierre del día */
-    initModalCierre();
+    /* Arqueo y movimientos de caja */
+    initCaja();
 
 });
 
@@ -265,102 +265,6 @@ async function descargarExcel(idTipoPago, btnEl) {
 }
 
 /* ════════════════════════════════════════════════════════════
-   CIERRE DEL DÍA
-   ════════════════════════════════════════════════════════════ */
-var _modalCierre = null;
-
-function initModalCierre() {
-    var el = document.getElementById("modalConfirmCierre");
-    if (!el) return;
-    _modalCierre = bootstrap.Modal.getOrCreateInstance(el, {
-        backdrop: "static", keyboard: false
-    });
-    $("#btnAbrirCierre").on("click", abrirModalCierre);
-}
-
-function abrirModalCierre() {
-    document.getElementById("resumenPreCierre").innerHTML =
-        '<div class="d-flex justify-content-center py-2">' +
-        '<div class="spinner-border spinner-border-sm text-danger"></div></div>';
-    document.getElementById("inputObservaciones").value = "";
-    if (_modalCierre) _modalCierre.show();
-
-    $.ajax({
-        url: API.corte,
-        type: "GET",
-        success: function(lista) {
-            if (!lista || !lista.length) {
-                document.getElementById("resumenPreCierre").innerHTML =
-                    '<p class="text-muted small mb-0 text-center">No hay ordenes cerradas para archivar.</p>';
-                document.getElementById("btnConfirmarCierreFinal").disabled = true;
-                return;
-            }
-            document.getElementById("btnConfirmarCierreFinal").disabled = false;
-            var html = '<ul class="list-unstyled mb-0">';
-            lista.forEach(function(row) {
-                var metodo  = (row.metodo_pago || "").toUpperCase();
-                var esTotal = metodo === "TOTAL GENERAL";
-                var colorClass = esTotal
-                    ? "bg-danger text-white"
-                    : metodo === "EFECTIVO"       ? "bg-success text-white"
-                    : metodo === "TRANSFERENCIA"  ? "bg-info text-white"
-                    : "bg-primary text-white";
-                html += '<li class="d-flex justify-content-between align-items-center mb-2">' +
-                    '<span class="badge ' + colorClass + ' rounded-pill" style="font-size:.72rem;">' +
-                    (row.metodo_pago || "—") + '</span>' +
-                    '<span class="small"><strong>' + (row.total_ordenes || 0) + '</strong> ordenes &nbsp;' +
-                    '<strong>$' + Number(row.total_monto || 0).toFixed(2) + '</strong></span>' +
-                    '</li>';
-            });
-            html += '</ul>';
-            document.getElementById("resumenPreCierre").innerHTML = html;
-        },
-        error: function() {
-            document.getElementById("resumenPreCierre").innerHTML =
-                '<p class="text-danger small mb-0">No se pudo cargar el resumen.</p>';
-        }
-    });
-}
-
-function ejecutarCierre() {
-    var btn     = document.getElementById("btnConfirmarCierreFinal");
-    var spinner = document.getElementById("spinnerCierre");
-    var obs     = document.getElementById("inputObservaciones").value.trim();
-
-    btn.disabled = true;
-    spinner.style.display = "inline-block";
-
-    var params = new URLSearchParams();
-    if (obs) params.append("observaciones", obs);
-
-    fetch("/api/cierres/ejecutar", { method: "POST", body: params })
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-            if (_modalCierre) _modalCierre.hide();
-            if (data.resultado === 1) {
-                var btnPrincipal = document.getElementById("btnAbrirCierre");
-                btnPrincipal.disabled = true;
-                btnPrincipal.classList.add("ejecutado");
-                btnPrincipal.innerHTML =
-                    '<i class="bi bi-check-circle-fill"></i> Cierre ejecutado correctamente';
-                cargarDetalle(null);
-                resetCardsCorte();
-                document.getElementById("wrapTablaCorte").style.display = "none";
-                mostrarConfirmacion2("✅ " + data.mensaje, function(){}, function(){}, "exito");
-            } else {
-                mostrarConfirmacion2("⚠️ " + data.mensaje, function(){}, function(){}, "advertencia");
-            }
-        })
-        .catch(function() {
-            mostrarConfirmacion2("❌ Error de conexión.", function(){}, function(){}, "error");
-        })
-        .finally(function() {
-            btn.disabled = false;
-            spinner.style.display = "none";
-        });
-}
-
-/* ════════════════════════════════════════════════════════════
    UTILIDADES
    ════════════════════════════════════════════════════════════ */
 function renderEstadoTabla(tbody, tipo) {
@@ -409,4 +313,3 @@ function actualizarConteo(n) {
 }
 
 
-window.ejecutarCierre = ejecutarCierre;
