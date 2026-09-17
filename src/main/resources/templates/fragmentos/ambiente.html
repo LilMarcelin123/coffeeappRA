@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Banda de ambiente.
+
+  Solo aparece fuera de produccion. Es fija arriba de la ventana y
+  empuja el contenido con un padding en <html>, para que no tape el
+  hero de ninguna pantalla.
+-->
+<th:block th:fragment="banda">
+    <div class="banda-ambiente" th:unless="${esProduccion}">
+        <span class="banda-ambiente__punto"></span>
+        AMBIENTE DE PRUEBAS · los datos de esta pantalla no son del negocio
+    </div>
+    <style th:unless="${esProduccion}">
+        html { padding-top: 26px; }
+
+        .banda-ambiente {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 2000;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font: 700 .66rem/1 'Poppins', system-ui, sans-serif;
+            letter-spacing: .09em;
+            text-transform: uppercase;
+            color: #4A2600;
+            background: repeating-linear-gradient(
+                135deg,
+                #F59E0B 0 14px,
+                #FBBF24 14px 28px);
+            box-shadow: 0 1px 6px rgba(0,0,0,.22);
+            user-select: none;
+        }
+
+        .banda-ambiente__punto {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: #7C2D12;
+        }
+
+        /* La banda es fija: lo que tambien lo sea tiene que bajar. */
+        .modal { top: 26px; }
+
+        @media (max-width: 560px) {
+            .banda-ambiente { font-size: .58rem; letter-spacing: .05em; }
+        }
+    </style>
+</th:block>
+
+</body>
+</html>
