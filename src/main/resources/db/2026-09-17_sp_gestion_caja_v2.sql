@@ -19,6 +19,10 @@
 -- dinero ya esta fisicamente en la caja pero aun no cuenta como
 -- venta, y el arqueo saldria sobrado.
 --
+-- Las horas y el dia salen ya formateados (n_hora_desde, n_dia):
+-- las columnas DATETIME viajan a JSON como milisegundos y el
+-- navegador no debe andar recortando ese numero a mano.
+--
 -- Solo reemplaza el procedimiento: las tablas y los datos no se tocan.
 -- Ejecutar con el cliente de mysql (lleva DELIMITER).
 -- ═══════════════════════════════════════════════════════════════
@@ -140,6 +144,7 @@ BEGIN
         SET v_esperado = v_fondo + v_venta + v_entradas - v_salidas;
 
         SELECT v_desde     AS t_desde,
+               TIME_FORMAT(v_desde, '%H:%i') AS n_hora_desde,
                v_ahora     AS t_ahora,
                v_dia       AS d_dia_negocio,
                v_fondo     AS p_fondo,
@@ -227,7 +232,8 @@ BEGIN
     ELSEIF pa_tipo_proceso = 5 THEN
 
         SELECT id_arqueo, d_dia_negocio, t_fecha_arqueo, t_desde,
-               TIME_FORMAT(t_fecha_arqueo, '%H:%i') AS n_hora,
+               DATE_FORMAT(d_dia_negocio, '%d/%m/%Y')   AS n_dia,
+               TIME_FORMAT(t_fecha_arqueo, '%H:%i')     AS n_hora,
                p_fondo, p_venta_efectivo, p_entradas, p_salidas,
                p_esperado, p_contado, p_diferencia,
                n_usuario, n_observaciones

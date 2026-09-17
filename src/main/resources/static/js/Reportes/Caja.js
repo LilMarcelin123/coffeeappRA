@@ -7,7 +7,7 @@
    responde el servidor y se manda lo que la cajera escribio.
    ════════════════════════════════════════════════════════════ */
 
-import { mostrarConfirmacion2 } from '../FuncionesGenerales.js';
+import { mensajesAlert, mostrarConfirmacion2 } from '../FuncionesGenerales.js';
 
 const API = {
     resumen     : "/admin/caja/resumen",
@@ -99,7 +99,7 @@ function pintarResumen(r) {
 
     pintarTapados();
 
-    const desde   = hora(r.t_desde);
+    const desde   = r.n_hora_desde ?? "01:00";
     const arqueos = Number(r.n_arqueos_hoy ?? 0);
     texto("cajaSubtitulo",
           arqueos > 0
@@ -204,13 +204,18 @@ function pintarMovimientos(lista) {
     }).join("");
 }
 
-async function alClicEnMovimientos(evento) {
+function alClicEnMovimientos(evento) {
     const boton = evento.target.closest("[data-borrar]");
     if (!boton) return;
 
-    if (!confirm("¿Borrar este movimiento? Solo se puede mientras no se arquee.")) return;
+    mostrarConfirmacion2(
+        "¿Borrar este movimiento? Solo se puede mientras no se arquee.",
+        () => borrarMovimiento(boton.dataset.borrar),
+        () => {});
+}
 
-    const salida = await enviar(`${API.movimientos}/${boton.dataset.borrar}`, "DELETE");
+async function borrarMovimiento(idMovimiento) {
+    const salida = await enviar(`${API.movimientos}/${idMovimiento}`, "DELETE");
     if (!salida?.ok) { avisar(salida?.mensaje ?? "No se pudo borrar.", "advertencia"); return; }
 
     await refrescarTurno();
@@ -325,7 +330,7 @@ async function cargarArqueos() {
         const clase = Math.abs(dif) < 1 ? "dif-cuadra" : dif > 0 ? "dif-sobra" : "dif-falta";
         return `
             <tr>
-                <td style="font-size:.82rem;">${esc(String(a.d_dia_negocio).substring(0, 10))}</td>
+                <td style="font-size:.82rem;">${esc(a.n_dia)}</td>
                 <td style="font-size:.82rem;color:var(--text-muted);">${esc(a.n_hora)}</td>
                 <td class="td-total">${dinero(a.p_esperado)}</td>
                 <td class="td-total">${dinero(a.p_contado)}</td>
@@ -368,11 +373,6 @@ function dinero(valor) {
         minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
-function hora(marca) {
-    if (!marca) return "01:00";
-    return String(marca).replace("T", " ").substring(11, 16) || "01:00";
-}
-
 function texto(id, valor) {
     const el = document.getElementById(id);
     if (el) el.textContent = valor;
@@ -390,6 +390,13 @@ function esc(valor) {
         .replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 }
 
+/** mensajesAlert espera "texto|clase-de-fondo". */
+const COLOR_AVISO = {
+    error       : "bg-danger",
+    advertencia : "bg-warning",
+    exito       : "bg-success",
+};
+
 function avisar(mensaje, tipo) {
-    mostrarConfirmacion2(mensaje, () => {}, () => {}, tipo);
+    mensajesAlert(`${mensaje}|${COLOR_AVISO[tipo] ?? "bg-secondary"}`);
 }
