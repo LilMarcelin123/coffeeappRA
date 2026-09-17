@@ -380,6 +380,23 @@
     box-shadow: 0 0 0 3px rgba(21,128,61,.15);
 }
 
+.arqueo-abiertas {
+    display: none;
+    align-items: flex-start;
+    gap: 9px;
+    margin-bottom: 16px;
+    padding: 12px 14px;
+    border: 1px solid rgba(185,28,28,.24);
+    border-radius: var(--radius-md);
+    background: rgba(185,28,28,.08);
+    font-size: .78rem;
+    line-height: 1.5;
+    color: #991B1B;
+}
+
+.arqueo-abiertas.visible { display: flex; }
+.arqueo-abiertas i { margin-top: 2px; flex-shrink: 0; }
+
 .arqueo-resultado {
     display: none;
     margin-top: 6px;

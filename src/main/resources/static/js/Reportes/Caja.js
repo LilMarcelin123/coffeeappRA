@@ -27,6 +27,7 @@ const estado = {
     tipo     : "SALIDA",   // el movimiento que mas hacen
     venta    : null,
     esperado : null,
+    abiertas : 0,          // ordenes sin cobrar al momento de consultar
     enviando : false,
 };
 
@@ -90,6 +91,7 @@ function pintarResumen(r) {
 
     estado.venta    = Number(r.p_venta_efectivo ?? 0);
     estado.esperado = Number(r.p_esperado ?? 0);
+    estado.abiertas = Number(r.n_ordenes_abiertas ?? 0);
 
     texto("cajaFondo",    dinero(r.p_fondo));
     texto("cajaEntradas", dinero(r.p_entradas));
@@ -215,14 +217,41 @@ async function alClicEnMovimientos(evento) {
 }
 
 /* ── Arqueo ───────────────────────────────────────────────── */
-function abrirArqueo() {
-    document.getElementById("arqContado").value      = "";
+/**
+ * El dinero de una orden abierta ya esta en el cajon pero todavia no
+ * cuenta como venta, asi que arquear con ordenes sin cobrar da un
+ * sobrante que no existe. No se bloquea el arqueo (a veces hay que
+ * hacerlo de todos modos), pero se dice antes de contar.
+ */
+function avisarAbiertas() {
+    const caja  = document.getElementById("arqAbiertas");
+    const n     = estado.abiertas;
+
+    caja.classList.toggle("visible", n > 0);
+    if (n === 0) return;
+
+    document.getElementById("arqAbiertasTexto").textContent =
+        n === 1
+            ? "Hay 1 orden sin cobrar. Su dinero ya está en la caja pero todavía no cuenta como venta, así que el arqueo va a salir sobrado. Ciérrala antes de contar."
+            : `Hay ${n} órdenes sin cobrar. Su dinero ya está en la caja pero todavía no cuenta como venta, así que el arqueo va a salir sobrado. Ciérralas antes de contar.`;
+}
+
+async function abrirArqueo() {
+    document.getElementById("arqContado").value       = "";
     document.getElementById("arqObservaciones").value = "";
     document.getElementById("arqResultado").className = "arqueo-resultado";
-    document.getElementById("btnConfirmarArqueo").disabled = false;
+    document.getElementById("arqAbiertas").classList.remove("visible");
+    document.getElementById("btnConfirmarArqueo").disabled    = false;
     document.getElementById("btnConfirmarArqueo").textContent = "Registrar arqueo";
+
+    // El modal abre de inmediato; el aviso de ordenes sin cobrar
+    // aparece en cuanto responde el servidor, para no dejar a la
+    // cajera viendo un boton muerto mientras cargan dos consultas.
     modalArqueo.show();
     setTimeout(() => document.getElementById("arqContado").focus(), 300);
+
+    await refrescarTurno();
+    avisarAbiertas();
 }
 
 async function confirmarArqueo() {
