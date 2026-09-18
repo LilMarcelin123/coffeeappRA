@@ -727,6 +727,30 @@ public class ProcedimientosAlmacenados {
     }
 
     /**
+     * 1 = ordenes por dia de la semana y hora,
+     * 2 = cuantos dias abiertos hubo de cada dia de la semana.
+     */
+    public List<Map<String, Object>> spGestionRitmo(int tipoProceso,
+                                                    LocalDate desde, LocalDate hasta) {
+        final String SQL = "{CALL sp_gestion_ritmo(?,?,?)}";
+        try (Connection conn = conexionJDBC.getConexion2();
+             CallableStatement cs = conn.prepareCall(SQL)) {
+
+            cs.setInt(1, tipoProceso);
+            cs.setDate(2, java.sql.Date.valueOf(desde));
+            cs.setDate(3, java.sql.Date.valueOf(hasta));
+
+            try (ResultSet rs = cs.executeQuery()) {
+                return mapResultSetGeneric(rs);
+            }
+
+        } catch (SQLException e) {
+            log.error("sp_gestion_ritmo proceso {}: {}", tipoProceso, e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    /**
      * Detalle de una orden para el modal de la Bitacora.
      * El procedimiento devuelve dos resultados: cabecera e items.
      */

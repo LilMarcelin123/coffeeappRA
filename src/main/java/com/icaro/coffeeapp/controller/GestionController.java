@@ -150,6 +150,39 @@ public class GestionController {
         return ResponseEntity.ok(salida);
     }
 
+    // ── Ritmo ───────────────────────────────────────────────
+
+    @GetMapping("/admin/gestion/ritmo")
+    public String ritmo(Model model, Authentication authentication) {
+        model.addAttribute("nombreUsuario", authentication.getName());
+        model.addAttribute("hoyNegocio", hoyNegocio().toString());
+        return "admin/ritmo";
+    }
+
+    /**
+     * El mapa y su divisor van juntos: el mapa se lee como promedio
+     * por dia abierto y sin el segundo no se puede pintar nada.
+     */
+    @GetMapping("/admin/gestion/ritmo/datos")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> ritmoDatos(
+            @RequestParam(required = false) String desde,
+            @RequestParam(required = false) String hasta) {
+
+        LocalDate dHasta = parseOHoy(hasta);
+        LocalDate dDesde = parseO(desde, dHasta);
+        if (dDesde.isAfter(dHasta)) { LocalDate t = dDesde; dDesde = dHasta; dHasta = t; }
+
+        Map<String, Object> salida = new java.util.LinkedHashMap<>();
+        salida.put("ok", true);
+        salida.put("desde", dDesde.toString());
+        salida.put("hasta", dHasta.toString());
+        salida.put("mapa",  procedimientosAlmacenados.spGestionRitmo(1, dDesde, dHasta));
+        salida.put("dias",  procedimientosAlmacenados.spGestionRitmo(2, dDesde, dHasta));
+
+        return ResponseEntity.ok(salida);
+    }
+
     @GetMapping("/admin/gestion/bitacora")
     public String bitacora(Model model, Authentication authentication) {
         model.addAttribute("nombreUsuario", authentication.getName());
