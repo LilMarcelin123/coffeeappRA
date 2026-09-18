@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{admin/gestion/fragmentos :: cabeza('Productos — Módulo de Gestión', 'productos')}"></head>
+
+<body class="gestion-body" th:attr="data-hoy-negocio=${hoyNegocio}, data-tema=${tema}">
+
+
+<header th:replace="~{admin/gestion/fragmentos :: encabezado(
+            'bi-cup-hot',
+            'Productos',
+            'Qué se vende, qué se va para llevar y qué lleva días sin salir.')}"></header>
+
+<main class="gestion-main">
+
+    <section th:replace="~{admin/gestion/fragmentos :: periodo(
+                'hoy=Hoy|ayer=Ayer|7dias=7 días|mes=Este mes|rango=Rango',
+                '/admin/gestion', 'Volver al módulo')}"></section>
+
+    <!-- ── Resumen ────────────────────────────────────────── -->
+    <section class="tiras" id="resumen" hidden>
+        <div class="tira vidrio">
+            <small class="rotulo">Unidades vendidas</small>
+            <b class="cifra" id="totUnidades">0</b>
+        </div>
+        <div class="tira vidrio">
+            <small class="rotulo">Productos distintos</small>
+            <b class="cifra" id="totProductos">0</b>
+        </div>
+        <div class="tira vidrio">
+            <small class="rotulo">Para llevar</small>
+            <b class="cifra" id="totLlevar">0%</b>
+        </div>
+    </section>
+
+    <!-- ── Ranking ────────────────────────────────────────── -->
+    <section class="bloque vidrio" id="bloqueRanking" hidden>
+        <div class="bloque__cabecera">
+            <div>
+                <h2 class="bloque__titulo">Los más vendidos</h2>
+                <p class="bloque__bajada" id="rankingBajada">—</p>
+            </div>
+
+            <div class="interruptor" role="group" aria-label="Ordenar el ranking">
+                <button type="button" class="interruptor__btn is-activo"
+                        data-orden="unidades" aria-pressed="true">Por unidades</button>
+                <button type="button" class="interruptor__btn"
+                        data-orden="dinero" aria-pressed="false">Por dinero</button>
+            </div>
+        </div>
+
+        <ol class="ranking" id="ranking"></ol>
+    </section>
+
+    <!-- ── Categorías ─────────────────────────────────────── -->
+    <section class="bloque vidrio" id="bloqueCategorias" hidden>
+        <div class="bloque__cabecera">
+            <div>
+                <h2 class="bloque__titulo">Por categoría</h2>
+                <p class="bloque__bajada">Cuánto pesa cada familia en la venta del periodo.</p>
+            </div>
+        </div>
+        <div class="categorias" id="categorias"></div>
+    </section>
+
+    <!-- ── Sin venta ──────────────────────────────────────── -->
+    <section class="bloque vidrio" id="bloqueSinVenta" hidden>
+        <div class="bloque__cabecera">
+            <div>
+                <h2 class="bloque__titulo">No se vendieron</h2>
+                <p class="bloque__bajada" id="sinVentaBajada">
+                    Productos activos del catálogo sin una sola venta en el periodo.
+                </p>
+            </div>
+        </div>
+        <div class="sinventa" id="sinVenta"></div>
+    </section>
+
+    <p class="vacio" id="vacio" hidden>
+        <i class="bi bi-cup"></i>
+        <span>No hubo ventas en este periodo.</span>
+    </p>
+
+    <!-- ── Plantillas ─────────────────────────────────────── -->
+    <template id="tplFila">
+        <li class="fila">
+            <span class="fila__puesto"></span>
+
+            <span class="fila__cuerpo">
+                <span class="fila__encabezado">
+                    <b class="fila__nombre"></b>
+                    <span class="fila__categoria"></span>
+                </span>
+
+                <span class="fila__barra" aria-hidden="true">
+                    <span class="fila__barra-aqui"></span>
+                    <span class="fila__barra-llevar"></span>
+                </span>
+
+                <span class="fila__consumo"></span>
+            </span>
+
+            <span class="fila__cifras">
+                <b class="fila__principal cifra"></b>
+                <small class="fila__secundaria"></small>
+            </span>
+        </li>
+    </template>
+
+    <template id="tplCategoria">
+        <article class="categoria">
+            <span class="categoria__nombre"></span>
+            <span class="categoria__barra" aria-hidden="true"><span></span></span>
+            <span class="categoria__cifras">
+                <b class="cifra"></b>
+                <small></small>
+            </span>
+        </article>
+    </template>
+
+</main>
+
+<footer th:replace="~{admin/gestion/fragmentos :: pie}"></footer>
+
+<script type="module" th:src="@{/js/Gestion/productos.js}"></script>
+
+</body>
+</html>

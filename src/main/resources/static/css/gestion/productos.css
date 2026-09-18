@@ -1,0 +1,270 @@
+/* ================================================================
+   gestion/productos.css
+   Productos: ranking, categorias y lo que no se vendio.
+
+   Requiere gestion/nucleo.css.
+   ================================================================ */
+
+/* ── Tiras de resumen ────────────────────────────────────────── */
+.tiras {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 18px;
+}
+.tira {
+    flex: 1 1 190px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 15px 19px;
+    border-radius: var(--radius-lg);
+}
+.tira b {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.55rem;
+    color: var(--cafe-deep);
+}
+
+/* ── Bloques ─────────────────────────────────────────────────── */
+.bloque {
+    margin-top: 18px;
+    padding: 20px 22px 8px;
+    border-radius: var(--radius-lg);
+}
+
+.bloque__cabecera {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(139,94,60,.12);
+}
+
+.bloque__titulo {
+    margin: 0;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.22rem;
+    color: var(--cafe-deep);
+}
+
+.bloque__bajada {
+    margin: 3px 0 0;
+    font-size: var(--txt-chico);
+    color: var(--text-muted);
+}
+
+/* ── Interruptor unidades / dinero ───────────────────────────── */
+.interruptor {
+    display: inline-flex;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 100px;
+    background: rgba(139,94,60,.09);
+}
+
+.interruptor__btn {
+    border: none;
+    border-radius: 100px;
+    padding: 7px 15px;
+    font: 600 var(--txt-chico)/1 'Poppins', sans-serif;
+    color: var(--text-muted);
+    background: transparent;
+    cursor: pointer;
+    transition: background var(--veloz) var(--fluido),
+                color var(--veloz) var(--fluido),
+                box-shadow var(--veloz) var(--fluido);
+}
+
+.interruptor__btn.is-activo {
+    color: var(--cafe-deep);
+    background: rgba(255,255,255,.95);
+    box-shadow: 0 1px 3px rgba(92,51,23,.16);
+}
+
+/* ── Ranking ─────────────────────────────────────────────────── */
+.ranking {
+    list-style: none;
+    margin: 0;
+    padding: 6px 0 14px;
+    display: flex;
+    flex-direction: column;
+}
+
+.fila {
+    display: grid;
+    grid-template-columns: 34px 1fr auto;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 4px;
+    border-bottom: 1px solid rgba(139,94,60,.08);
+}
+.fila:last-child { border-bottom: none; }
+
+.fila__puesto {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.05rem;
+    text-align: center;
+    color: var(--text-muted);
+}
+/* Los tres primeros son los que se leen de un vistazo */
+.fila:nth-child(-n+3) .fila__puesto { color: var(--cafe-mid); font-weight: 700; }
+
+.fila__cuerpo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.fila__encabezado {
+    display: flex;
+    align-items: baseline;
+    gap: 9px;
+    flex-wrap: wrap;
+}
+
+.fila__nombre {
+    font-size: var(--txt-base);
+    color: var(--cafe-ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.fila__categoria {
+    font-size: var(--txt-micro);
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+/* La barra dice de un vistazo cuanto se va para llevar */
+.fila__barra {
+    display: flex;
+    height: 5px;
+    border-radius: 100px;
+    overflow: hidden;
+    background: rgba(139,94,60,.12);
+}
+.fila__barra-aqui   { background: var(--cafe-mid); }
+.fila__barra-llevar { background: #C1873F; }
+
+.fila__consumo {
+    font-size: var(--txt-micro);
+    color: var(--text-muted);
+}
+
+.fila__cifras {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1px;
+}
+.fila__principal {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.15rem;
+    color: var(--cafe-deep);
+}
+.fila__secundaria { font-size: var(--txt-micro); color: var(--text-muted); }
+
+/* ── Categorias ──────────────────────────────────────────────── */
+.categorias {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    padding: 16px 0 18px;
+}
+
+.categoria {
+    display: grid;
+    grid-template-columns: minmax(110px, 1fr) 2fr auto;
+    align-items: center;
+    gap: 14px;
+}
+
+.categoria__nombre {
+    font-size: var(--txt-base);
+    color: var(--cafe-ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.categoria__barra {
+    height: 9px;
+    border-radius: 100px;
+    background: rgba(139,94,60,.1);
+    overflow: hidden;
+}
+.categoria__barra > span {
+    display: block;
+    height: 100%;
+    border-radius: 100px;
+    background: linear-gradient(90deg, var(--cafe-dark), var(--cafe-mid));
+    transition: width var(--lento) var(--fluido);
+}
+
+.categoria__cifras {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+.categoria__cifras b     { font-size: var(--txt-base); color: var(--cafe-deep); }
+.categoria__cifras small { font-size: var(--txt-micro); color: var(--text-muted); }
+
+/* ── Sin venta ───────────────────────────────────────────────── */
+.sinventa {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 16px 0 20px;
+}
+
+.sinventa__item {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 7px;
+    padding: 7px 13px;
+    border: 1px solid rgba(139,94,60,.18);
+    border-radius: 100px;
+    background: rgba(255,255,255,.55);
+    font-size: var(--txt-chico);
+    color: var(--cafe-ink);
+}
+.sinventa__item small {
+    font-size: var(--txt-micro);
+    color: var(--text-muted);
+}
+
+.sinventa__todo {
+    padding: 14px 0 20px;
+    font-size: var(--txt-chico);
+    color: var(--text-muted);
+}
+
+/* ── Vacio ───────────────────────────────────────────────────── */
+.vacio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 40px;
+    color: var(--text-muted);
+    font-size: var(--txt-base);
+}
+.vacio i { font-size: 2rem; opacity: .5; }
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 620px) {
+    .bloque { padding: 18px 16px 6px; }
+    .fila { grid-template-columns: 26px 1fr auto; gap: 10px; }
+    .categoria { grid-template-columns: 1fr auto; }
+    .categoria__barra { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .interruptor__btn, .categoria__barra > span { transition: none; }
+}

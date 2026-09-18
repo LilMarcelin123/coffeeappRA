@@ -702,6 +702,31 @@ public class ProcedimientosAlmacenados {
     }
 
     /**
+     * 1 = ranking de productos, 2 = peso por categoria,
+     * 3 = productos activos sin una sola venta en el periodo.
+     * Las fechas son dias de negocio, igual que en el resto del modulo.
+     */
+    public List<Map<String, Object>> spGestionProductos(int tipoProceso,
+                                                        LocalDate desde, LocalDate hasta) {
+        final String SQL = "{CALL sp_gestion_productos(?,?,?)}";
+        try (Connection conn = conexionJDBC.getConexion2();
+             CallableStatement cs = conn.prepareCall(SQL)) {
+
+            cs.setInt(1, tipoProceso);
+            cs.setDate(2, java.sql.Date.valueOf(desde));
+            cs.setDate(3, java.sql.Date.valueOf(hasta));
+
+            try (ResultSet rs = cs.executeQuery()) {
+                return mapResultSetGeneric(rs);
+            }
+
+        } catch (SQLException e) {
+            log.error("sp_gestion_productos proceso {}: {}", tipoProceso, e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    /**
      * Detalle de una orden para el modal de la Bitacora.
      * El procedimiento devuelve dos resultados: cabecera e items.
      */
