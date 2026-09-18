@@ -115,6 +115,41 @@ public class GestionController {
         return ResponseEntity.ok(procedimientosAlmacenados.spGestionModulo(2, dDesde, dHasta));
     }
 
+    // ── Productos ───────────────────────────────────────────
+
+    @GetMapping("/admin/gestion/productos")
+    public String productos(Model model, Authentication authentication) {
+        model.addAttribute("nombreUsuario", authentication.getName());
+        model.addAttribute("hoyNegocio", hoyNegocio().toString());
+        return "admin/productos";
+    }
+
+    /**
+     * Ranking, categorias y no vendidos en una sola respuesta: las
+     * tres tablas se pintan juntas y pedirlas por separado solo
+     * agregaria tres viajes para mostrar la misma pantalla.
+     */
+    @GetMapping("/admin/gestion/productos/datos")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> productosDatos(
+            @RequestParam(required = false) String desde,
+            @RequestParam(required = false) String hasta) {
+
+        LocalDate dHasta = parseOHoy(hasta);
+        LocalDate dDesde = parseO(desde, dHasta);
+        if (dDesde.isAfter(dHasta)) { LocalDate t = dDesde; dDesde = dHasta; dHasta = t; }
+
+        Map<String, Object> salida = new java.util.LinkedHashMap<>();
+        salida.put("ok", true);
+        salida.put("desde", dDesde.toString());
+        salida.put("hasta", dHasta.toString());
+        salida.put("ranking",    procedimientosAlmacenados.spGestionProductos(1, dDesde, dHasta));
+        salida.put("categorias", procedimientosAlmacenados.spGestionProductos(2, dDesde, dHasta));
+        salida.put("sinVenta",   procedimientosAlmacenados.spGestionProductos(3, dDesde, dHasta));
+
+        return ResponseEntity.ok(salida);
+    }
+
     @GetMapping("/admin/gestion/bitacora")
     public String bitacora(Model model, Authentication authentication) {
         model.addAttribute("nombreUsuario", authentication.getName());
