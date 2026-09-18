@@ -1,0 +1,177 @@
+/* ================================================================
+   gestion/ritmo.css
+   Ritmo: mapa de dia de la semana contra hora.
+
+   Requiere gestion/nucleo.css.
+   ================================================================ */
+
+/* ── Tiras ───────────────────────────────────────────────────── */
+.tiras {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 18px;
+}
+.tira {
+    flex: 1 1 190px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 15px 19px;
+    border-radius: var(--radius-lg);
+}
+.tira b {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.55rem;
+    color: var(--cafe-deep);
+}
+.tira__pie {
+    font-size: var(--txt-micro);
+    color: var(--text-muted);
+}
+
+/* ── Bloque ──────────────────────────────────────────────────── */
+.bloque {
+    margin-top: 18px;
+    padding: 20px 22px 18px;
+    border-radius: var(--radius-lg);
+}
+
+.bloque__cabecera {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 14px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(139,94,60,.12);
+}
+
+.bloque__titulo {
+    margin: 0;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.22rem;
+    color: var(--cafe-deep);
+}
+
+.bloque__bajada {
+    margin: 3px 0 0;
+    max-width: 52ch;
+    font-size: var(--txt-chico);
+    color: var(--text-muted);
+}
+
+/* ── Escala ──────────────────────────────────────────────────── */
+.escala {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--txt-micro);
+    color: var(--text-muted);
+}
+.escala__muestras { display: inline-flex; gap: 3px; }
+.escala__muestras i {
+    width: 15px;
+    height: 15px;
+    border-radius: 4px;
+}
+
+/* Cuatro pasos, no un degradado continuo: el ojo compara mucho
+   mejor unos pocos escalones que una rampa de 40 tonos. */
+[data-nivel="0"] { background: rgba(139,94,60,.06); }
+[data-nivel="1"] { background: rgba(184,147,106,.34); }
+[data-nivel="2"] { background: rgba(184,147,106,.62); }
+[data-nivel="3"] { background: rgba(139,94,60,.80); }
+[data-nivel="4"] { background: var(--cafe-deep); }
+
+/* ── Mapa ────────────────────────────────────────────────────── */
+.mapa-scroll {
+    overflow-x: auto;
+    padding: 18px 0 6px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.mapa {
+    border-collapse: separate;
+    border-spacing: 3px;
+    margin: 0 auto;
+}
+
+.mapa th {
+    font-size: var(--txt-micro);
+    font-weight: 600;
+    letter-spacing: .04em;
+    color: var(--text-muted);
+    padding: 0 0 4px;
+}
+
+.mapa th[scope="row"] {
+    padding: 0 10px 0 0;
+    text-align: right;
+    white-space: nowrap;
+    font-size: var(--txt-chico);
+    color: var(--cafe-ink);
+}
+
+.mapa td {
+    width: 34px;
+    height: 30px;
+    border-radius: 5px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: var(--txt-micro);
+    font-weight: 600;
+    color: var(--cafe-ink);
+    transition: transform var(--veloz) var(--fluido);
+}
+
+/* En las celdas oscuras el texto oscuro no se ve */
+.mapa td[data-nivel="3"],
+.mapa td[data-nivel="4"] { color: #FDFAF6; }
+
+/* Cero no lleva numero: un campo de ceros tapa el patron */
+.mapa td[data-nivel="0"] { color: transparent; }
+
+.mapa td:hover { transform: scale(1.14); }
+
+/* El dia con mas carga, marcado sin gritar */
+.mapa tr[data-pico="1"] th[scope="row"] { color: var(--cafe-deep); font-weight: 700; }
+
+.mapa__nota {
+    margin: 10px 0 0;
+    font-size: var(--txt-micro);
+    color: var(--text-muted);
+}
+
+/* ── Vacio ───────────────────────────────────────────────────── */
+.vacio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 40px;
+    color: var(--text-muted);
+    font-size: var(--txt-base);
+}
+.vacio i { font-size: 2rem; opacity: .5; }
+
+.visually-hidden {
+    position: absolute;
+    width: 1px; height: 1px;
+    margin: -1px; padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 620px) {
+    .bloque { padding: 18px 14px 14px; }
+    .mapa td { width: 28px; height: 26px; }
+    .escala { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mapa td { transition: none; }
+    .mapa td:hover { transform: none; }
+}

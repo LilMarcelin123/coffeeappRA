@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{admin/gestion/fragmentos :: cabeza('Ritmo — Módulo de Gestión', 'ritmo')}"></head>
+
+<body class="gestion-body" th:attr="data-hoy-negocio=${hoyNegocio}, data-tema=${tema}">
+
+
+<header th:replace="~{admin/gestion/fragmentos :: encabezado(
+            'bi-activity',
+            'Ritmo',
+            'A qué horas se llena, para saber cuánta gente hace falta.')}"></header>
+
+<main class="gestion-main">
+
+    <section th:replace="~{admin/gestion/fragmentos :: periodo(
+                '7dias=7 días|mes=Este mes|rango=Rango',
+                '/admin/gestion', 'Volver al módulo')}"></section>
+
+    <!-- ── Tiras ──────────────────────────────────────────── -->
+    <section class="tiras" id="resumen" hidden>
+        <div class="tira vidrio">
+            <small class="rotulo">Hora más cargada</small>
+            <b class="cifra" id="horaPico">—</b>
+            <span class="tira__pie" id="horaPicoPie"></span>
+        </div>
+        <div class="tira vidrio">
+            <small class="rotulo">Día más cargado</small>
+            <b class="cifra" id="diaPico">—</b>
+            <span class="tira__pie" id="diaPicoPie"></span>
+        </div>
+        <div class="tira vidrio">
+            <small class="rotulo">Días abiertos</small>
+            <b class="cifra" id="diasAbiertos">0</b>
+            <span class="tira__pie">en el periodo</span>
+        </div>
+    </section>
+
+    <!-- ── Mapa ───────────────────────────────────────────── -->
+    <section class="bloque vidrio" id="bloqueMapa" hidden>
+        <div class="bloque__cabecera">
+            <div>
+                <h2 class="bloque__titulo">Cuándo se llena</h2>
+                <p class="bloque__bajada">
+                    Órdenes por hora, en promedio por cada día abierto. Entre más oscura
+                    la celda, más carga para la barra.
+                </p>
+            </div>
+            <div class="escala" aria-hidden="true">
+                <span>menos</span>
+                <span class="escala__muestras">
+                    <i data-nivel="1"></i><i data-nivel="2"></i>
+                    <i data-nivel="3"></i><i data-nivel="4"></i>
+                </span>
+                <span>más</span>
+            </div>
+        </div>
+
+        <div class="mapa-scroll">
+            <table class="mapa" id="mapa">
+                <caption class="visually-hidden">
+                    Promedio de órdenes por día de la semana y hora
+                </caption>
+                <thead><tr id="mapaHoras"></tr></thead>
+                <tbody id="mapaCuerpo"></tbody>
+            </table>
+        </div>
+
+        <p class="mapa__nota" id="mapaNota"></p>
+    </section>
+
+    <p class="vacio" id="vacio" hidden>
+        <i class="bi bi-activity"></i>
+        <span>No hubo ventas en este periodo.</span>
+    </p>
+
+</main>
+
+<footer th:replace="~{admin/gestion/fragmentos :: pie}"></footer>
+
+<script type="module" th:src="@{/js/Gestion/ritmo.js}"></script>
+
+</body>
+</html>
