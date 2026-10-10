@@ -60,6 +60,31 @@ print({'h': p.hostname, 'p': p.port, 'u': p.username,
 D_HOST="$(leer h)"; D_PORT="$(leer p)"; D_USER="$(leer u)"
 D_PASS="$(leer w)"; D_BASE="$(leer d)"
 
+# Si DEMO_URL no es una URL de mysql, urlparse devuelve None en todo
+# y mysql lo recibe como si fuera un puerto. Eso ya paso una vez: el
+# script alcanzo a volcar produccion antes de tronar. Que se detenga
+# aqui, antes de tocar nada.
+for campo in D_HOST D_PORT D_USER D_BASE; do
+    valor="${!campo}"
+    if [[ -z "$valor" || "$valor" == "None" ]]; then
+        echo "DEMO_URL no es una URL de MySQL valida (falta $campo)."
+        echo
+        echo "Se espera algo asi:"
+        echo "  export DEMO_URL='mysql://root:CONTRASENA@HOST.proxy.rlwy.net:12345/railway'"
+        echo
+        echo "Copialo de MYSQL_PUBLIC_URL, en la pestana Variables del"
+        echo "servicio MySQL del proyecto daedax-demo. Con comillas"
+        echo "simples: la contrasena suele traer caracteres que el"
+        echo "shell interpreta."
+        exit 1
+    fi
+done
+
+if ! [[ "$D_PORT" =~ ^[0-9]+$ ]]; then
+    echo "El puerto de DEMO_URL no es un numero: $D_PORT"
+    exit 1
+fi
+
 echo "▸ Destino: $D_USER@$D_HOST:$D_PORT/$D_BASE"
 
 # ── Candado: el destino no puede ser produccion ──────────────────
