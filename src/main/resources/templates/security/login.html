@@ -4,7 +4,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title th:text="|${nombreNegocio} | Inicio de sesión|">Inicio de sesión</title>
+    <!-- Ojo: aqui NO se puede usar el literal |...| de Thymeleaf,
+     porque la barra del titulo lo cerraria a la mitad. -->
+    <title th:text="${nombreNegocio} + ' | Inicio de sesión'">Inicio de sesión</title>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Poppins:wght@300;400;500;600&display=swap">
