@@ -62,6 +62,20 @@ FROM   DUAL
 WHERE  NOT EXISTS (SELECT 1 FROM sys_config WHERE clave = 'caja.fondo');
 
 
+-- La maestra que pide la app antes de entrar a Reportes, Usuarios y
+-- al Modulo de Gestion. La valida sp_gestion_usuarios en su proceso 8,
+-- leyendo esta misma fila, asi que sin ella esos modulos quedan
+-- cerrados con llave y sin llave. Va tambien demo2026: en una
+-- demostracion, dos contrasenas distintas solo son una oportunidad
+-- mas de atorarse enfrente del cliente.
+INSERT INTO sys_config (clave, valor, descripcion)
+SELECT 'password_modulos',
+       '$2b$10$tE/KOlbY3rfmlNdP8L29xeMdGnHGXs6UQdaGZ94BKLKLxIw.55fpW',
+       'Contrasena maestra de acceso a los modulos protegidos'
+FROM   DUAL
+WHERE  NOT EXISTS (SELECT 1 FROM sys_config WHERE clave = 'password_modulos');
+
+
 -- ── Lo que queda fuera a proposito ──────────────────────────
 -- orden, orden_item, orden_preparacion, hist_*, arqueo_caja,
 -- caja_movimiento, log_inventario, wa_*: vacias. El demo se
