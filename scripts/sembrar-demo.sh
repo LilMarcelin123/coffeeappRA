@@ -52,9 +52,15 @@ fi
 # entorno y no en la linea de comandos.
 leer() { python3 -c "
 import sys, urllib.parse as u
-p = u.urlparse(sys.argv[1])
-print({'h': p.hostname, 'p': p.port, 'u': p.username,
-       'w': u.unquote(p.password or ''), 'd': p.path.lstrip('/')}[sys.argv[2]])
+try:
+    p = u.urlparse(sys.argv[1])
+    campos = {'h': p.hostname, 'p': p.port, 'u': p.username,
+              'w': u.unquote(p.password or ''), 'd': p.path.lstrip('/')}
+    print(campos[sys.argv[2]] if campos[sys.argv[2]] is not None else '')
+except Exception:
+    # Una URL mal formada no merece un traceback de Python: se
+    # devuelve vacio y la validacion de abajo explica que falta.
+    print('')
 " "$DEMO_URL" "$1"; }
 
 D_HOST="$(leer h)"; D_PORT="$(leer p)"; D_USER="$(leer u)"
