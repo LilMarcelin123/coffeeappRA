@@ -80,6 +80,19 @@ for campo in D_HOST D_PORT D_USER D_BASE; do
     fi
 done
 
+# Railway publica dos URLs y se parecen. La interna
+# (*.railway.internal) solo resuelve dentro de su red: desde una
+# terminal de casa no existe. La que sirve aqui es la publica.
+if [[ "$D_HOST" == *.railway.internal ]]; then
+    echo "Esa es MYSQL_URL, la interna: '$D_HOST' solo resuelve"
+    echo "dentro de Railway."
+    echo
+    echo "Usa MYSQL_PUBLIC_URL, la de junto en la misma pestana."
+    echo "Su host termina en .proxy.rlwy.net y el puerto tiene"
+    echo "cinco digitos."
+    exit 1
+fi
+
 if ! [[ "$D_PORT" =~ ^[0-9]+$ ]]; then
     echo "El puerto de DEMO_URL no es un numero: $D_PORT"
     exit 1
