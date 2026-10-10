@@ -32,13 +32,25 @@ DEALLOCATE PREPARE candado;
 -- Dos cuentas y ya: una de admin para ensenar todo y una de
 -- operador para mostrar la pantalla de la barra. La contrasena
 -- de las dos es demo2026, con hash BCrypt como las reales.
-INSERT INTO sys_user (username, password, id_rol)
-SELECT 'demo', '$2b$10$i3SrNtqYfKE/LzqBVw.8A.Go//Qn7bp3EoXf.ad1nTV4Ma3dxYqK6', 1
+--
+-- Dos detalles del esquema real, que no son obvios:
+--
+--  · sys_user.id no es AUTO_INCREMENT. Los ids los reparte
+--    Hibernate con la tabla sys_user_SEQ, empezando por abajo. Por
+--    eso estas dos cuentas se van al 9001 y 9002: asi el contador
+--    puede crecer durante anos sin chocar con ellas.
+--  · telefono es NOT NULL y no tiene default, asi que va vacio en
+--    lugar de omitirse.
+
+INSERT INTO sys_user (id, username, password, id_rol, telefono)
+SELECT 9001, 'demo',
+       '$2b$10$i3SrNtqYfKE/LzqBVw.8A.Go//Qn7bp3EoXf.ad1nTV4Ma3dxYqK6', 1, ''
 FROM   DUAL
 WHERE  NOT EXISTS (SELECT 1 FROM sys_user WHERE username = 'demo');
 
-INSERT INTO sys_user (username, password, id_rol)
-SELECT 'barista', '$2b$10$1eIlYNuQ8towNU8HKSEI3Om2lcNdqGpQlOsRTa5EZAFUG8JJ4x9hW', 4
+INSERT INTO sys_user (id, username, password, id_rol, telefono)
+SELECT 9002, 'barista',
+       '$2b$10$1eIlYNuQ8towNU8HKSEI3Om2lcNdqGpQlOsRTa5EZAFUG8JJ4x9hW', 4, ''
 FROM   DUAL
 WHERE  NOT EXISTS (SELECT 1 FROM sys_user WHERE username = 'barista');
 
