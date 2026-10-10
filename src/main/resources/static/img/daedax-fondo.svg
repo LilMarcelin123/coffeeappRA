@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000"
+     preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <!-- Fondo del login en el ambiente demo: sustituye la foto del local
+       del cliente, que no tiene por que aparecer en una demostracion. -->
+  <defs>
+    <radialGradient id="halo" cx="22%" cy="18%" r="85%">
+      <stop offset="0" stop-color="#1B3A6B"/>
+      <stop offset="55%" stop-color="#0C1C33"/>
+      <stop offset="100%" stop-color="#060D18"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1600" height="1000" fill="url(#halo)"/>
+
+  <!-- Retícula muy tenue: da textura sin competir con la tarjeta -->
+  <g stroke="#2E86F5" stroke-opacity=".07" stroke-width="1">
+    <path d="M0 125H1600M0 250H1600M0 375H1600M0 500H1600M0 625H1600M0 750H1600M0 875H1600"/>
+    <path d="M200 0V1000M400 0V1000M600 0V1000M800 0V1000M1000 0V1000M1200 0V1000M1400 0V1000"/>
+  </g>
+
+  <circle cx="1320" cy="760" r="300" fill="#2E86F5" fill-opacity=".05"/>
+  <circle cx="250" cy="180" r="190" fill="#2E86F5" fill-opacity=".06"/>
+</svg>

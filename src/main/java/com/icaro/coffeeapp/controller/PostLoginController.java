@@ -2,6 +2,7 @@ package com.icaro.coffeeapp.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
@@ -14,6 +15,11 @@ import java.util.Collection;
 @Controller
 public class PostLoginController {
 
+    /** El nombre que ve el personal. Sale de la configuracion, no del codigo:
+     *  el mismo jar corre para varios negocios y para el demo. */
+    @Value("${negocio.nombre:Mi Negocio}")
+    private String negocioNombre;
+
     @GetMapping("/postLogin")
     public String redirigirSegunRol(Authentication authentication, HttpServletRequest request) {
 
@@ -24,7 +30,7 @@ public class PostLoginController {
 
         session.setAttribute("nombreUsuario", authentication.getName());
         session.setAttribute("idRol",         securityUser.getIdRol());
-        session.setAttribute("nombreNegocio", "Rincón Arboledas");
+        session.setAttribute("nombreNegocio", negocioNombre);
 
         System.out.println(">>> Usuario:     " + authentication.getName());
         System.out.println(">>> Authorities: " + authentication.getAuthorities());

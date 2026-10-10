@@ -48,9 +48,9 @@
             </div>
             <div class="hero-right">
                 <div class="hero-logo-wrap">
-                    <img th:src="@{/img/arboledasLogo.jpg}" alt="Logo de El Rincón en las Arboledas">
+                    <img th:src="@{${logoNegocio}}" th:alt="|Logo de ${nombreNegocio}|">
                 </div>
-                <p class="hero-negocio">Rincón Arboledas</p>
+                <p class="hero-negocio" th:text="${nombreNegocio}">Mi Negocio</p>
             </div>
         </div>
     </div>
@@ -91,7 +91,7 @@
 <!-- ── Pie ─────────────────────────────────────────────────── -->
 <footer th:fragment="pie" class="footer-custom">
     <div class="footer-inner">
-        <span>&copy; 2026 · Rincón Arboledas. Todos los derechos reservados.</span>
+        <span>&copy; 2026 · <span th:text="${nombreNegocio}">Mi Negocio</span>. Todos los derechos reservados.</span>
         <div class="footer-powered">
             <span>Powered by</span>
             <img th:src="@{/img/isotipo_icarix.jpg}" alt="ICARIX" class="footer-icarix-logo">

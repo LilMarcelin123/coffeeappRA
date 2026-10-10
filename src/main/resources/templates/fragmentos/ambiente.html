@@ -5,19 +5,35 @@
 <!--
   Banda de ambiente.
 
-  Solo aparece fuera de produccion. Es fija arriba de la ventana y
-  empuja el contenido con un padding en <html>, para que no tape el
-  hero de ninguna pantalla.
+  Tres ambientes, tres caras. Produccion va limpia; staging lleva la
+  banda amarilla de obra, porque dos pantallas identicas es como
+  alguien acaba cobrando una orden real en el de pruebas; y demo lleva
+  una banda sobria de DAEDAX, que se le ensena a un prospecto y tiene
+  que verse intencional, no como un sistema a medio terminar.
+
+  Las dos son fijas arriba de la ventana y empujan el contenido con un
+  padding en <html>, para que no tapen el hero de ninguna pantalla.
 -->
 <th:block th:fragment="banda">
-    <div class="banda-ambiente" th:unless="${esProduccion}">
+
+    <!-- ── Staging: obra en curso ─────────────────────────────── -->
+    <div class="banda-ambiente" th:if="${ambiente == 'staging'}">
         <span class="banda-ambiente__punto"></span>
         AMBIENTE DE PRUEBAS · los datos de esta pantalla no son del negocio
     </div>
+
+    <!-- ── Demo: vitrina para prospectos ──────────────────────── -->
+    <div class="banda-demo" th:if="${ambiente == 'demo'}">
+        <span class="banda-demo__marca">DÆDAX</span>
+        <span class="banda-demo__filo" aria-hidden="true"></span>
+        <span>Demostración · datos de muestra</span>
+    </div>
+
     <style th:unless="${esProduccion}">
         html { padding-top: 26px; }
 
-        .banda-ambiente {
+        .banda-ambiente,
+        .banda-demo {
             position: fixed;
             top: 0; left: 0; right: 0;
             z-index: 2000;
@@ -29,13 +45,16 @@
             font: 700 .66rem/1 'Poppins', system-ui, sans-serif;
             letter-spacing: .09em;
             text-transform: uppercase;
+            user-select: none;
+        }
+
+        .banda-ambiente {
             color: #4A2600;
             background: repeating-linear-gradient(
                 135deg,
                 #F59E0B 0 14px,
                 #FBBF24 14px 28px);
             box-shadow: 0 1px 6px rgba(0,0,0,.22);
-            user-select: none;
         }
 
         .banda-ambiente__punto {
@@ -44,11 +63,32 @@
             background: #7C2D12;
         }
 
-        /* La banda es fija: lo que tambien lo sea tiene que bajar. */
+        /* Azul ICARIX sobre tinta: se lee como firma, no como alerta. */
+        .banda-demo {
+            color: #CFE4FF;
+            background: linear-gradient(90deg, #0B1A2F 0%, #122D52 100%);
+            border-bottom: 1px solid rgba(46, 134, 245, .55);
+            font-weight: 500;
+        }
+
+        .banda-demo__marca {
+            font-weight: 700;
+            letter-spacing: .18em;
+            color: #2E86F5;
+        }
+
+        .banda-demo__filo {
+            width: 1px; height: 11px;
+            background: rgba(207, 228, 255, .35);
+        }
+
+        /* Las bandas son fijas: lo que tambien lo sea tiene que bajar. */
         .modal { top: 26px; }
 
         @media (max-width: 560px) {
-            .banda-ambiente { font-size: .58rem; letter-spacing: .05em; }
+            .banda-ambiente,
+            .banda-demo { font-size: .58rem; letter-spacing: .05em; }
+            .banda-demo__marca { letter-spacing: .12em; }
         }
     </style>
 </th:block>

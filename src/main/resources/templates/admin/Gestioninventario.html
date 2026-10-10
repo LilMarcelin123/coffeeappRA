@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion de Inventario — Rincon Arboledas</title>
+    <title th:text="|Gestión de Inventario — ${nombreNegocio}|">Gestión de Inventario</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
@@ -24,7 +24,7 @@
             </div>
             <div class="hero-right">
                 <div class="hero-logo-wrap"><img th:src="@{/img/arboledasLogo.jpg}" alt="Logo"></div>
-                <p class="hero-negocio">Rincon Arboledas</p>
+                <p class="hero-negocio" th:text="${nombreNegocio}">Mi Negocio</p>
             </div>
         </div>
     </div>
@@ -362,7 +362,7 @@
 
 <footer class="footer-custom">
     <div class="footer-inner">
-        <span>&copy; 2025 &middot; Rincon Arboledas &mdash; Gestion de Inventario.</span>
+        <span>&copy; 2025 &middot; <span th:text="${nombreNegocio}">Mi Negocio</span> &mdash; Gestion de Inventario.</span>
         <div class="footer-powered">
             <span>Powered by</span>
             <img th:src="@{/img/isotipo_icarix.jpg}" alt="ICARIX" class="footer-icarix-logo">
