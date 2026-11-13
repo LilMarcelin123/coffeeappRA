@@ -19,8 +19,7 @@
 <header>
     <div class="hero-section">
         <div class="hero-overlay"></div>
-        <div th:if="${tema == 'halloween'}"
-             th:replace="~{fragmentos/temporada :: halloween-banda}"></div>
+        <div th:replace="~{fragmentos/temporada :: __${tema ?: 'ninguna'}__-banda}"></div>
         <div class="hero-content">
             <div class="hero-left">
                 <span class="hero-badge">

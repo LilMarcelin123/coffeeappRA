@@ -19,8 +19,7 @@
     <img th:src="@{/img/IMG_1450.jpg}" src="/img/IMG_1450.jpg" alt="">
 </div>
 
-<div th:if="${tema == 'halloween'}"
-     th:replace="~{fragmentos/temporada :: halloween}"></div>
+<div th:replace="~{fragmentos/temporada :: __${tema ?: 'ninguna'}__}"></div>
 
 <main class="centrado">
     <div class="acceso">

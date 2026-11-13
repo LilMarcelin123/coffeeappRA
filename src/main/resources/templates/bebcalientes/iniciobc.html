@@ -61,8 +61,7 @@
 
 <!-- ── HERO ──────────────────────────────────────────────────── -->
 <section class="op-hero">
-    <div th:if="${tema == 'halloween'}"
-         th:replace="~{fragmentos/temporada :: halloween-banda}"></div>
+    <div th:replace="~{fragmentos/temporada :: __${tema ?: 'ninguna'}__-banda}"></div>
     <div class="op-hero-inner">
         <div class="op-hero-text">
             <p class="op-eyebrow"><i class="bi bi-layout-wtf"></i> Panel de Órdenes</p>

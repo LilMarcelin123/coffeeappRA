@@ -2,8 +2,8 @@
    temporada.css
    Decoracion de temporada — El Rincon en las Arboledas
 
-   Solo se pinta cuando el <body> trae data-tema="halloween", que lo
-   decide el servidor por calendario. Fuera de temporada este archivo
+   Solo se pinta cuando el <body> trae data-tema="halloween" o
+   data-tema="navidad", que lo decide el servidor por calendario. Fuera de temporada este archivo
    no dibuja nada, asi que puede quedarse enlazado todo el año.
 
    Todo es decorativo y no intercepta clics: nada de esto debe
@@ -19,7 +19,7 @@
 }
 
 /* Fuera de temporada, ni se dibuja */
-body:not([data-tema="halloween"]) .temporada { display: none; }
+body:not([data-tema="halloween"]) .temporada:not(.temporada--navidad) { display: none; }
 
 /* ── Telarañas ───────────────────────────────────────────────────
    Van en las esquinas de arriba, que es donde las pondria alguien
@@ -136,7 +136,7 @@ body:not([data-tema="halloween"]) .temporada { display: none; }
     pointer-events: none;
     overflow: hidden;
 }
-body:not([data-tema="halloween"]) .temporada-banda { display: none; }
+body:not([data-tema="halloween"]) .temporada-banda:not(.temporada-banda--navidad) { display: none; }
 
 /* Las telaraãs se recargan en las esquinas de la banda */
 .tb-telarana {
@@ -214,4 +214,318 @@ body:not([data-tema="halloween"]) .temporada-banda { display: none; }
     .tb-telarana--der { display: none; }
     .tb-murcielago { display: none; }
     .tb-arana { left: auto; right: 18%; }
+}
+
+
+/* ================================================================
+   NAVIDAD
+   Del 1 de diciembre al 6 de enero. Paleta de nochebuena: rojo,
+   verde pino y dorado, con luces de colores como las series de
+   foquitos de cualquier casa en diciembre.
+
+   Igual que en Halloween: nada intercepta clics, en login nada
+   tapa el formulario y en las pantallas de trabajo todo se queda
+   dentro de la banda del encabezado.
+
+   Solo se anima transform y opacity, que es lo que la tele de
+   cocina (Fire Stick) mueve sin trabarse.
+   ================================================================ */
+
+body:not([data-tema="navidad"]) .temporada--navidad,
+body:not([data-tema="navidad"]) .temporada-banda--navidad { display: none; }
+
+/* ── Piezas compartidas: pino, nochebuena y esferas ─────────────── */
+.pino__tallo       { fill: none; stroke: #4A2E17; stroke-linecap: round; }
+.pino__aguja       { fill: none; stroke: #1F5A35; stroke-linecap: round; }
+.pino__aguja--clara{ stroke: #2F7A48; }
+.pino__hoja        { fill: #C8202F; }
+.pino__hoja--int   { fill: #9E1424; }
+.pino__centro      { fill: #F6C453; }
+.pino__baya        { fill: #D8263A; stroke: rgba(0,0,0,.25); stroke-width: .6; }
+
+.esfera__argolla   { fill: none; stroke: #C9A24A; stroke-width: 1.6; }
+.esfera__casquillo { fill: #D9B45C; }
+.esfera__cuerpo    { fill: currentColor; }
+.esfera__franja    { fill: none; stroke: rgba(255, 236, 190, .7); stroke-width: 1.4; stroke-linecap: round; }
+.esfera__brillo    { fill: rgba(255, 255, 255, .55); }
+
+/* Colores de foquitos: rojo, verde, dorado, azul, en ese orden */
+.nv-luces__foco:nth-child(4n+1) i, .tbn-luces__foco:nth-child(4n+1) i { --c: #FF4D4D; }
+.nv-luces__foco:nth-child(4n+2) i, .tbn-luces__foco:nth-child(4n+2) i { --c: #3DDC84; }
+.nv-luces__foco:nth-child(4n+3) i, .tbn-luces__foco:nth-child(4n+3) i { --c: #FFD45C; }
+.nv-luces__foco:nth-child(4n+4) i, .tbn-luces__foco:nth-child(4n+4) i { --c: #5CB8FF; }
+
+/* Parpadeo: pares contra nones, como las series de verdad */
+@keyframes nv-brilla {
+    0%, 45%  { opacity: 1; }
+    55%, 100%{ opacity: .38; }
+}
+
+/* ── LOGIN ───────────────────────────────────────────────────────── */
+
+/* Nieve: copos redondos y difusos, pocos y despacio. Es ambiente,
+   no tormenta: el foco sigue siendo el formulario. */
+.nv-nieve { position: absolute; inset: 0; }
+.nv-copo {
+    position: absolute;
+    top: -12px;
+    left: var(--x);
+    width: var(--s);
+    height: var(--s);
+    border-radius: 50%;
+    background: #fff;
+    opacity: var(--o);
+    filter: blur(.4px);
+    box-shadow: 0 0 6px rgba(255, 255, 255, .6);
+    animation: nv-cae var(--t) linear var(--r) infinite;
+    will-change: transform;
+}
+@keyframes nv-cae {
+    0%   { transform: translate3d(0, 0, 0); }
+    25%  { transform: translate3d(14px, 28vh, 0); }
+    50%  { transform: translate3d(-10px, 56vh, 0); }
+    75%  { transform: translate3d(12px, 84vh, 0); }
+    100% { transform: translate3d(0, 112vh, 0); }
+}
+
+/* Ramas de pino en las esquinas de arriba, donde iban las telarañas */
+.nv-pino {
+    position: absolute;
+    top: 0;
+    width: clamp(160px, 21vw, 290px);
+    height: auto;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, .45));
+}
+.nv-pino--izq { left: 0; }
+.nv-pino--der { right: 0; transform: scaleX(-1); }
+
+/* Serie de luces: cada foco cuelga de su tramo de cable, y los
+   tramos juntos hacen la guirnalda ondulada. */
+.nv-luces {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 46px;
+    display: flex;
+    z-index: 1;
+}
+.nv-luces__foco { position: relative; flex: 1; }
+.nv-luces__foco::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -18px;
+    height: 36px;
+    border-bottom: 2px solid #17301F;
+    border-radius: 0 0 50% 50% / 0 0 100% 100%;
+}
+.nv-luces__foco i {
+    position: absolute;
+    left: 50%;
+    top: 21px;
+    width: 10px;
+    height: 15px;
+    margin-left: -5px;
+    border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+    background: var(--c);
+    box-shadow: 0 0 10px 3px var(--c);
+    animation: nv-brilla 1.8s steps(1, end) infinite;
+}
+.nv-luces__foco:nth-child(even) i { animation-delay: .9s; }
+.nv-luces__foco i::before {             /* casquillo */
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: -4px;
+    width: 6px;
+    height: 5px;
+    border-radius: 1px;
+    background: #2B3A2F;
+}
+
+/* Esferas: cuelgan del borde de arriba y se mecen. Van a los lados
+   del formulario, que esta centrado. */
+.nv-esfera {
+    position: absolute;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform-origin: top center;
+    animation: nv-baja 1.6s cubic-bezier(.32, .72, 0, 1) both,
+               nv-mece 4.8s ease-in-out 1.6s infinite;
+}
+.nv-esfera__hilo {
+    width: 1px;
+    background: linear-gradient(rgba(255, 236, 190, .25), rgba(255, 236, 190, .8));
+}
+.nv-esfera__bola {
+    width: clamp(34px, 3.6vw, 50px);
+    height: auto;
+    margin-top: -2px;
+    filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .45));
+}
+.nv-esfera--roja   { left: clamp(14%, 18vw, 24%); color: #C8202F; }
+.nv-esfera--roja   .nv-esfera__hilo { height: clamp(80px, 14vh, 150px); }
+.nv-esfera--dorada { right: clamp(16%, 22vw, 28%); color: #D9A830; animation-delay: .25s, 2.1s; }
+.nv-esfera--dorada .nv-esfera__hilo { height: clamp(50px, 9vh, 100px); }
+.nv-esfera--verde  { right: clamp(8%, 11vw, 14%); color: #1F7A45; animation-delay: .5s, 2.6s; }
+.nv-esfera--verde  .nv-esfera__hilo { height: clamp(110px, 20vh, 200px); }
+
+@keyframes nv-baja {
+    from { transform: translateY(-100%); }
+    to   { transform: translateY(0); }
+}
+@keyframes nv-mece {
+    0%, 100% { transform: rotate(-4deg); }
+    50%      { transform: rotate(4deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .nv-esfera, .nv-luces__foco i { animation: none; }
+    .nv-nieve { display: none; }
+}
+
+/* Celular: el formulario ocupa casi todo. Se queda la serie de
+   luces, una rama, una esfera y la mitad de la nieve. */
+@media (max-width: 620px) {
+    .nv-pino { width: 130px; }
+    .nv-pino--der { display: none; }
+    .nv-esfera--dorada, .nv-esfera--verde { display: none; }
+    .nv-esfera--roja { left: auto; right: 10%; }
+    .nv-esfera--roja .nv-esfera__hilo { height: 34px; }   /* arriba de la tarjeta */
+    .nv-luces__foco:nth-child(n+11) { display: none; }
+    .nv-copo:nth-child(2n) { display: none; }
+}
+
+
+/* ── BANDA — panel, cocina y modulo de gestion ───────────────────── */
+
+/* Detras del contenido del encabezado (titulo, fichas, logo), que
+   va en z-index 1: el adorno nunca tapa un dato. */
+.temporada-banda--navidad { z-index: 0; }
+
+.tbn-nieve { position: absolute; inset: 0; }
+.tbn-copo {
+    position: absolute;
+    top: -8px;
+    left: var(--x);
+    width: calc(var(--s) - 1px);
+    height: calc(var(--s) - 1px);
+    border-radius: 50%;
+    background: #fff;
+    opacity: calc(var(--o) * .8);
+    animation: tbn-cae var(--t) linear var(--r) infinite;
+    will-change: transform;
+}
+/* La banda mide pocos cientos de pixeles: el copo cruza y se
+   desvanece antes del borde de abajo, nunca sale de ella. */
+@keyframes tbn-cae {
+    0%   { transform: translate3d(0, 0, 0);       opacity: 0; }
+    10%  { opacity: calc(var(--o) * .8); }
+    50%  { transform: translate3d(8px, 130px, 0); }
+    85%  { opacity: calc(var(--o) * .6); }
+    100% { transform: translate3d(-4px, 260px, 0); opacity: 0; }
+}
+
+.tbn-pino {
+    position: absolute;
+    top: 0;
+    width: clamp(84px, 9vw, 132px);
+    height: auto;
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, .45));
+}
+.tbn-pino--izq { left: 0; }
+.tbn-pino--der { right: 0; transform: scaleX(-1); }
+
+.tbn-luces {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 34px;
+    display: flex;
+    z-index: 1;
+}
+.tbn-luces__foco { position: relative; flex: 1; }
+.tbn-luces__foco::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -12px;
+    height: 24px;
+    border-bottom: 1.5px solid #10240F;
+    border-radius: 0 0 50% 50% / 0 0 100% 100%;
+}
+.tbn-luces__foco i {
+    position: absolute;
+    left: 50%;
+    top: 14px;
+    width: 7px;
+    height: 11px;
+    margin-left: -3.5px;
+    border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+    background: var(--c);
+    box-shadow: 0 0 8px 2px var(--c);
+    animation: nv-brilla 1.8s steps(1, end) infinite;
+}
+.tbn-luces__foco:nth-child(even) i { animation-delay: .9s; }
+.tbn-luces__foco i::before {
+    content: "";
+    position: absolute;
+    left: 1.5px;
+    top: -3px;
+    width: 4px;
+    height: 4px;
+    border-radius: 1px;
+    background: #2B3A2F;
+}
+
+/* Dos esferas con hilo corto: caben en la banda y no se asoman
+   al area de trabajo. */
+.tbn-esfera {
+    position: absolute;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform-origin: top center;
+    animation: tbn-mece 5s ease-in-out infinite;
+}
+.tbn-esfera__hilo {
+    width: 1px;
+    background: linear-gradient(rgba(255,236,190,.15), rgba(255,236,190,.65));
+}
+.tbn-esfera__bola {
+    width: clamp(24px, 2.4vw, 34px);
+    height: auto;
+    margin-top: -2px;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,.5));
+}
+.tbn-esfera--roja   { left: clamp(26%, 34vw, 42%); color: #C8202F; }
+.tbn-esfera--roja   .tbn-esfera__hilo { height: clamp(26px, 4vh, 48px); }
+.tbn-esfera--dorada { right: clamp(20%, 24vw, 30%); color: #D9A830; animation-delay: -2.2s; }
+.tbn-esfera--dorada .tbn-esfera__hilo { height: clamp(16px, 2.6vh, 30px); }
+
+@keyframes tbn-mece {
+    0%, 100% { transform: rotate(-3deg); }
+    50%      { transform: rotate(3deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tbn-esfera, .tbn-luces__foco i { animation: none; }
+    .tbn-nieve { display: none; }
+}
+
+/* Banda angosta: una rama, una esfera, menos foquitos y menos nieve */
+@media (max-width: 720px) {
+    .tbn-pino { width: 76px; }
+    .tbn-pino--der { display: none; }
+    .tbn-esfera--dorada { display: none; }
+    .tbn-esfera--roja { left: auto; right: 14%; }
+    .tbn-luces__foco:nth-child(n+10) { display: none; }
+    .tbn-copo:nth-child(2n) { display: none; }
 }

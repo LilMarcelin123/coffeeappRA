@@ -18,8 +18,7 @@
 		     style="background-image: url('/img/granoscafe.jpg');">
 
         
-        <div th:if="${tema == 'halloween'}"
-             th:replace="~{fragmentos/temporada :: halloween-banda}"></div>
+        <div th:replace="~{fragmentos/temporada :: __${tema ?: 'ninguna'}__-banda}"></div>
 <div class="hero-overlay">
             <div class="container">
                 <div class="row align-items-center">
