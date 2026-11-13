@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
  * sale del calendario:
  *
  *   halloween → 1 de octubre al 2 de noviembre (Halloween y Dia de Muertos)
- *   navidad   → 1 de diciembre al 6 de enero (hasta el Dia de Reyes)
+ *   navidad   → 3 de noviembre al 6 de enero (de Muertos a Reyes)
  *
  * Se puede forzar desde application.properties:
  *   app.temporada=auto        → por calendario (predeterminado)
@@ -49,7 +49,7 @@ public class TemporadaAdvice {
 
     private static final List<Temporada> CALENDARIO = List.of(
         new Temporada("halloween", MonthDay.of(10, 1),  MonthDay.of(11, 2)),
-        new Temporada("navidad",   MonthDay.of(12, 1),  MonthDay.of(1, 6))
+        new Temporada("navidad",   MonthDay.of(11, 3),  MonthDay.of(1, 6))
     );
 
     @Value("${app.temporada:auto}")

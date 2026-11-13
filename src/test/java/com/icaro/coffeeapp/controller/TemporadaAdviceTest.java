@@ -18,18 +18,19 @@ class TemporadaAdviceTest {
         assertEquals("ninguna",   auto(9, 30));
         assertEquals("halloween", auto(10, 1));
         assertEquals("halloween", auto(11, 2));
-        assertEquals("ninguna",   auto(11, 3));
+        assertEquals("navidad",   auto(11, 3));
     }
 
     @Test
     void navidadCruzaElAnio() {
-        assertEquals("ninguna", auto(11, 30));
-        assertEquals("navidad", auto(12, 1));
+        assertEquals("navidad", auto(11, 3));
+        assertEquals("navidad", auto(11, 12));
         assertEquals("navidad", auto(12, 31));
         assertEquals("navidad", auto(1, 1));
         assertEquals("navidad", auto(1, 6));
         assertEquals("ninguna", auto(1, 7));
         assertEquals("ninguna", auto(6, 15));
+        assertEquals("ninguna", auto(9, 30));
     }
 
     @Test
