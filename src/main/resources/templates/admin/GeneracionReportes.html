@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" th:href="@{/css/styleGeneracionReportes.css}">
     <link rel="stylesheet" th:href="@{/css/caja.css}">
+    <link rel="stylesheet" th:href="@{/css/compras.css}">
 </head>
 
 <body th:attr="data-hoy-negocio=${hoyNegocio}">
@@ -187,6 +188,73 @@
 
     </section>
 
+    <!-- ── SECCIÓN 3a: CONDENSADO DEL DÍA ─────────────────── -->
+    <!-- Lo vendido contra lo comprado hoy. Las compras se anotan desde
+         Inicio; aquí solo se consultan. La venta, el resultado y el
+         esperado se tapan igual que en el arqueo y comparten su ojo. -->
+    <section class="panel-card reveal caja" style="animation-delay:.2s">
+
+        <div class="section-head">
+            <div class="section-title-group">
+                <span class="section-icon section-icon--gold"><i class="bi bi-clipboard-data-fill"></i></span>
+                <div>
+                    <h2 class="section-title">Condensado del Día</h2>
+                    <p class="section-sub" id="condSubtitulo">Lo vendido contra lo comprado hoy</p>
+                </div>
+            </div>
+            <button class="caja-ojo caja-ojo--suelto" id="btnVerCondensado" type="button"
+                    aria-label="Mostrar venta, resultado y esperado">
+                <i class="bi bi-eye-fill"></i>
+            </button>
+        </div>
+
+        <div class="condensado">
+            <div class="condensado-tile">
+                <span class="condensado-tile__label">Venta total</span>
+                <span class="condensado-tile__valor" id="condVenta" data-oculto="1">••••</span>
+                <span class="condensado-tile__nota" id="condVentaNota" data-oculto="1"></span>
+            </div>
+            <div class="condensado-tile condensado-tile--compras">
+                <span class="condensado-tile__label">Compras</span>
+                <span class="condensado-tile__valor" id="condCompras">—</span>
+                <span class="condensado-tile__nota" id="condComprasNota"></span>
+            </div>
+            <div class="condensado-tile condensado-tile--resultado" id="tileResultado">
+                <span class="condensado-tile__label">Resultado del día</span>
+                <span class="condensado-tile__valor" id="condResultado" data-oculto="1">••••</span>
+                <span class="condensado-tile__nota">Venta total − compras</span>
+            </div>
+            <div class="condensado-tile">
+                <span class="condensado-tile__label">Debería haber en caja</span>
+                <span class="condensado-tile__valor" id="condEsperado" data-oculto="1">••••</span>
+                <span class="condensado-tile__nota">Fondo + efectivo + entradas − salidas. Ya descuenta las compras de caja.</span>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table class="rpt-table" aria-label="Compras del día">
+                <thead>
+                    <tr>
+                        <th>Hora</th>
+                        <th>Concepto</th>
+                        <th>Pago</th>
+                        <th>Quién</th>
+                        <th class="text-end">Monto</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyComprasCaja"></tbody>
+            </table>
+        </div>
+
+        <p class="caja-nota">
+            <i class="bi bi-info-circle"></i>
+            Las compras se anotan desde Inicio, en «Compras del día». Las pagadas de caja
+            aparecen también abajo como salida y el arqueo las descuenta; las pagadas de
+            otra manera solo cuentan como gasto del día.
+        </p>
+
+    </section>
+
     <!-- ── SECCIÓN 3: ARQUEO DE CAJA ──────────────────────── -->
     <section class="panel-card reveal caja" style="animation-delay:.24s">
 
@@ -269,7 +337,6 @@
             <label class="mov-campo">
                 <span>Categoría</span>
                 <select id="movCategoria">
-                    <option value="PROVEEDOR">Proveedor</option>
                     <option value="BANCO">Banco</option>
                     <option value="GASTO">Gasto chico</option>
                     <option value="CAMBIO">Cambio</option>

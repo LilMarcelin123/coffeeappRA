@@ -26,6 +26,14 @@
             <small class="rotulo">Arqueado en cortes</small>
             <b class="cifra" id="totArqueado">$0</b>
         </div>
+        <div class="tira vidrio">
+            <small class="rotulo">Compras</small>
+            <b class="cifra" id="totCompras">$0</b>
+        </div>
+        <div class="tira vidrio">
+            <small class="rotulo">Venta − compras</small>
+            <b class="cifra" id="totResultado">$0</b>
+        </div>
         <div class="tira vidrio tira--alerta" id="tiraDiferencia" hidden>
             <small class="rotulo">Sin arquear</small>
             <b class="cifra" id="totDiferencia">$0</b>
@@ -70,6 +78,11 @@
                     <span><i class="bi bi-cash"></i> Efectivo <b class="pago-efectivo cifra"></b></span>
                     <span><i class="bi bi-credit-card"></i> Tarjeta <b class="pago-tarjeta cifra"></b></span>
                     <span><i class="bi bi-arrow-left-right"></i> Otro <b class="pago-otro cifra"></b></span>
+                </div>
+                <div class="pagos pagos--compras">
+                    <span><i class="bi bi-bag-check"></i> Compras <b class="compras-total cifra"></b>
+                        <small class="compras-desglose"></small></span>
+                    <span><i class="bi bi-graph-up-arrow"></i> Venta − compras <b class="compras-resultado cifra"></b></span>
                 </div>
                 <div class="cortes"></div>
             </div>

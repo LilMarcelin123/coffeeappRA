@@ -3,7 +3,8 @@
    Rincón Arboledas
 
    El turno, el fondo y lo que deberia haber en caja los calcula
-   sp_gestion_caja. Aqui no se suma nada: solo se pinta lo que
+   sp_gestion_caja; el condensado del dia (venta contra compras),
+   sp_gestion_compras. Aqui no se suma nada: solo se pinta lo que
    responde el servidor y se manda lo que la cajera escribio.
    ════════════════════════════════════════════════════════════ */
 
@@ -13,9 +14,14 @@ const API = {
     resumen     : "/admin/caja/resumen",
     movimientos : "/admin/caja/movimientos",
     arqueos     : "/admin/caja/arqueos",
+    condensado  : "/admin/compras/condensado",
+    compras     : "/admin/compras",
 };
 
+/* PROVEEDOR ya no se ofrece (las compras se anotan desde Inicio), pero
+   se conserva la etiqueta para los movimientos viejos. */
 const CATEGORIA = {
+    COMPRA    : "Compra",
     PROVEEDOR : "Proveedor",
     BANCO     : "Banco",
     GASTO     : "Gasto chico",
@@ -29,12 +35,16 @@ const estado = {
     esperado : null,
     abiertas : 0,          // ordenes sin cobrar al momento de consultar
     enviando : false,
+    condensado : null,     // venta contra compras del dia
 };
 
 /* Se tapan la venta en efectivo y el esperado, no el fondo ni los
    movimientos: esos la cajera ya los conoce. Tapar solo el esperado
-   no serviria de nada, porque se saca sumando los demas recuadros. */
-const TAPADOS = ["cajaVenta", "cajaEsperado"];
+   no serviria de nada, porque se saca sumando los demas recuadros.
+   Por lo mismo, en el condensado se tapan la venta, su desglose, el
+   resultado y el esperado: con ellos tambien se deduce el efectivo. */
+const TAPADOS = ["cajaVenta", "cajaEsperado",
+                 "condVenta", "condVentaNota", "condResultado", "condEsperado"];
 
 let modalArqueo = null;
 
@@ -65,6 +75,9 @@ function enlazarEventos() {
     document.getElementById("btnVerEsperado")
             .addEventListener("click", alternarEsperado);
 
+    document.getElementById("btnVerCondensado")
+            ?.addEventListener("click", alternarEsperado);
+
     document.getElementById("btnAbrirArqueo")
             .addEventListener("click", abrirArqueo);
 
@@ -77,13 +90,18 @@ function enlazarEventos() {
 
 /* ── Turno en curso ───────────────────────────────────────── */
 async function refrescarTurno() {
-    const [resumen, movimientos] = await Promise.all([
+    const [resumen, movimientos, condensado, compras] = await Promise.all([
         pedir(API.resumen),
         pedir(API.movimientos),
+        pedir(API.condensado),
+        pedir(API.compras),
     ]);
 
+    estado.condensado = condensado;
     pintarResumen(resumen);
     pintarMovimientos(movimientos ?? []);
+    pintarCondensado(condensado);
+    pintarComprasCaja(compras ?? []);
 }
 
 function pintarResumen(r) {
@@ -107,24 +125,85 @@ function pintarResumen(r) {
               : `Turno en curso desde las ${desde} · primer arqueo del día`);
 }
 
-/** Un solo interruptor para los dos recuadros que delatan el conteo. */
+/** Un solo interruptor para todos los recuadros que delatan el conteo. */
 function alternarEsperado() {
     const destapar = document.getElementById("cajaEsperado").dataset.oculto === "1";
 
-    TAPADOS.forEach(id => { document.getElementById(id).dataset.oculto = destapar ? "0" : "1"; });
-    document.querySelector("#btnVerEsperado i").className =
-        destapar ? "bi bi-eye-slash-fill" : "bi bi-eye-fill";
+    TAPADOS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.dataset.oculto = destapar ? "0" : "1";
+    });
+    document.querySelectorAll("#btnVerEsperado i, #btnVerCondensado i").forEach(icono => {
+        icono.className = destapar ? "bi bi-eye-slash-fill" : "bi bi-eye-fill";
+    });
 
     pintarTapados();
 }
 
 function pintarTapados() {
-    const valores = { cajaVenta: estado.venta, cajaEsperado: estado.esperado };
+    const c = estado.condensado;
+    const valores = {
+        cajaVenta     : dinero(estado.venta),
+        cajaEsperado  : dinero(estado.esperado),
+        condVenta     : c ? dinero(c.p_venta_total) : "—",
+        condVentaNota : c ? `Efectivo ${dinero(c.p_venta_efectivo)} · Tarjeta ${dinero(c.p_venta_tarjeta)} · Otro ${dinero(c.p_venta_otro)}` : "",
+        condResultado : c ? firmado(c.p_resultado) : "—",
+        condEsperado  : dinero(estado.esperado),
+    };
+    const TAPA = { condVentaNota: "Efectivo •••• · Tarjeta •••• · Otro ••••" };
 
     TAPADOS.forEach(id => {
-        const tile = document.getElementById(id);
-        tile.textContent = tile.dataset.oculto === "1" ? "••••" : dinero(valores[id]);
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = el.dataset.oculto === "1" ? (TAPA[id] ?? "••••") : valores[id];
     });
+}
+
+/* ── Condensado del dia ───────────────────────────────────── */
+function pintarCondensado(c) {
+    if (!c || !document.getElementById("condCompras")) return;
+
+    texto("condCompras", dinero(c.p_compras_total));
+    const n = Number(c.n_compras ?? 0);
+    texto("condComprasNota",
+          `${n} compra${n !== 1 ? "s" : ""} · Caja ${dinero(c.p_compras_caja)} · Fuera ${dinero(c.p_compras_fuera)}`);
+    texto("condSubtitulo", `Lo vendido contra lo comprado · ${c.n_dia ?? "hoy"}`);
+
+    document.getElementById("tileResultado")
+            .classList.toggle("condensado-tile--negativo", Number(c.p_resultado ?? 0) < 0);
+
+    pintarTapados();
+}
+
+function pintarComprasCaja(lista) {
+    const tbody = document.getElementById("tbodyComprasCaja");
+    if (!tbody) return;
+
+    if (!lista.length) {
+        tbody.innerHTML = `
+            <tr><td colspan="5">
+                <div class="empty-state">
+                    <i class="bi bi-bag"></i>
+                    <span>Sin compras anotadas hoy</span>
+                </div>
+            </td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = lista.map(c => {
+        const caja    = c.n_origen_pago === "CAJA";
+        const detalle = c.n_origen_detalle
+            ? `<small class="compras-detalle">${esc(c.n_origen_detalle)}</small>` : "";
+        return `
+            <tr>
+                <td style="font-size:.82rem;color:var(--text-muted);">${esc(c.n_hora)}</td>
+                <td style="font-size:.82rem;">${esc(c.n_concepto)}</td>
+                <td><span class="compras-chip ${caja ? "compras-chip--caja" : "compras-chip--fuera"}">
+                    ${caja ? "Caja" : "Fuera"}</span>${detalle}</td>
+                <td style="font-size:.78rem;color:var(--text-muted);">${esc(c.n_usuario)}</td>
+                <td class="td-salida">−${dinero(c.p_monto)}</td>
+            </tr>`;
+    }).join("");
 }
 
 /* ── Movimientos ──────────────────────────────────────────── */
@@ -195,10 +274,14 @@ function pintarMovimientos(lista) {
                 <td style="font-size:.78rem;color:var(--text-muted);">${esc(m.n_usuario)}</td>
                 <td class="${salida ? "td-salida" : "td-entrada"}">${salida ? "−" : "+"}${dinero(m.p_monto)}</td>
                 <td style="text-align:right;">
-                    <button class="btn-borrar-mov" data-borrar="${m.id_movimiento}"
-                            title="Borrar este movimiento" aria-label="Borrar movimiento">
-                        <i class="bi bi-trash3"></i>
-                    </button>
+                    ${m.n_categoria === "COMPRA"
+                        ? `<span class="btn-borrar-mov" style="cursor:default;"
+                                 title="Es una compra: se cancela desde Inicio, en Compras del día">
+                               <i class="bi bi-bag-check"></i></span>`
+                        : `<button class="btn-borrar-mov" data-borrar="${m.id_movimiento}"
+                                   title="Borrar este movimiento" aria-label="Borrar movimiento">
+                               <i class="bi bi-trash3"></i>
+                           </button>`}
                 </td>
             </tr>`;
     }).join("");
@@ -366,6 +449,12 @@ async function enviar(url, metodo, cuerpo) {
         console.error("caja:", url, error);
         return { ok: false, mensaje: "No hay conexión con el servidor." };
     }
+}
+
+/** Con signo: el resultado del dia puede salir negativo. */
+function firmado(valor) {
+    const n = Number(valor ?? 0);
+    return `${n < 0 ? "−" : ""}${dinero(n)}`;
 }
 
 function dinero(valor) {

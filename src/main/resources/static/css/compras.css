@@ -1,0 +1,262 @@
+/* ════════════════════════════════════════════════════════════
+   compras.css — Compras del día
+   Rincón Arboledas
+
+   Se usa en Inicio (alta rápida y lista del día) y en Caja
+   (condensado). Toma los tokens de marca de la hoja de cada
+   pantalla (--cafe-*, --radius-*, --text-*); no redefine ninguno.
+   El formulario sigue el mismo trazo que el de movimientos de caja.
+   ════════════════════════════════════════════════════════════ */
+
+:root {
+    --compra-caja:       #B45309;
+    --compra-caja-bg:    rgba(180,83,9,.10);
+    --compra-caja-bdr:   rgba(180,83,9,.24);
+    --compra-fuera:      #4338CA;
+    --compra-fuera-bg:   rgba(67,56,202,.09);
+    --compra-fuera-bdr:  rgba(67,56,202,.22);
+    --compra-salida:     #B91C1C;
+}
+
+/* ── Totales de la cabecera ──────────────────────────────────── */
+.compras-totales {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.compras-total {
+    font-size: .8rem;
+    color: var(--text-muted);
+}
+
+.compras-total b {
+    margin-left: 4px;
+    font-size: 1rem;
+    color: var(--cafe-deep);
+    font-variant-numeric: tabular-nums;
+}
+
+.compras-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: var(--radius-pill);
+    padding: 4px 11px;
+    font-size: .72rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.compras-chip b { font-variant-numeric: tabular-nums; }
+
+.compras-chip--caja  { color: var(--compra-caja);  background: var(--compra-caja-bg);  border: 1px solid var(--compra-caja-bdr); }
+.compras-chip--fuera { color: var(--compra-fuera); background: var(--compra-fuera-bg); border: 1px solid var(--compra-fuera-bdr); }
+
+/* ── Formulario ──────────────────────────────────────────────── */
+.compra-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px;
+    margin: 16px 20px;
+    padding: 16px;
+    border: 1px solid rgba(139,94,60,.14);
+    border-radius: var(--radius-lg);
+    background: rgba(255,255,255,.62);
+}
+
+.compra-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 0 1 auto;
+    min-width: 0;
+}
+
+.compra-campo[hidden] { display: none; }
+
+.compra-campo > span {
+    font-size: .66rem;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.compra-campo--ancho   { flex: 1 1 240px; }
+.compra-campo--monto   { width: 130px; }
+.compra-campo--detalle { flex: 1 1 200px; }
+
+.compra-campo select,
+.compra-campo input[type="text"],
+.compra-monto input {
+    width: 100%;
+    border: 1px solid rgba(139,94,60,.22);
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+    font: 500 .84rem/1 'Poppins', sans-serif;
+    color: var(--text-primary);
+    background: rgba(255,255,255,.92);
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.compra-campo select:focus,
+.compra-campo input:focus {
+    outline: none;
+    border-color: var(--cafe-mid);
+    box-shadow: 0 0 0 3px rgba(184,147,106,.2);
+}
+
+.compra-monto { position: relative; }
+.compra-monto i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-style: normal;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+.compra-monto input { padding-left: 26px; }
+
+.compra-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    border-radius: var(--radius-pill);
+    padding: 11px 22px;
+    font: 700 .8rem/1 'Poppins', sans-serif;
+    color: #fff;
+    background: linear-gradient(135deg, var(--cafe-deep), var(--cafe-dark));
+    box-shadow: 0 6px 18px -8px rgba(92,51,23,.8);
+    cursor: pointer;
+    transition: transform .22s ease;
+}
+
+.compra-btn:hover:not(:disabled) { transform: translateY(-2px); }
+.compra-btn:disabled { opacity: .55; cursor: not-allowed; }
+.compra-btn:focus-visible { outline: 2px solid var(--cafe-mid); outline-offset: 2px; }
+
+/* ── Lista ───────────────────────────────────────────────────── */
+.compras-tabla tbody tr { cursor: default; }
+
+.compras-hora {
+    font-size: .82rem;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.compras-detalle {
+    display: block;
+    margin-top: 3px;
+    font-size: .72rem;
+    color: var(--text-muted);
+}
+
+.compras-monto-celda {
+    text-align: right;
+    font-weight: 700;
+    color: var(--compra-salida);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.compras-cancelar {
+    border: none;
+    background: none;
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1;
+    padding: 4px 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: color .2s ease, background .2s ease;
+}
+
+.compras-cancelar:hover,
+.compras-cancelar:focus-visible { color: var(--compra-salida); background: rgba(185,28,28,.08); outline: none; }
+
+.compras-sellada {
+    display: inline-block;
+    padding: 4px 6px;
+    color: var(--text-muted);
+    opacity: .6;
+}
+
+.compras-vacio {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 18px 0;
+    font-size: .85rem;
+    color: var(--text-muted);
+}
+
+/* ── Condensado del día (Caja) ───────────────────────────────── */
+/* El ojo del condensado va en la cabecera, no encima de un recuadro
+   como el del arqueo; comparte con el su clase y su comportamiento. */
+.caja-ojo.caja-ojo--suelto {
+    position: static;
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+}
+.condensado {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.condensado-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    padding: 14px 16px;
+    border: 1px solid rgba(139,94,60,.14);
+    border-radius: var(--radius-lg);
+    background: rgba(255,255,255,.7);
+}
+
+.condensado-tile__label {
+    font-size: .66rem;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.condensado-tile__valor {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--cafe-deep);
+    font-variant-numeric: tabular-nums;
+}
+
+.condensado-tile__nota {
+    font-size: .74rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+.condensado-tile--compras .condensado-tile__valor   { color: var(--compra-salida); }
+.condensado-tile--resultado                          { border-color: rgba(21,128,61,.28); }
+.condensado-tile--resultado .condensado-tile__valor { color: #15803D; }
+.condensado-tile--negativo .condensado-tile__valor  { color: var(--compra-salida); }
+
+@media (max-width: 539px) {
+    .compra-form { margin: 12px; padding: 12px; }
+    .compra-campo--monto { width: 100%; }
+    .compra-campo,
+    .compra-btn { flex: 1 1 100%; justify-content: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .compra-btn,
+    .compras-cancelar { transition: none; }
+}

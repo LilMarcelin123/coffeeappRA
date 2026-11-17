@@ -90,6 +90,10 @@
 .pagos b { color: var(--text-primary); }
 .pagos i { color: var(--cafe-mid); margin-right: 5px; }
 
+/* Compras del dia: segunda fila de cifras, pegada a la de pagos */
+.pagos--compras { padding-top: 0; }
+.pagos--compras .compras-desglose { margin-left: 4px; font-size: .85em; }
+
 .cortes { display: flex; flex-direction: column; gap: 8px; }
 
 .corte {

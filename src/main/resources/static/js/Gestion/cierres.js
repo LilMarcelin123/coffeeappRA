@@ -26,8 +26,12 @@ function pintarResumen(dias) {
     const arqueado = dias.reduce((s, d) => s + Number(d.p_arqueado || 0), 0);
     const falta    = vendido - arqueado;
 
-    document.getElementById('totVendido').textContent  = fmt.dinero(vendido);
-    document.getElementById('totArqueado').textContent = fmt.dinero(arqueado);
+    const compras  = dias.reduce((s, d) => s + Number(d.p_compras || 0), 0);
+
+    document.getElementById('totVendido').textContent   = fmt.dinero(vendido);
+    document.getElementById('totArqueado').textContent  = fmt.dinero(arqueado);
+    document.getElementById('totCompras').textContent   = fmt.dinero(compras);
+    document.getElementById('totResultado').textContent = fmt.dinero(vendido - compras);
 
     const tira = document.getElementById('tiraDiferencia');
     tira.hidden = Math.abs(falta) < UMBRAL_DIFERENCIA;
@@ -119,6 +123,13 @@ function pintarDias(dias, cortes) {
         nodo.querySelector('.pago-efectivo').textContent = fmt.dineroCorto(dia.p_efectivo);
         nodo.querySelector('.pago-tarjeta').textContent  = fmt.dineroCorto(dia.p_tarjeta);
         nodo.querySelector('.pago-otro').textContent     = fmt.dineroCorto(dia.p_otro);
+
+        // Compras del dia, en vivo: una cancelada ya no cuenta.
+        nodo.querySelector('.compras-total').textContent     = fmt.dineroCorto(dia.p_compras);
+        nodo.querySelector('.compras-resultado').textContent = fmt.dineroCorto(dia.p_resultado);
+        nodo.querySelector('.compras-desglose').textContent  = Number(dia.n_compras || 0) > 0
+            ? `(caja ${fmt.dineroCorto(dia.p_compras_caja)} · fuera ${fmt.dineroCorto(dia.p_compras_fuera)})`
+            : '';
 
         const detalle = nodo.querySelector('.dia__detalle');
         pintarCortes(detalle.querySelector('.cortes'),
