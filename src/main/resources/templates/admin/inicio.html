@@ -116,10 +116,27 @@
     <!-- Sustituye la libreta de compras. Lo pagado "De caja" se anota
          solo como salida y el arqueo lo descuenta; lo pagado "De otra
          manera" cuenta como gasto pero no toca la caja. -->
-    <div class="panel-card mb-4 compras" id="panelCompras">
+    <!-- Cajon lateral (Offcanvas de Bootstrap): oculto por defecto para
+         no ocupar pantalla. La pestaña del borde derecho lo abre y lo
+         cierra y lleva cuantas compras van hoy. Sin fondo oscuro ni
+         bloqueo de scroll: se puede seguir trabajando con el abierto. -->
+    <button type="button" class="compras-pestana" id="pestanaCompras"
+            data-bs-toggle="offcanvas" data-bs-target="#cajonCompras"
+            aria-controls="cajonCompras" aria-expanded="false"
+            title="Compras del día">
+        <span class="compras-pestana__ico">
+            <i class="bi bi-cart3" aria-hidden="true"></i>
+            <span class="compras-pestana__num" id="comprasContador" hidden>0</span>
+        </span>
+        <span class="compras-pestana__texto">Compras</span>
+    </button>
+    <aside class="offcanvas offcanvas-end compras-cajon" id="cajonCompras" tabindex="-1"
+           aria-labelledby="comprasTitulo"
+           data-bs-backdrop="false" data-bs-scroll="true">
+    <div class="panel-card compras" id="panelCompras">
         <div class="panel-card-header">
-            <div class="panel-card-title">
-                <i class="bi bi-bag-check-fill icon-badge"></i>
+            <div class="panel-card-title" id="comprasTitulo">
+                <i class="bi bi-cart-check-fill icon-badge"></i>
                 Compras del día
             </div>
             <div class="compras-totales" id="comprasTotales" aria-live="polite">
@@ -127,6 +144,11 @@
                 <span class="compras-chip compras-chip--caja">Caja <b id="comprasCaja">$0.00</b></span>
                 <span class="compras-chip compras-chip--fuera">Fuera <b id="comprasFuera">$0.00</b></span>
             </div>
+            <button type="button" class="compras-cerrar" id="cerrarCompras"
+                    data-bs-dismiss="offcanvas"
+                    aria-label="Ocultar compras" title="Ocultar">
+                <i class="bi bi-chevron-double-right"></i>
+            </button>
         </div>
 
         <form class="compra-form" id="formCompra" autocomplete="off" novalidate>
@@ -179,6 +201,7 @@
             </table>
         </div>
     </div>
+    </aside>
 
     <!-- ── MÓDULOS ────────────────────────────────────────── -->
     <!-- CAMBIO 3: data-modulo en cada tarjeta; toda la card es clickeable -->

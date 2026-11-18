@@ -260,3 +260,171 @@
     .compra-btn,
     .compras-cancelar { transition: none; }
 }
+
+
+/* ════════════════════════════════════════════════════════════
+   CAJÓN LATERAL — Compras del día en Inicio
+   Offcanvas de Bootstrap 5 (offcanvas-end), sin backdrop y con
+   scroll libre: Bootstrap pone el deslizamiento, Esc y el foco;
+   aquí solo va la piel y la pestaña. Puntos de corte de Bootstrap:
+   sm 576 · md 768 · lg 992.
+   ════════════════════════════════════════════════════════════ */
+
+:root {
+    /* Ancho del cajón; la pestaña se recorre exactamente esto */
+    --compras-ancho: min(560px, calc(100vw - 84px));
+}
+
+.compras-cajon.offcanvas {
+    --bs-offcanvas-width: var(--compras-ancho);
+    --bs-offcanvas-bg: rgba(255, 252, 247, .97);
+    --bs-offcanvas-border-width: 0;
+    --bs-offcanvas-transition: transform .38s cubic-bezier(.32, .72, 0, 1);
+    border-radius: var(--radius-lg, 20px) 0 0 var(--radius-lg, 20px);
+    box-shadow: -24px 0 60px -28px rgba(59, 31, 10, .55);
+}
+
+/* El panel ocupa el alto y se desplaza por dentro */
+.compras-cajon .compras {
+    height: 100%;
+    margin: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border: 0;
+    border-radius: inherit;
+    background: transparent;
+    box-shadow: none;
+}
+
+/* Cabecera fija arriba mientras se baja por la lista */
+.compras-cajon .panel-card-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: rgba(255, 252, 247, .94);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+/* Titulo y boton de ocultar arriba; los totales en su propio renglon */
+.compras-cajon .panel-card-title { order: 1; }
+.compras-cajon .compras-cerrar   { order: 2; }
+.compras-cajon .compras-totales  { order: 3; flex-basis: 100%; }
+
+/* En un panel angosto el formulario va en dos renglones */
+.compras-cajon .compra-form { margin: 14px 16px; }
+.compras-cajon .compra-campo--ancho { flex-basis: 100%; }
+.compras-cajon .compra-btn { margin-left: auto; }
+
+.compras-cerrar {
+    margin-left: auto;
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(139,94,60,.22);
+    border-radius: 50%;
+    background: rgba(255,255,255,.8);
+    color: var(--cafe-dark);
+    cursor: pointer;
+    transition: background .2s ease, transform .2s ease;
+}
+.compras-cerrar:hover { background: #fff; transform: translateX(2px); }
+
+/* ── La pestaña ────────────────────────────────────────────────
+   Fija en el borde derecho; cuando el cajón abre se recorre su
+   ancho para quedar pegada a él. */
+.compras-pestana {
+    position: fixed;
+    top: 42%;
+    right: 0;
+    z-index: 1046;                    /* sobre el offcanvas (1045), bajo modales (1055) */
+    width: 78px;
+    padding: 14px 0 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    border: 0;
+    border-radius: 18px 0 0 18px;
+    color: #fff;
+    background: linear-gradient(160deg, var(--cafe-dark, #8B5E3C), var(--cafe-deep, #5C3317));
+    box-shadow: -10px 10px 26px -12px rgba(59, 31, 10, .75),
+                inset 0 1px 0 rgba(255, 255, 255, .25);
+    cursor: pointer;
+    transition: transform .38s cubic-bezier(.32, .72, 0, 1), filter .2s ease;
+}
+.compras-pestana.is-abierta { transform: translateX(calc(-1 * var(--compras-ancho))); }
+.compras-pestana:hover { filter: brightness(1.08); }
+.compras-pestana:focus-visible { outline: 3px solid var(--cafe-light, #D4B896); outline-offset: 2px; }
+
+.compras-pestana__ico { position: relative; font-size: 1.45rem; line-height: 1; }
+
+/* Cuántas compras van hoy, arriba del carrito */
+.compras-pestana__num {
+    position: absolute;
+    top: -9px;
+    right: -13px;
+    min-width: 21px;
+    height: 21px;
+    padding: 0 6px;
+    display: grid;
+    place-items: center;
+    border: 2px solid #fff;
+    border-radius: 999px;
+    background: #DC2626;
+    font: 700 .66rem/1 'Poppins', sans-serif;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+}
+.compras-pestana__num[hidden] { display: none; }
+.compras-pestana__num.is-salta { animation: compras-salta .5s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes compras-salta {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.35); }
+    100% { transform: scale(1); }
+}
+
+/* Derecho, para que se lea sin ladear la cabeza */
+.compras-pestana__texto {
+    font: 600 .72rem/1 'Poppins', sans-serif;
+    letter-spacing: .02em;
+    white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .compras-cajon.offcanvas { --bs-offcanvas-transition: none; }
+    .compras-pestana { transition: none; }
+    .compras-pestana__num.is-salta { animation: none; }
+}
+
+/* Tableta (< lg): cajón un poco más angosto */
+@media (max-width: 991.98px) {
+    :root { --compras-ancho: min(480px, calc(100vw - 84px)); }
+}
+
+/* Celular (< sm): el panel ocupa casi todo el ancho */
+@media (max-width: 575.98px) {
+    :root { --compras-ancho: calc(100vw - 66px); }
+    /* Abajo en la esquina y compacta: ahí no tapa datos de las órdenes */
+    .compras-pestana { width: 62px; top: auto; bottom: 14px; padding: 11px 0 9px; gap: 6px; }
+    .compras-pestana__ico { font-size: 1.3rem; }
+    .compras-pestana__texto { font-size: .62rem; }
+    /* Espacio al final de la página para que lo último no quede debajo */
+    body:has(.compras-pestana) { padding-bottom: 84px; }
+    .compras-cajon .compra-campo,
+    .compras-cajon .compra-campo--monto { flex-basis: 100%; width: 100%; }
+    .compras-cajon .compra-btn { width: 100%; justify-content: center; }
+    /* La tabla cabe sin desplazarse de lado */
+    .compras-cajon .compras-tabla { font-size: .76rem; }
+    .compras-cajon .compras-tabla th,
+    .compras-cajon .compras-tabla td { padding: .55rem .4rem; }
+    .compras-cajon .compras-tabla th:nth-child(2),
+    .compras-cajon .compras-tabla td:nth-child(2) { padding-left: .8rem; }
+    .compras-cajon .compras-tabla td:last-child  { padding-right: .6rem; }
+    /* En el celular la hora sobra: concepto, pago y monto caben completos */
+    .compras-cajon .compras-tabla th:first-child,
+    .compras-cajon .compras-tabla td.compras-hora { display: none; }
+}

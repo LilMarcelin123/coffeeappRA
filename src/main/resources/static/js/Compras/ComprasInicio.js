@@ -20,7 +20,7 @@ const ORIGEN = {
 // La lista se refresca sola por si otra persona anota desde otro equipo.
 const REFRESCO_MS = 60000;
 
-const estado = { enviando: false };
+const estado = { enviando: false, cuantas: null };
 
 /* ── Arranque ─────────────────────────────────────────────── */
 function init() {
@@ -32,6 +32,7 @@ function init() {
     document.getElementById("tbodyCompras").addEventListener("click", alClicEnCompras);
 
     alCambiarOrigen();
+    prepararCajon();
     cargarCompras();
 
     setInterval(() => {
@@ -39,6 +40,54 @@ function init() {
         if (document.querySelector(".modal.show")) return;
         cargarCompras();
     }, REFRESCO_MS);
+}
+
+/* ── Cajón lateral ────────────────────────────────────────── */
+/**
+ * Offcanvas de Bootstrap: abre/cierra con la pestaña (data-bs-toggle),
+ * el botón » y Esc. Aquí solo se acompaña: la pestaña se recorre con
+ * el cajón y, al abrir, se refresca la lista y se enfoca el concepto.
+ */
+function prepararCajon() {
+    const cajon   = document.getElementById("cajonCompras");
+    const pestana = document.getElementById("pestanaCompras");
+    if (!cajon || !pestana) return;
+
+    cajon.addEventListener("show.bs.offcanvas", () => {
+        pestana.classList.add("is-abierta");
+        pestana.setAttribute("aria-expanded", "true");
+        pestana.title = "Ocultar compras";
+        cargarCompras();
+    });
+    cajon.addEventListener("shown.bs.offcanvas", () => {
+        document.getElementById("compraConcepto")?.focus();
+    });
+    cajon.addEventListener("hide.bs.offcanvas", () => {
+        pestana.classList.remove("is-abierta");
+        pestana.setAttribute("aria-expanded", "false");
+        pestana.title = "Compras del día";
+    });
+}
+
+/** Cuántas compras van hoy, en el globito del carrito. */
+function pintarContador(n) {
+    const num = document.getElementById("comprasContador");
+    if (!num) return;
+
+    num.textContent = n > 99 ? "99+" : String(n);
+    num.hidden = n === 0;
+
+    // Salta solo cuando sube, no en cada refresco
+    if (estado.cuantas !== null && n > estado.cuantas) {
+        num.classList.remove("is-salta");
+        void num.offsetWidth;
+        num.classList.add("is-salta");
+    }
+    estado.cuantas = n;
+
+    const pestana = document.getElementById("pestanaCompras");
+    if (pestana) pestana.setAttribute("aria-label",
+        `Compras del día: ${n} ${n === 1 ? "compra" : "compras"}`);
 }
 
 /* ── Formulario ───────────────────────────────────────────── */
@@ -104,6 +153,7 @@ function pintarCompras(lista) {
     texto("comprasTotal", dinero(caja + fuera));
     texto("comprasCaja",  dinero(caja));
     texto("comprasFuera", dinero(fuera));
+    pintarContador(lista.length);
 
     const tbody = document.getElementById("tbodyCompras");
 

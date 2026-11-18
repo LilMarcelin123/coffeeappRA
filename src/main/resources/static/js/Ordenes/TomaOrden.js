@@ -483,6 +483,18 @@ function renderPendientes(lista) {
     });
 }
 
+/**
+ * Cocina recibe en n_extras_descripcion los extras y la nota juntos:
+ *   "Nutella x1, Fresa x1 | Nota: sin azucar"   o   " | Nota: tibio"
+ * Aqui se separan para pintar la nota aparte y que no se pierda.
+ */
+function separarExtrasYNota(texto) {
+    const t = String(texto || "");
+    const i = t.indexOf("| Nota:");
+    if (i < 0) return { extras: t.trim(), nota: "" };
+    return { extras: t.slice(0, i).trim(), nota: t.slice(i + 7).trim() };
+}
+
 function pintarTarjetasPendientes(lista, items) {
     const tbody = document.getElementById("tbodyPendientes");
     const tabla = tbody ? tbody.closest("table") : null;
@@ -556,9 +568,15 @@ function pintarTarjetasPendientes(lista, items) {
         const filas = its.map(i => {
             const ok = String(i.n_estado_preparacion).toUpperCase() === "LISTO";
             const cant = Number(i.p_cantidad) > 1 ? '<span class="ord-cant">×' + i.p_cantidad + '</span>' : "";
+            // Mismo texto que ve cocina: extras y, si hay, la nota.
+            const det = separarExtrasYNota(i.n_extras_descripcion);
             return '<li class="ord-item' + (ok ? " is-listo" : "") + '">' +
                    '<span class="ord-dot"></span>' +
-                   '<span class="ord-nombre">' + escHtmlAdmin(i.n_nombre_producto || "—") + '</span>' +
+                   '<span class="ord-txt">' +
+                       '<span class="ord-nombre">' + escHtmlAdmin(i.n_nombre_producto || "—") + '</span>' +
+                       (det.extras ? '<span class="ord-extras">' + escHtmlAdmin(det.extras) + '</span>' : "") +
+                       (det.nota ? '<span class="ord-nota"><i class="bi bi-chat-left-text-fill"></i> ' + escHtmlAdmin(det.nota) + '</span>' : "") +
+                   '</span>' +
                    cant + '</li>';
         }).join("");
 

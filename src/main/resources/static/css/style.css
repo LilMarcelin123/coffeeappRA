@@ -535,6 +535,33 @@ header, .page-main, .footer-custom { position: relative; z-index: 1; }
     text-decoration-color: rgba(90,78,70,.55);
 }
 .ord-nombre { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Nombre arriba; extras y nota abajo, como en cocina */
+.ord-item:has(.ord-extras, .ord-nota) { align-items: flex-start; }
+.ord-item:has(.ord-extras, .ord-nota) .ord-dot { margin-top: .32rem; }
+.ord-txt {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column; gap: .12rem;
+}
+.ord-txt .ord-nombre { flex: none; }
+.ord-extras {
+    font-size: .7rem; font-style: italic; line-height: 1.35;
+    color: var(--text-muted); overflow-wrap: anywhere;
+}
+/* La nota es una instruccion: se tiene que ver de un vistazo */
+.ord-nota {
+    align-self: flex-start;
+    display: inline-flex; align-items: flex-start; gap: .3rem;
+    max-width: 100%;
+    padding: .16rem .5rem;
+    border: 1px solid rgba(180,83,9,.28);
+    border-radius: 8px;
+    background: rgba(253,230,138,.42);
+    font-size: .72rem; font-weight: 600; line-height: 1.35;
+    color: #92400E; overflow-wrap: anywhere;
+}
+.ord-nota i { font-size: .66rem; margin-top: .15rem; }
+.ord-item.is-listo .ord-nota { opacity: .6; }
 .ord-cant {
     font-size: .7rem; font-weight: 800; color: var(--cafe-dark);
     background: linear-gradient(158deg, rgba(255,255,255,.8), rgba(212,184,150,.32));
