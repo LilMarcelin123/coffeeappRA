@@ -1,0 +1,50 @@
+/* ================================================================
+   apertura.css — Apertura de caja
+   Va encima de login.css: misma tarjeta, mismos campos. Aqui solo
+   lo propio de esta pantalla.
+   ================================================================ */
+
+/* El monto es lo importante: mas grande que un campo normal */
+.apertura__monto {
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: .02em;
+}
+/* Sin flechitas del number: se teclea, no se sube de 0.50 en 0.50 */
+.apertura__monto::-webkit-outer-spin-button,
+.apertura__monto::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.apertura__monto[type=number] { -moz-appearance: textfield; appearance: textfield; }
+
+.apertura__nota {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    margin: 4px 0 18px;
+    font-size: .8rem;
+    line-height: 1.45;
+    text-align: left;
+    color: #7A5A3C;
+}
+.apertura__nota i { margin-top: 2px; color: #A0703F; }
+
+.apertura__salir {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(184, 147, 106, .25);
+    font-size: .78rem;
+    color: #8A6A4C;
+}
+.apertura__salir button {
+    border: 0;
+    background: none;
+    font: inherit;
+    color: #8A6A4C;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 8px;
+}
+.apertura__salir button:hover { color: #5C3317; background: rgba(184, 147, 106, .12); }

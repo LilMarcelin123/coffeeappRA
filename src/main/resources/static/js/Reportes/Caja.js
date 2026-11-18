@@ -112,6 +112,11 @@ function pintarResumen(r) {
     estado.abiertas = Number(r.n_ordenes_abiertas ?? 0);
 
     texto("cajaFondo",    dinero(r.p_fondo));
+    // Quien declaro el fondo al abrir la caja (apertura del dia)
+    texto("cajaFondoQuien",
+          Number(r.f_apertura ?? 0) === 1 && r.n_responsable_fondo
+              ? `${r.n_responsable_fondo} · ${r.n_hora_apertura ?? ""}`
+              : "Sin apertura registrada");
     texto("cajaEntradas", dinero(r.p_entradas));
     texto("cajaSalidas",  dinero(r.p_salidas));
 
