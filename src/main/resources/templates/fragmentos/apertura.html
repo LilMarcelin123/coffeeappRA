@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<!--
+  fragmentos/apertura.html
+  Modal fijo de apertura de caja, dentro de Inicio del administrador.
+
+  Aparece mientras no exista la apertura del dia de negocio en curso
+  (AdminController pone aperturaPendiente). No se cierra: sin boton de
+  cerrar, sin Esc y sin clic afuera. Dos pasos: capturar y confirmar.
+  El envio y los pasos viven en js/Caja/AperturaCaja.js.
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="modal" class="modal fade apertura-modal" id="modalAperturaCaja"
+     tabindex="-1" aria-labelledby="aperturaTitulo" aria-modal="true" role="dialog"
+     data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="apertura-modal__cabeza">
+                <span class="apertura-modal__icono" aria-hidden="true"><i class="bi bi-cash-coin"></i></span>
+                <div>
+                    <p class="apertura-modal__eyebrow">
+                        Nuevo día · <span th:text="${diaApertura}">18/11/2026</span>
+                    </p>
+                    <h5 class="apertura-modal__titulo" id="aperturaTitulo">Apertura de caja</h5>
+                </div>
+            </div>
+
+            <!-- Paso 1 · capturar -->
+            <form class="apertura-modal__cuerpo" id="aperturaPasoCaptura" novalidate>
+                <p class="apertura-modal__bajada">
+                    Antes de tomar órdenes, registra con cuánto <strong>cambio</strong> abre la caja hoy.
+                </p>
+
+                <label class="apertura-modal__label" for="aperturaFondo">Fondo de caja (cambio)</label>
+                <div class="apertura-modal__monto">
+                    <span aria-hidden="true">$</span>
+                    <input type="number" id="aperturaFondo" name="fondo"
+                           inputmode="decimal" min="0" max="20000" step="0.50"
+                           placeholder="0.00" autocomplete="off" required>
+                </div>
+
+                <label class="apertura-modal__label" for="aperturaResponsable">¿Quién lo registra?</label>
+                <input class="form-control apertura-modal__input" type="text"
+                       id="aperturaResponsable" name="responsable"
+                       maxlength="120" autocomplete="off"
+                       placeholder="Nombre y apellido" required>
+
+                <p class="apertura-modal__nota">
+                    <i class="bi bi-shield-check" aria-hidden="true"></i>
+                    El monto queda firmado con este nombre y no se puede cambiar después.
+                    Cuéntalo antes de guardarlo.
+                </p>
+
+                <div class="apertura-modal__error" id="aperturaError" role="alert" hidden></div>
+
+                <button type="submit" class="btn apertura-modal__btn">
+                    Continuar <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                </button>
+            </form>
+
+            <!-- Paso 2 · confirmar -->
+            <div class="apertura-modal__cuerpo" id="aperturaPasoConfirmar" hidden>
+                <p class="apertura-modal__bajada">Revisa antes de abrir. No se puede cambiar después.</p>
+
+                <div class="apertura-modal__resumen">
+                    <div>
+                        <span class="apertura-modal__label">Fondo</span>
+                        <strong class="apertura-modal__cifra" id="aperturaConfMonto">$0.00</strong>
+                    </div>
+                    <div>
+                        <span class="apertura-modal__label">Registra</span>
+                        <strong id="aperturaConfNombre">—</strong>
+                    </div>
+                </div>
+
+                <div class="apertura-modal__error" id="aperturaErrorConf" role="alert" hidden></div>
+
+                <div class="apertura-modal__acciones">
+                    <button type="button" class="btn btn-outline-secondary" id="aperturaCorregir">
+                        <i class="bi bi-pencil" aria-hidden="true"></i> Corregir
+                    </button>
+                    <button type="button" class="btn apertura-modal__btn" id="aperturaConfirmar">
+                        <i class="bi bi-unlock" aria-hidden="true"></i> Sí, abrir caja
+                    </button>
+                </div>
+            </div>
+
+            <form th:action="@{/logout}" method="post" class="apertura-modal__pie">
+                <span>Sesión: <strong th:text="${nombreUsuario}">admin</strong></span>
+                <button type="submit"><i class="bi bi-box-arrow-left" aria-hidden="true"></i> Salir</button>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

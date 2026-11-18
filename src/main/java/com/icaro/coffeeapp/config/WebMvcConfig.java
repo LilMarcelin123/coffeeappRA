@@ -15,7 +15,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // Todo lo del administrador, mas las rutas de orden que no
-        // cuelgan de /admin. La pantalla de apertura queda fuera.
+        // cuelgan de /admin. Quedan fuera Inicio (ahi esta el modal
+        // de apertura) y el registro de la apertura.
         registry.addInterceptor(aperturaCajaInterceptor)
                 .addPathPatterns(
                         "/admin/**",
@@ -23,7 +24,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/procesoInicialOrden",
                         "/api/acceso-modulo")
                 .excludePathPatterns(
-                        AperturaCajaInterceptor.PANTALLA_APERTURA,
-                        AperturaCajaInterceptor.PANTALLA_APERTURA + "/**");
+                        AperturaCajaInterceptor.INICIO,
+                        AperturaCajaInterceptor.APERTURA);
     }
 }

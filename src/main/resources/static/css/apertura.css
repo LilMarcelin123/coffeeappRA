@@ -1,50 +1,184 @@
 /* ================================================================
-   apertura.css — Apertura de caja
-   Va encima de login.css: misma tarjeta, mismos campos. Aqui solo
-   lo propio de esta pantalla.
+   apertura.css — modal fijo de apertura de caja (Inicio admin)
+   Misma familia visual que el panel: cafe, vidrio claro, Playfair
+   en el titulo. Se carga solo cuando falta la apertura del dia.
    ================================================================ */
 
-/* El monto es lo importante: mas grande que un campo normal */
-.apertura__monto {
-    font-size: 1.35rem;
-    font-weight: 600;
-    letter-spacing: .02em;
-}
-/* Sin flechitas del number: se teclea, no se sube de 0.50 en 0.50 */
-.apertura__monto::-webkit-outer-spin-button,
-.apertura__monto::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-.apertura__monto[type=number] { -moz-appearance: textfield; appearance: textfield; }
+/* Fondo mas cerrado que un modal normal: el panel no esta disponible */
+.modal-backdrop.show:has(+ .apertura-modal),
+body:has(.apertura-modal.show) .modal-backdrop.show { opacity: .72; }
 
-.apertura__nota {
+.apertura-modal .modal-dialog { max-width: 440px; }
+
+.apertura-modal .modal-content {
+    border: 1px solid rgba(184, 147, 106, .35);
+    border-radius: 24px;
+    background: linear-gradient(165deg, #FFFDF9 0%, #F6EEE4 100%);
+    box-shadow: 0 30px 70px -20px rgba(59, 31, 10, .7);
+    overflow: hidden;
+}
+
+.apertura-modal__cabeza {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 24px 26px 6px;
+}
+.apertura-modal__icono {
+    flex: 0 0 52px;
+    height: 52px;
+    display: grid;
+    place-items: center;
+    border-radius: 16px;
+    font-size: 1.5rem;
+    color: #fff;
+    background: linear-gradient(150deg, #B8936A, #5C3317);
+    box-shadow: 0 10px 22px -10px rgba(92, 51, 23, .9);
+}
+.apertura-modal__eyebrow {
+    margin: 0 0 2px;
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: #A0703F;
+}
+.apertura-modal__titulo {
+    margin: 0;
+    font-family: "Playfair Display", serif;
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: #3B1F0A;
+}
+
+.apertura-modal__cuerpo { padding: 12px 26px 6px; }
+
+.apertura-modal__bajada {
+    margin: 0 0 16px;
+    font-size: .88rem;
+    color: #6B4A2E;
+}
+
+.apertura-modal__label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    color: #5C3317;
+}
+
+/* El monto es lo importante: grande y con el signo de pesos fijo */
+.apertura-modal__monto {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 16px;
+    padding: 6px 16px;
+    border: 1.5px solid #D4B896;
+    border-radius: 14px;
+    background: #fff;
+    transition: border-color .2s, box-shadow .2s;
+}
+.apertura-modal__monto:focus-within {
+    border-color: #8B5E3C;
+    box-shadow: 0 0 0 4px rgba(184, 147, 106, .22);
+}
+.apertura-modal__monto span { font-size: 1.5rem; font-weight: 700; color: #8B5E3C; }
+.apertura-modal__monto input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: #3B1F0A;
+    font-variant-numeric: tabular-nums;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+.apertura-modal__monto input::-webkit-outer-spin-button,
+.apertura-modal__monto input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+.apertura-modal__input {
+    margin-bottom: 14px;
+    padding: 11px 14px;
+    border: 1.5px solid #D4B896;
+    border-radius: 12px;
+}
+.apertura-modal__input:focus {
+    border-color: #8B5E3C;
+    box-shadow: 0 0 0 4px rgba(184, 147, 106, .22);
+}
+
+.apertura-modal__nota {
     display: flex;
     gap: 8px;
-    align-items: flex-start;
-    margin: 4px 0 18px;
-    font-size: .8rem;
+    margin: 0 0 16px;
+    font-size: .78rem;
     line-height: 1.45;
-    text-align: left;
     color: #7A5A3C;
 }
-.apertura__nota i { margin-top: 2px; color: #A0703F; }
+.apertura-modal__nota i { margin-top: 2px; color: #A0703F; }
 
-.apertura__salir {
+.apertura-modal__error {
+    margin-bottom: 14px;
+    padding: 10px 12px;
+    border: 1px solid rgba(193, 45, 31, .28);
+    border-radius: 12px;
+    background: rgba(193, 45, 31, .08);
+    font-size: .82rem;
+    color: #B3301E;
+}
+
+.apertura-modal__btn {
+    width: 100%;
+    padding: 12px;
+    border: 0;
+    border-radius: 14px;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(135deg, #8B5E3C, #5C3317);
+    box-shadow: 0 14px 28px -14px rgba(92, 51, 23, .95);
+}
+.apertura-modal__btn:hover,
+.apertura-modal__btn:focus { color: #fff; filter: brightness(1.08); }
+.apertura-modal__btn:disabled { color: #fff; opacity: .6; }
+
+/* Paso 2 */
+.apertura-modal__resumen {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 18px;
+    padding: 16px;
+    border: 1px solid rgba(184, 147, 106, .35);
+    border-radius: 16px;
+    background: #fff;
+}
+.apertura-modal__resumen strong { display: block; color: #3B1F0A; overflow-wrap: anywhere; }
+.apertura-modal__cifra { font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+
+.apertura-modal__acciones { display: flex; gap: 10px; }
+.apertura-modal__acciones .btn { flex: 1; padding: 12px; border-radius: 14px; font-weight: 600; }
+
+.apertura-modal__pie {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 10px;
-    margin-top: 18px;
-    padding-top: 14px;
+    margin: 14px 26px 0;
+    padding: 12px 0 18px;
     border-top: 1px solid rgba(184, 147, 106, .25);
     font-size: .78rem;
     color: #8A6A4C;
 }
-.apertura__salir button {
+.apertura-modal__pie button {
     border: 0;
     background: none;
     font: inherit;
     color: #8A6A4C;
-    cursor: pointer;
     padding: 4px 6px;
     border-radius: 8px;
 }
-.apertura__salir button:hover { color: #5C3317; background: rgba(184, 147, 106, .12); }
+.apertura-modal__pie button:hover { color: #5C3317; background: rgba(184, 147, 106, .12); }

@@ -15,9 +15,10 @@ import lombok.RequiredArgsConstructor;
  * Candado de apertura de caja.
  *
  * Mientras no se haya registrado el fondo del dia de negocio en curso,
- * el administrador no puede entrar a Inicio, tomar ordenes ni abrir
- * ningun modulo: cualquier pantalla lo manda a /admin/apertura, y
- * cualquier llamada de fondo (fetch) recibe 428 con el motivo.
+ * el administrador no puede tomar ordenes ni abrir ningun modulo:
+ * cualquier pantalla lo regresa a Inicio, donde el modal fijo de
+ * apertura le pide el fondo, y cualquier llamada de fondo (fetch)
+ * recibe 428 con el motivo.
  *
  * Las pantallas de cocina y de area NO pasan por aqui: no toman
  * ordenes, y la tele de cocina no debe quedarse trabada esperando
@@ -27,7 +28,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AperturaCajaInterceptor implements HandlerInterceptor {
 
-    static final String PANTALLA_APERTURA = "/admin/apertura";
+    /** Donde vive el modal de apertura. */
+    static final String INICIO   = "/admin/inicio";
+    /** Donde se registra la apertura. */
+    static final String APERTURA = "/admin/apertura";
 
     private final AperturaCajaService aperturaCajaService;
 
@@ -39,7 +43,7 @@ public class AperturaCajaInterceptor implements HandlerInterceptor {
         if (aperturaCajaService.cajaAbiertaHoy()) return true;
 
         if (esNavegacion(request)) {
-            response.sendRedirect(request.getContextPath() + PANTALLA_APERTURA);
+            response.sendRedirect(request.getContextPath() + INICIO);
         } else {
             response.setStatus(428); // Precondition Required
             response.setContentType("application/json");
@@ -47,7 +51,7 @@ public class AperturaCajaInterceptor implements HandlerInterceptor {
             response.getWriter().write(
                 "{\"resultado\":0,\"apertura\":false,"
               + "\"mensaje\":\"Primero registra el fondo de caja del dia.\","
-              + "\"redirect\":\"" + PANTALLA_APERTURA + "\"}");
+              + "\"redirect\":\"" + INICIO + "\"}");
         }
         return false;
     }
