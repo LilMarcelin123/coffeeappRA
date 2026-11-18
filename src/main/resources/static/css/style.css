@@ -484,6 +484,8 @@ header, .page-main, .footer-custom { position: relative; z-index: 1; }
 .ord-head { display: flex; align-items: center; gap: .45rem; margin-bottom: .35rem; }
 .ord-check { display: flex; margin: 0; }
 .ord-num { font-weight: 800; font-size: .95rem; color: var(--cafe-deep); letter-spacing: -.01em; }
+.ord-personaje { display: inline-flex; }
+.ord-personaje:empty { display: none; }
 .ord-wa {
     display: inline-flex; align-items: center; justify-content: center;
     width: 20px; height: 20px; border-radius: 50%;

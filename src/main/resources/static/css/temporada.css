@@ -529,3 +529,33 @@ body:not([data-tema="navidad"]) .temporada-banda--navidad { display: none; }
     .tbn-luces__foco:nth-child(n+10) { display: none; }
     .tbn-copo:nth-child(2n) { display: none; }
 }
+
+
+/* ================================================================
+   PERSONAJE POR ORDEN
+   Complemento del numero de orden (PersonajesOrden.js). Va junto al
+   folio, nunca en su lugar. Circulo crema detras para que se vea
+   igual sobre el encabezado normal y sobre el rojo de "critica".
+   ================================================================ */
+.personaje-orden {
+    flex: 0 0 auto;
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    padding: 2px;
+    border-radius: 50%;
+    background: rgba(255, 252, 247, .92);
+    box-shadow: 0 0 0 1px rgba(139, 94, 60, .18), 0 3px 8px -4px rgba(59, 31, 10, .5);
+    object-fit: contain;
+    vertical-align: middle;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+/* Administracion (tarjetas de pendientes) */
+.personaje-orden--admin  { width: 26px; height: 26px; }
+/* Cocina: se ve de lejos en la tele */
+.personaje-orden--cocina { width: 38px; height: 38px; padding: 3px; margin-left: .15rem; }
+
+@media (max-width: 575.98px) {
+    .personaje-orden--cocina { width: 32px; height: 32px; }
+}

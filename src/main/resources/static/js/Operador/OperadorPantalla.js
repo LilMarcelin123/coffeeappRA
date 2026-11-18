@@ -350,6 +350,7 @@ function actualizarCabeceraCard(card, orden) {
     const folio = orden.n_folio_dia != null ? orden.n_folio_dia : orden.id_orden;
     card.querySelector(".orden-id-val").textContent = `Orden #${folio}`;
 
+
     const hora = orden.t_hora_creacion
         ? String(orden.t_hora_creacion).replace("T", " ").substring(11, 16)
         : "—";
@@ -369,6 +370,13 @@ function actualizarCabeceraCard(card, orden) {
         elCli.innerHTML = '<i class="bi bi-person-fill"></i> ' + nombreCli;
     } else if (elCli) {
         elCli.remove();
+    }
+
+    // Personaje de temporada pegado al numero: el mismo que ve Administracion.
+    // Va despues del cliente para que el nombre no se meta en medio.
+    if (window.PersonajeOrden) {
+        window.PersonajeOrden.pintar(card.querySelector(".orden-num"), folio, "cocina",
+                                     card.querySelector(".orden-id-val"));
     }
 
     // ── Tipo de consumo: mismo dato que ve Administracion ──

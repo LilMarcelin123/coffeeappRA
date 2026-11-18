@@ -481,6 +481,7 @@
 </th:block>
 
 <th:block th:unless="${aperturaPendiente}">
+    <script th:src="@{/js/Temporada/PersonajesOrden.js}"></script>
     <script type="module" th:src="@{/js/Ordenes/TomaOrden.js}"></script>
     <script type="module" th:src="@{/js/Compras/ComprasInicio.js}"></script>
     <script th:src="@{/js/Ordenes/ActualizacionEstatus.js}"></script>

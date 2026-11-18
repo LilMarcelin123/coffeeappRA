@@ -584,6 +584,7 @@ function pintarTarjetasPendientes(lista, items) {
             '<header class="ord-head">' +
                 '<label class="ord-check"><input type="checkbox" class="chkRow form-check-input"></label>' +
                 '<span class="ord-num">#' + folio + '</span>' +
+                '<span class="ord-personaje"></span>' +
                 (esWa ? '<span class="ord-wa" title="Pedido por WhatsApp"><i class="bi bi-whatsapp"></i></span>' : "") +
                 '<span class="ord-hora">' + String(o.t_hora_creacion || "").replace("T", " ").substring(11, 16) + '</span>' +
             '</header>' +
@@ -596,6 +597,11 @@ function pintarTarjetasPendientes(lista, items) {
                     ? '<span class="ord-estado ord-estado--ok"><i class="bi bi-check-circle-fill"></i> COMPLETA</span>'
                     : '<span class="ord-estado">' + listos + " / " + total + '</span>') +
             '</footer>';
+
+        // Personaje de temporada junto al numero (complemento, no reemplazo)
+        if (window.PersonajeOrden) {
+            window.PersonajeOrden.pintar(card.querySelector(".ord-personaje"), folio, "admin");
+        }
 
         if (esWa) {
             const acc = document.createElement("div");
