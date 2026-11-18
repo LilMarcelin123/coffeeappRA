@@ -367,7 +367,10 @@ function actualizarCabeceraCard(card, orden) {
             if (cab && cab.parentNode) cab.parentNode.insertBefore(elCli, cab.nextSibling);
             else card.appendChild(elCli);
         }
-        elCli.innerHTML = '<i class="bi bi-person-fill"></i> ' + nombreCli;
+        // El nombre puede venir de afuera (perfil de WhatsApp): se pinta
+        // como texto, nunca como HTML (POL-ID-001, PS-7).
+        elCli.innerHTML = '<i class="bi bi-person-fill"></i> ';
+        elCli.appendChild(document.createTextNode(nombreCli));
     } else if (elCli) {
         elCli.remove();
     }
