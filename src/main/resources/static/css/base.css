@@ -1,0 +1,161 @@
+/* ================================================================
+   base.css — Base visual común · El Rincón en las Arboledas
+
+   Tokens de marca y componentes que comparten las pantallas, para
+   que todo lo nuevo salga igual sin rehacer estilos en cada hoja:
+     · tokens (color, radio, sombra, capas, foco)
+     · avisos (Toast de Bootstrap) ........ js/Comun/Avisos.js
+     · pestañas de sección (Tabs de Bootstrap)
+     · botón ocupado (no se puede mandar dos veces)
+     · encabezado de página compacto
+
+   Se carga ANTES de la hoja propia de cada pantalla, así que esa
+   hoja puede seguir sobrescribiendo lo que necesite. Puntos de
+   corte: los de Bootstrap 5 (sm 576 · md 768 · lg 992).
+   ================================================================ */
+
+:root {
+    /* Marca */
+    --rincon-cafe-ink:   #3B1F0A;
+    --rincon-cafe-deep:  #5C3317;
+    --rincon-cafe-dark:  #8B5E3C;
+    --rincon-cafe-mid:   #B8936A;
+    --rincon-cafe-light: #D4B896;
+    --rincon-crema:      #FFFCF7;
+    --rincon-texto:      #1A0F08;
+    --rincon-texto-suave:#7A5A3C;
+
+    /* Estados */
+    --rincon-exito:  #15803D;
+    --rincon-aviso:  #B45309;
+    --rincon-error:  #B91C1C;
+    --rincon-info:   #1D4ED8;
+
+    /* Forma */
+    --rincon-radio-sm: 10px;
+    --rincon-radio:    14px;
+    --rincon-radio-lg: 20px;
+    --rincon-sombra:   0 10px 26px -16px rgba(59, 31, 10, .55);
+    --rincon-foco:     0 0 0 3px rgba(184, 147, 106, .45);
+
+    /* Capas (Bootstrap: offcanvas 1045, modal 1055, toast 1090) */
+    --rincon-z-pegajoso: 1020;
+}
+
+/* ── Foco visible y consistente en todo lo interactivo ───────── */
+:where(a, button, [role="tab"], input, select, textarea):focus-visible {
+    outline: none;
+    box-shadow: var(--rincon-foco);
+}
+
+/* ── Avisos (Toast de Bootstrap) ─────────────────────────────── */
+.rincon-avisos {
+    z-index: 1090;
+    max-width: min(420px, calc(100vw - 24px));
+}
+.rincon-aviso.toast {
+    --bs-toast-bg: rgba(255, 252, 247, .97);
+    --bs-toast-border-color: rgba(139, 94, 60, .18);
+    --bs-toast-border-radius: var(--rincon-radio);
+    --bs-toast-box-shadow: 0 18px 40px -18px rgba(59, 31, 10, .6);
+    --bs-toast-max-width: 100%;
+    font-family: 'Poppins', system-ui, sans-serif;
+    color: var(--rincon-texto);
+    border-left: 5px solid var(--rincon-aviso-color, var(--rincon-info));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+.rincon-aviso .toast-body {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 12px 12px 14px;
+    font-size: .86rem;
+    line-height: 1.4;
+}
+.rincon-aviso__icono { font-size: 1.15rem; line-height: 1.2; color: var(--rincon-aviso-color); }
+.rincon-aviso__texto { flex: 1; overflow-wrap: anywhere; }
+.rincon-aviso .btn-close { flex: 0 0 auto; margin-top: 2px; font-size: .7rem; }
+.rincon-aviso--exito       { --rincon-aviso-color: var(--rincon-exito); }
+.rincon-aviso--error       { --rincon-aviso-color: var(--rincon-error); }
+.rincon-aviso--advertencia { --rincon-aviso-color: var(--rincon-aviso); }
+.rincon-aviso--info        { --rincon-aviso-color: var(--rincon-info); }
+
+/* ── Botón ocupado: se ve que está trabajando y no acepta otro clic ── */
+.is-ocupado {
+    pointer-events: none;
+    opacity: .7;
+    cursor: progress;
+}
+
+/* ── Pestañas de sección (Tabs de Bootstrap) ─────────────────── */
+.rincon-pestanas {
+    position: sticky;
+    top: 0;
+    z-index: var(--rincon-z-pegajoso);
+    display: flex;
+    gap: 6px;
+    margin: 0 0 18px;
+    padding: 6px;
+    border: 1px solid rgba(139, 94, 60, .16);
+    border-radius: var(--rincon-radio-lg);
+    background: rgba(255, 252, 247, .9);
+    box-shadow: var(--rincon-sombra);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+.rincon-pestanas::-webkit-scrollbar { display: none; }
+
+.rincon-pestana {
+    flex: 1 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;                    /* objetivo táctil */
+    padding: 8px 16px;
+    border: 0;
+    border-radius: var(--rincon-radio);
+    background: transparent;
+    font: 600 .86rem/1 'Poppins', system-ui, sans-serif;
+    color: var(--rincon-texto-suave);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background .2s ease, color .2s ease;
+}
+.rincon-pestana i { font-size: 1.05rem; }
+.rincon-pestana:hover { background: rgba(184, 147, 106, .12); color: var(--rincon-cafe-deep); }
+.rincon-pestana.active {
+    color: #fff;
+    background: linear-gradient(135deg, var(--rincon-cafe-dark), var(--rincon-cafe-deep));
+    box-shadow: 0 8px 18px -10px rgba(92, 51, 23, .9);
+}
+.rincon-pestana__num {
+    min-width: 20px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: rgba(139, 94, 60, .14);
+    font-size: .7rem;
+    font-variant-numeric: tabular-nums;
+}
+.rincon-pestana.active .rincon-pestana__num { background: rgba(255, 255, 255, .22); }
+.rincon-pestana__num:empty { display: none; }
+
+@media (max-width: 575.98px) {
+    .rincon-pestana { flex: 0 0 auto; padding: 8px 12px; font-size: .8rem; }
+}
+
+/* ── Encabezado de página compacto ───────────────────────────── */
+/* Menos título y más espacio de trabajo: el nombre de la pantalla
+   se lee igual a la mitad de tamaño. */
+.header-block--compacto { margin-top: 20px !important; }
+.header-block--compacto .header-main-title { font-size: clamp(1.6rem, 3.2vw, 2.2rem) !important; margin-bottom: 0 !important; }
+.header-block--compacto .header-eyebrow   { margin-bottom: 4px !important; }
+.header-block--compacto .header-divider   { margin-top: 8px !important; }
+.header-block--compacto .header-logo      { width: 44px !important; height: 44px !important; }
+
+@media (prefers-reduced-motion: reduce) {
+    .rincon-pestana, .rincon-aviso.toast { transition: none; }
+}

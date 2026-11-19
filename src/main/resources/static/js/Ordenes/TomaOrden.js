@@ -1,4 +1,5 @@
 import { mensajesAlert, mostrarConfirmacion2 } from '../FuncionesGenerales.js';
+import { avisar, ocupar } from '../Comun/Avisos.js';
 
 let modalConfirmCerrar  = null;
 let modalConfirmReabrir = null;
@@ -55,6 +56,9 @@ $(document).ready(function () {
         });
     }
 
+    // ── Nueva orden (boton principal de la cabecera) ─────────
+    $("#btnNuevaOrden").on("click", function () { iniciarOrden(this); });
+
     // ── CAMBIO 3: Toda la tarjeta es clickeable via data-modulo ──
     //    Las tarjetas con .modulo-disabled son ignoradas por CSS
     //    (pointer-events: none), pero se agrega también una guarda JS.
@@ -66,25 +70,11 @@ $(document).ready(function () {
 
         switch (modulo) {
 
-            // ── Toma de ordenes — SIN contrasena ─────────────
+            // ── Toma de ordenes — directo, sin confirmacion ──
+            // Si queda una orden vacia abierta, el servidor la reusa:
+            // entrar no deja basura, asi que no hace falta preguntar.
             case "orden":
-                mostrarConfirmacion2(
-                    "¿Seguro que quieres iniciar una orden?",
-                    () => {
-                        $.ajax({
-                            url: "/procesoInicialOrden",
-                            type: "GET",
-                            data: { tipoProceso: 1 },
-                            success: function (data) {
-                                window.location.href = "/admin/tomaOrden?idOrden=" + data.idOrden;
-                            },
-                            error: function () {
-                                alert("No se pudo iniciar la orden, intenta de nuevo.");
-                            }
-                        });
-                    },
-                    () => { console.log("cancelado"); }
-                );
+                iniciarOrden(this);
                 break;
 
 			// ── Gestion catalogo — SIN contrasena ────────────
@@ -92,7 +82,7 @@ $(document).ready(function () {
 				mostrarConfirmacion2(
 					"¿Seguro que quieres modificar el catálogo?",
 					() => { window.location.href = "/admin/gestionCatalogo"; },
-					() => { console.log("cancelado"); }
+					() => {}
 				);
 				break;
 
@@ -211,7 +201,7 @@ $(document).ready(function () {
     $("#btnReabrirSeleccionadas").on("click", function () {
         const ids = obtenerIdsSeleccionados();
         if (ids.length === 0) return;
-        if (ids.length > 1) { alert("Solo puedes reabrir una orden a la vez."); return; }
+        if (ids.length > 1) { avisar("Solo puedes reabrir una orden a la vez.", "advertencia"); return; }
         renderListaReabrir(ids);
         modalConfirmReabrir = abrirModalSeguro("modalConfirmReabrir");
     });
@@ -454,6 +444,38 @@ function _resetAccesoModal() {
 }
 
 // ════════════════════════════════════════════════════════════
+// NUEVA ORDEN
+// Un solo camino para el boton de la cabecera y la tarjeta del
+// modulo. Mientras responde el servidor no acepta otro clic, para
+// no abrir dos ordenes.
+// ════════════════════════════════════════════════════════════
+let iniciandoOrden = false;
+
+function iniciarOrden(origen) {
+    if (iniciandoOrden) return;
+    iniciandoOrden = true;
+
+    const boton   = origen && origen.tagName === "BUTTON" ? origen : null;
+    const liberar = boton ? ocupar(boton, "Abriendo…") : () => {};
+    if (!boton && origen) origen.classList.add("is-ocupado");
+
+    $.ajax({
+        url: "/procesoInicialOrden",
+        type: "GET",
+        data: { tipoProceso: 1 },
+        success: function (data) {
+            window.location.href = "/admin/tomaOrden?idOrden=" + data.idOrden;
+        },
+        error: function () {
+            iniciandoOrden = false;
+            liberar();
+            if (!boton && origen) origen.classList.remove("is-ocupado");
+            avisar("No se pudo iniciar la orden. Revisa la conexión e intenta de nuevo.", "error");
+        }
+    });
+}
+
+// ════════════════════════════════════════════════════════════
 // TABLA ORDENES PENDIENTES
 // ════════════════════════════════════════════════════════════
 
@@ -470,7 +492,7 @@ function cargarPendientes() {
         url: "/admin/orden/pendientes",
         type: "GET",
         success: function (lista) { renderPendientes(lista); },
-        error: function (xhr) { console.log("Error pendientes:", xhr.responseText); }
+        error: function (xhr) { console.error("Error pendientes:", xhr.responseText); }
     });
 }
 
@@ -488,6 +510,24 @@ function renderPendientes(lista) {
  *   "Nutella x1, Fresa x1 | Nota: sin azucar"   o   " | Nota: tibio"
  * Aqui se separan para pintar la nota aparte y que no se pierda.
  */
+/**
+ * Minutos de espera, con los mismos umbrales que la pantalla de
+ * cocina (OperadorPantalla.js): aviso a los 15 min y critica al 65 %
+ * del tramo 15→60 (≈ 44 min). Antes de 15 no se muestra nada.
+ */
+const ESPERA_AVISO_MIN   = 15;
+const ESPERA_CRITICA_MIN = ESPERA_AVISO_MIN + Math.round((60 - ESPERA_AVISO_MIN) * 0.65);
+
+function tiempoEsperaHtml(ts) {
+    const d = new Date(String(ts || "").replace(" ", "T"));
+    if (isNaN(d.getTime())) return "";
+    const mins = Math.max(0, Math.floor((Date.now() - d.getTime()) / 60000));
+    if (mins < ESPERA_AVISO_MIN) return "";
+    const critica = mins >= ESPERA_CRITICA_MIN;
+    return '<span class="ord-espera' + (critica ? " ord-espera--critica" : "") +
+           '" title="Tiempo esperando"><i class="bi bi-hourglass-split"></i> ' + mins + ' min</span>';
+}
+
 function separarExtrasYNota(texto) {
     const t = String(texto || "");
     const i = t.indexOf("| Nota:");
@@ -536,6 +576,10 @@ function pintarTarjetasPendientes(lista, items) {
         actualizarBotonesAccion();
         return;
     }
+
+    // Igual que cocina: la que lleva mas tiempo esperando va primero.
+    lista = lista.slice().sort((a, b) =>
+        String(a.t_hora_creacion || "").localeCompare(String(b.t_hora_creacion || "")));
 
     lista.forEach(o => {
         const id     = o.id_orden;
@@ -586,6 +630,7 @@ function pintarTarjetasPendientes(lista, items) {
                 '<span class="ord-num">#' + folio + '</span>' +
                 '<span class="ord-personaje"></span>' +
                 (esWa ? '<span class="ord-wa" title="Pedido por WhatsApp"><i class="bi bi-whatsapp"></i></span>' : "") +
+                tiempoEsperaHtml(o.t_hora_creacion) +
                 '<span class="ord-hora">' + String(o.t_hora_creacion || "").replace("T", " ").substring(11, 16) + '</span>' +
             '</header>' +
             tcHtml +
@@ -688,8 +733,8 @@ function cerrarOrdenes(ids) {
         })
         .fail(function (xhr) {
             $("#btnConfirmarCerrar").prop("disabled", false);
-            console.log("Error cerrando:", xhr.responseText);
-            alert("No se pudieron cerrar una o mas ordenes.");
+            console.error("Error cerrando:", xhr.responseText);
+            avisar("No se pudieron cerrar una o más órdenes. Revisa la conexión e intenta de nuevo.", "error");
         });
 }
 
@@ -704,7 +749,7 @@ function reabrirOrdenes(ids) {
         error: function (xhr) {
             $("#btnConfirmarReabrir").prop("disabled", false);
             console.error("Error reabriendo:", xhr.responseText);
-            alert("No se pudo reabrir la orden.");
+            avisar("No se pudo reabrir la orden.", "error");
         }
     });
 }

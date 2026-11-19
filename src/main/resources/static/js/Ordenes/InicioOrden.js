@@ -1,4 +1,5 @@
 import { mensajesAlert, mostrarConfirmacion } from '../FuncionesGenerales.js';
+import { avisar } from '../Comun/Avisos.js';
 
 // ─────────────────────────────────────────────────────────────
 // CONSTANTES Y CONFIGURACIÓN
@@ -67,7 +68,7 @@ function validarItemParaAgregar() {
     const idProducto = $selectProducto().val();
     const cantidad   = parseInt($cantidadProducto().val(), 10);
     if (!idProducto || !cantidad || cantidad < 1) {
-        alert('Selecciona un producto e ingresa una cantidad válida.');
+        avisar('Selecciona un producto e ingresa una cantidad válida.', 'advertencia');
         return false;
     }
     return true;
@@ -293,13 +294,22 @@ function eliminarItem(idOrdenItem) {
         success: () => cargarResumenOrden(),
         error: function (xhr) {
             console.error('Error eliminando item:', xhr.responseText);
-            alert('No se pudo eliminar el producto.');
+            avisar('No se pudo eliminar el producto.', 'error');
         },
     });
 }
 
+let agregandoItem = false;
+
 function agregarItemOrden() {
+    if (agregandoItem) return;          // evita agregar el mismo producto dos veces
     if (!validarItemParaAgregar()) return;
+    agregandoItem = true;
+    $btnAñadeItem().prop('disabled', true).addClass('is-ocupado');
+    const liberar = () => {
+        agregandoItem = false;
+        $btnAñadeItem().prop('disabled', false).removeClass('is-ocupado');
+    };
 
     const payload = {
         idOrden:          $idOrden().val(),
@@ -311,8 +321,8 @@ function agregarItemOrden() {
 
     $.ajax({
         url: ENDPOINTS.agregarItem, type: 'POST', data: payload,
-        success: function (data) {
-            console.log('Item agregado:', data);
+        success: function () {
+            liberar();
             limpiarFormulario();
             $btnConfirmaOrden().prop('disabled', false).show();
             cargarResumenOrden();
@@ -321,8 +331,9 @@ function agregarItemOrden() {
             guardarNombreClienteSilencioso();
         },
         error: function (xhr) {
+            liberar();
             console.error('Error al agregar item:', xhr.responseText);
-            alert('No se pudo agregar el producto a la orden.');
+            avisar('No se pudo agregar el producto a la orden.', 'error');
         },
     });
 }
@@ -390,7 +401,6 @@ function confirmarOrden() {
                 fallo(resp);
                 return;
             }
-            console.log('Preparaciones generadas:', resp.filas);
             window.location.href = ENDPOINTS.redireccionInicio;
         }, function (xhr) {
             fallo(xhr && xhr.responseText ? xhr.responseText : xhr);
@@ -491,7 +501,7 @@ function registrarEventos() {
         mostrarConfirmacion(
             '¿Confirmas el envío de la orden a cocina?',
             confirmarOrden,
-            () => console.log('Envío cancelado por el usuario.')
+            () => {}
         );
     });
 }

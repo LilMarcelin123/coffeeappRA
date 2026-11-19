@@ -174,7 +174,8 @@
 
     function notificar(tipo, mensaje) {
         if (typeof window.mensajesAlert === "function") window.mensajesAlert(tipo, mensaje);
-        else { console.log(`[${tipo}] ${mensaje}`); if (tipo === "error") alert(mensaje); }
+        else if (window.Avisos) { window.Avisos.avisar(mensaje, tipo === "error" ? "error" : (tipo === "success" || tipo === "exito" ? "exito" : "info")); }
+        else if (tipo === "error") { console.error(mensaje); }
     }
 
     function abrirModal(orden) {

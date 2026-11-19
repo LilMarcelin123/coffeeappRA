@@ -1,4 +1,5 @@
 import { initCaja } from './Caja.js';
+import { avisar } from '../Comun/Avisos.js';
 
 const API = {
     detalle : "/admin/reportes/detalle",
@@ -185,7 +186,7 @@ function cargarCorte() {
         error(xhr) {
             setBotonCargando(btn, false, '<i class="bi bi-play-circle-fill"></i> Generar corte');
             console.error("Error corte:", xhr.responseText);
-            alert("No se pudo generar el corte.");
+            avisar("No se pudo generar el corte.", "error");
         },
     });
 }
@@ -258,7 +259,7 @@ async function descargarExcel(idTipoPago, btnEl) {
         URL.revokeObjectURL(objectURL);
     } catch (err) {
         console.error("Error al descargar Excel:", err);
-        alert("No se pudo generar el Excel. Intenta de nuevo.");
+        avisar("No se pudo generar el Excel. Intenta de nuevo.", "error");
     } finally {
         setBotonCargando(btnEl, false, textoOriginal);
     }
